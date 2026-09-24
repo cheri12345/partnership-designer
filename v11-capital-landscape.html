@@ -1,0 +1,1264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Round 11: Your Capital Landscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v2-shared.css" />
+<style>
+  /* black & white only for this round — teal redefined near-black so any
+     shared classes we do borrow (buttons, focus rings) stay monochrome */
+  :root {
+    --teal: 0 0% 9%;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  body.scroll-unlocked {
+    height: auto;
+    min-height: 100%;
+    display: block;
+    overflow: visible;
+  }
+
+  .topbar { flex-shrink: 0; }
+
+  .proto-note {
+    font-size: 0.72rem;
+    color: hsl(var(--stone));
+    letter-spacing: 0.01em;
+  }
+
+  @media (max-width: 640px) {
+    .proto-note { display: none; }
+  }
+
+  main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .screen {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0 40px 28px;
+  }
+
+  /* ---------- head ---------- */
+
+  .landscape-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding: 4px 0 18px;
+  }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    color: hsl(var(--stone));
+    margin: 0 0 6px;
+  }
+
+  .landscape-head h1 {
+    font-size: clamp(1.5rem, 2.6vw, 2.05rem);
+    line-height: 1.15;
+    max-width: 620px;
+  }
+
+  .landscape-head .sub {
+    margin: 8px 0 0;
+    color: hsl(var(--stone));
+    font-size: 0.95rem;
+    max-width: 520px;
+  }
+
+  .mode-toggle {
+    display: inline-flex;
+    border: 1px solid hsl(var(--border));
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .mode-btn {
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: hsl(var(--stone));
+    padding: 7px 15px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .mode-btn[aria-selected="true"] {
+    background: hsl(var(--ink));
+    color: hsl(var(--paper));
+  }
+
+  .mode-btn:not([aria-selected="true"]):hover {
+    color: hsl(var(--ink));
+  }
+
+  /* ---------- canvas + detail split ---------- */
+
+  .canvas-shell {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    gap: 20px;
+  }
+
+  .canvas-wrap {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    border: 1px solid hsl(var(--border));
+    border-radius: 16px;
+    background:
+      radial-gradient(hsl(var(--ink) / 0.07) 1px, transparent 1px);
+    background-size: 24px 24px;
+    overflow: hidden;
+  }
+
+  .guide-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .guide-ring {
+    fill: none;
+    stroke: hsl(var(--ink) / 0.1);
+    stroke-width: 1;
+  }
+
+  .guide-spoke {
+    stroke: hsl(var(--ink) / 0.06);
+    stroke-width: 1;
+  }
+
+  .conn-line {
+    stroke: hsl(var(--ink) / 0.32);
+    stroke-width: 1.25;
+  }
+
+  .conn-line.is-unexpected {
+    stroke-dasharray: 3 4;
+    stroke: hsl(var(--ink) / 0.4);
+  }
+
+  .conn-dot {
+    fill: hsl(var(--paper));
+    stroke: hsl(var(--ink) / 0.5);
+    stroke-width: 1.25;
+  }
+
+  .sweep-line {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg, hsl(var(--ink) / 0.55), transparent);
+    transform-origin: 0 50%;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .sweep-line.is-active {
+    opacity: 1;
+    animation: sweep 1.7s linear 1;
+  }
+
+  @keyframes sweep {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* ---------- org node ---------- */
+
+  .org-node {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 3;
+    text-align: center;
+  }
+
+  .org-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: hsl(var(--ink));
+    box-shadow:
+      0 0 0 5px hsl(var(--paper)),
+      0 0 0 6px hsl(var(--ink) / 0.18);
+  }
+
+  .org-name {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.86rem;
+    max-width: 140px;
+    line-height: 1.2;
+  }
+
+  /* ---------- signal nodes ---------- */
+
+  .signal-node {
+    position: absolute;
+    transform: translate(-50%, -50%) scale(0.85);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: hsl(var(--paper));
+    border: 1px solid hsl(var(--border));
+    border-radius: 999px;
+    padding: 7px 13px 7px 10px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    z-index: 2;
+    opacity: 0;
+    transition: left 0.5s cubic-bezier(.4,.1,.2,1), top 0.5s cubic-bezier(.4,.1,.2,1),
+                transform 0.2s ease, opacity 0.4s ease, border-color 0.2s ease,
+                box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  .signal-node.is-in {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .signal-node:hover,
+  .signal-node:focus-visible {
+    border-color: hsl(var(--ink) / 0.5);
+    outline: none;
+  }
+
+  .signal-node.is-selected {
+    background: hsl(var(--ink));
+    color: hsl(var(--paper));
+    border-color: hsl(var(--ink));
+    box-shadow: 0 6px 18px hsl(var(--ink) / 0.18);
+  }
+
+  .signal-node.is-selected .signal-label { color: hsl(var(--paper)); }
+
+  .canvas-wrap.has-selection .signal-node:not(.is-selected) {
+    opacity: 0.42;
+  }
+
+  .signal-glyph {
+    width: 9px;
+    height: 9px;
+    flex-shrink: 0;
+    border: 1.4px solid currentColor;
+    background: transparent;
+  }
+
+  .glyph-funding { border-radius: 50%; }
+  .glyph-capital { border-radius: 2px; }
+  .glyph-investment {
+    width: 0; height: 0;
+    border: none;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 8px solid currentColor;
+  }
+  .glyph-partnership {
+    border-radius: 2px;
+    transform: rotate(45deg);
+  }
+
+  .signal-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: hsl(var(--ink));
+  }
+
+  .signal-node.rel-high .signal-label { font-size: 0.88rem; }
+  .signal-node.rel-low .signal-label { font-size: 0.78rem; }
+
+  .signal-node.is-unexpected {
+    border-style: dashed;
+  }
+
+  .signal-flag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: hsl(var(--ink));
+    background: hsl(var(--ink) / 0.08);
+    border-radius: 999px;
+    padding: 2px 7px;
+  }
+
+  .signal-node.is-selected .signal-flag {
+    background: hsl(var(--paper) / 0.2);
+    color: hsl(var(--paper));
+  }
+
+  .signal-node.is-unexpected::before {
+    content: "\2726";
+    position: absolute;
+    top: -7px;
+    right: -6px;
+    font-size: 0.62rem;
+    color: hsl(var(--ink));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .signal-node { transition: opacity 0.2s ease; }
+    .sweep-line.is-active { animation: none; opacity: 0.5; }
+  }
+
+  /* ---------- detail panel (desktop) ---------- */
+
+  .detail-panel {
+    width: 340px;
+    flex-shrink: 0;
+    border: 1px solid hsl(var(--border));
+    border-radius: 16px;
+    padding: 22px;
+    overflow-y: auto;
+    display: none;
+    flex-direction: column;
+  }
+
+  .detail-panel.is-open { display: flex; }
+
+  .detail-empty {
+    margin: auto 0;
+    color: hsl(var(--stone));
+    font-size: 0.88rem;
+    text-align: center;
+  }
+
+  .detail-tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: hsl(var(--stone));
+    margin-bottom: 8px;
+  }
+
+  .detail-panel h3 {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-size: 1.15rem;
+    margin: 0 0 10px;
+  }
+
+  .detail-desc {
+    font-size: 0.9rem;
+    color: hsl(var(--ink) / 0.85);
+    line-height: 1.5;
+    margin: 0 0 16px;
+  }
+
+  .why-heading {
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+
+  .why-reasons {
+    list-style: none;
+    margin: 0 0 18px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .why-reasons li {
+    font-size: 0.86rem;
+    color: hsl(var(--ink) / 0.8);
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .why-reasons li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: hsl(var(--ink) / 0.5);
+  }
+
+  .detail-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 14px;
+  }
+
+  .btn-primary,
+  .btn-ghost {
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 11px 14px;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .btn-primary {
+    background: hsl(var(--ink));
+    color: hsl(var(--paper));
+    border: 1px solid hsl(var(--ink));
+  }
+
+  .btn-primary:hover { background: hsl(var(--ink) / 0.85); }
+
+  .btn-ghost {
+    background: transparent;
+    color: hsl(var(--ink));
+    border: 1px solid hsl(var(--border));
+  }
+
+  .btn-ghost:hover { border-color: hsl(var(--ink) / 0.4); }
+
+  .detail-close {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    font-size: 0.78rem;
+    color: hsl(var(--stone));
+    cursor: pointer;
+    margin-bottom: 6px;
+    padding: 0;
+  }
+
+  .panel-back {
+    background: none;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: hsl(var(--stone));
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 14px;
+    align-self: flex-start;
+  }
+
+  /* ---------- designer split (desktop) ---------- */
+
+  .designer-split {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .designer-split[hidden] { display: none; }
+
+  .back-link {
+    align-self: flex-start;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: hsl(var(--stone));
+    cursor: pointer;
+    padding: 0 0 12px;
+  }
+
+  .back-link:hover { color: hsl(var(--ink)); }
+
+  .designer-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+  }
+
+  .designer-context,
+  .designer-draft {
+    border: 1px solid hsl(var(--border));
+    border-radius: 16px;
+    padding: 22px;
+    overflow-y: auto;
+  }
+
+  .designer-context h3,
+  .designer-draft h3 {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+
+  .designer-context .detail-desc { margin-bottom: 14px; }
+
+  .draft-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .status-pill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border-radius: 999px;
+    padding: 4px 10px;
+    border: 1px solid hsl(var(--border));
+    background: none;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .status-pill.is-sent {
+    background: hsl(var(--ink));
+    color: hsl(var(--paper));
+    border-color: hsl(var(--ink));
+  }
+
+  .draft-export {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: hsl(var(--stone));
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: auto;
+  }
+
+  .draft-export:hover { color: hsl(var(--ink)); }
+
+  .doc-section { margin-bottom: 20px; }
+
+  .doc-section label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .doc-section textarea {
+    width: 100%;
+    min-height: 88px;
+    font-family: inherit;
+    font-size: 0.87rem;
+    line-height: 1.5;
+    padding: 10px 12px;
+    border: 1px solid hsl(var(--border));
+    border-radius: 8px;
+    resize: vertical;
+  }
+
+  .redraft-link {
+    background: none;
+    border: none;
+    font-size: 0.75rem;
+    color: hsl(var(--stone));
+    cursor: pointer;
+    padding: 4px 0 0;
+  }
+
+  .redraft-link:hover { color: hsl(var(--ink)); text-decoration: underline; }
+
+  /* ---------- mobile ---------- */
+
+  @media (max-width: 860px) {
+    .screen { padding: 0 18px 18px; }
+
+    .landscape-head { align-items: flex-start; }
+
+    .canvas-shell { position: relative; }
+
+    .signal-node {
+      max-width: 128px;
+      white-space: normal;
+      padding: 6px 10px 6px 9px;
+    }
+
+    .signal-label { white-space: normal; line-height: 1.22; }
+
+    .detail-panel { display: none !important; }
+
+    .sheet-scrim {
+      position: fixed;
+      inset: 0;
+      background: hsl(var(--ink) / 0.35);
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .sheet-scrim.is-open { opacity: 1; pointer-events: auto; }
+
+    .bottom-sheet {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 21;
+      background: hsl(var(--paper));
+      border-radius: 18px 18px 0 0;
+      box-shadow: 0 -8px 28px hsl(var(--ink) / 0.18);
+      padding: 10px 20px 24px;
+      max-height: 72vh;
+      overflow-y: auto;
+      transform: translateY(100%);
+      transition: transform 0.28s cubic-bezier(.4,.1,.2,1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bottom-sheet.is-open { transform: translateY(0); }
+
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      border-radius: 999px;
+      background: hsl(var(--border));
+      margin: 0 auto 14px;
+    }
+
+    .mobile-designer {
+      position: fixed;
+      inset: 0;
+      z-index: 22;
+      background: hsl(var(--paper));
+      overflow-y: auto;
+      padding: 20px 20px 40px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(.4,.1,.2,1);
+    }
+
+    .mobile-designer.is-open { transform: translateY(0); }
+
+    .mobile-designer .designer-grid {
+      display: block;
+    }
+
+    .mobile-designer .designer-context,
+    .mobile-designer .designer-draft {
+      overflow-y: visible;
+      margin-bottom: 16px;
+    }
+  }
+
+  @media (min-width: 861px) {
+    .sheet-scrim, .bottom-sheet, .mobile-designer { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wordmark">CHELCIE</div>
+  <div class="top-actions">
+    <span class="proto-note">Illustrative data for prototype purposes</span>
+  </div>
+</header>
+
+<main>
+  <section class="screen" data-screen="landscape">
+
+    <div class="landscape-head">
+      <div>
+        <p class="eyebrow">Your capital landscape</p>
+        <h1 id="headline">Possibilities around Northside Community Health</h1>
+        <p class="sub">Tap a signal to see why it surfaced — CHELCIE is mapping what's around you, not handing you a list to search.</p>
+      </div>
+      <div class="mode-toggle" role="tablist" aria-label="Visualization mode">
+        <button class="mode-btn" data-mode="constellation" role="tab" aria-selected="true">Constellation</button>
+        <button class="mode-btn" data-mode="orbit" role="tab" aria-selected="false">Orbit</button>
+        <button class="mode-btn" data-mode="radar" role="tab" aria-selected="false">Radar</button>
+      </div>
+    </div>
+
+    <div class="canvas-shell" id="canvasShell">
+      <div class="canvas-wrap" id="canvasWrap">
+        <svg class="guide-svg" id="guideSvg"></svg>
+        <div class="sweep-line" id="sweepLine"></div>
+        <div class="org-node" id="orgNode">
+          <span class="org-dot"></span>
+          <span class="org-name" id="orgName">Northside Community Health</span>
+        </div>
+      </div>
+
+      <aside class="detail-panel" id="detailPanel">
+        <p class="detail-empty">Select a signal to see why CHELCIE surfaced it.</p>
+      </aside>
+    </div>
+
+    <div class="designer-split" id="designerSplit" hidden>
+      <button class="back-link" id="designerBack">&larr; Back to your landscape</button>
+      <div class="designer-grid" id="designerGrid"></div>
+    </div>
+
+  </section>
+</main>
+
+<div class="sheet-scrim" id="sheetScrim"></div>
+<div class="bottom-sheet" id="bottomSheet" aria-hidden="true">
+  <div class="sheet-handle"></div>
+  <div id="sheetContent"></div>
+</div>
+<div class="mobile-designer" id="mobileDesigner" aria-hidden="true"></div>
+
+<script>
+(() => {
+  const ORG = "Northside Community Health";
+
+  const SIGNALS = [
+    {
+      id: "gov-funding",
+      type: "funding",
+      label: "Government funding",
+      category: "Funding",
+      relevance: 0.82,
+      confidence: 0.78,
+      unexpected: false,
+      description: "Federal and state programmes your organization is positioned to apply for, based on service type and geography.",
+      reasoning: ["Organization type", "Geographic eligibility", "Service category match"],
+      action: "Explore"
+    },
+    {
+      id: "working-capital",
+      type: "capital",
+      label: "Working capital",
+      category: "Finance",
+      relevance: 0.66,
+      confidence: 0.7,
+      unexpected: false,
+      description: "Short-term credit sized to your operating cash flow, not just your balance sheet.",
+      reasoning: ["Revenue pattern", "Existing banking relationship", "Facility size"],
+      action: "Explore"
+    },
+    {
+      id: "regional-partnership",
+      type: "partnership",
+      label: "Regional healthcare partnership",
+      category: "Partnership",
+      relevance: 0.7,
+      confidence: 0.68,
+      unexpected: false,
+      description: "A regional health intermediary with overlapping goals, and a track record of co-funding organizations like yours.",
+      reasoning: ["Shared service area", "Complementary programme focus", "Active partnership history"],
+      action: "Explore partnership"
+    },
+    {
+      id: "community-investment",
+      type: "investment",
+      label: "Community investment",
+      category: "Investment",
+      relevance: 0.6,
+      confidence: 0.66,
+      unexpected: true,
+      description: "A potential capital pathway based on your organization profile — mission-aligned investors who fund exactly this kind of work.",
+      reasoning: ["Organization type", "Geographic eligibility", "Programme alignment"],
+      action: "See why"
+    }
+  ];
+
+  const ANGLES = { "gov-funding": -38, "working-capital": 218, "regional-partnership": 26, "community-investment": 140 };
+  const TIER_RADIUS = { known: 0.34, adjacent: 0.68, unexpected: 0.52 };
+
+  function tierOf(s) {
+    if (s.unexpected) return "unexpected";
+    return s.relevance >= 0.75 ? "known" : "adjacent";
+  }
+
+  const state = {
+    mode: "constellation",
+    selected: null,
+    panelStep: "info",
+    isMobile: window.innerWidth <= 860,
+    played: { radar: false },
+    drafts: {}
+  };
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const canvasWrap = document.getElementById("canvasWrap");
+  const guideSvg = document.getElementById("guideSvg");
+  const orgNode = document.getElementById("orgNode");
+  const orgName = document.getElementById("orgName");
+  const detailPanel = document.getElementById("detailPanel");
+  const sheetScrim = document.getElementById("sheetScrim");
+  const bottomSheet = document.getElementById("bottomSheet");
+  const sheetContent = document.getElementById("sheetContent");
+  const mobileDesigner = document.getElementById("mobileDesigner");
+  const designerSplit = document.getElementById("designerSplit");
+  const designerGrid = document.getElementById("designerGrid");
+  const designerBack = document.getElementById("designerBack");
+  const sweepLine = document.getElementById("sweepLine");
+
+  orgName.textContent = ORG;
+
+  const nodeEls = {};
+
+  function buildNodes() {
+    SIGNALS.forEach(s => {
+      const btn = document.createElement("button");
+      btn.className = "signal-node glyph-host";
+      btn.dataset.id = s.id;
+      btn.setAttribute("aria-label", (s.unexpected ? "New signal: " : "") + s.label);
+      if (s.unexpected) btn.classList.add("is-unexpected");
+      btn.classList.add(s.relevance >= 0.75 ? "rel-high" : s.relevance < 0.62 ? "rel-low" : "rel-mid");
+
+      const glyph = document.createElement("span");
+      glyph.className = "signal-glyph glyph-" + s.type;
+      btn.appendChild(glyph);
+
+      const label = document.createElement("span");
+      label.className = "signal-label";
+      label.textContent = s.label;
+      btn.appendChild(label);
+
+      if (s.unexpected) {
+        const flag = document.createElement("span");
+        flag.className = "signal-flag";
+        flag.textContent = "New signal";
+        btn.appendChild(flag);
+      }
+
+      btn.addEventListener("click", () => selectSignal(s.id));
+      canvasWrap.appendChild(btn);
+      nodeEls[s.id] = btn;
+    });
+  }
+
+  function layoutPositions(mode, rect) {
+    const cx = rect.width / 2, cy = rect.height / 2;
+    const maxR = Math.min(rect.width, rect.height) / 2 - 56;
+    const minR = Math.max(Math.min(maxR * 0.7, 140), 80);
+    const pos = {};
+    SIGNALS.forEach(s => {
+      const tier = tierOf(s);
+      let rFrac = TIER_RADIUS[tier];
+      if (mode === "orbit" || mode === "radar") {
+        rFrac = tier === "known" ? 0.34 : tier === "adjacent" ? 0.68 : 0.92;
+      }
+      const angle = (ANGLES[s.id] * Math.PI) / 180;
+      const r = minR + (maxR - minR) * rFrac;
+      const size = nodeEls[s.id].getBoundingClientRect();
+      const halfW = (size.width || 150) / 2 + 14;
+      const halfH = (size.height || 36) / 2 + 14;
+      let x = cx + Math.cos(angle) * r;
+      let y = cy + Math.sin(angle) * r;
+      x = Math.min(Math.max(x, halfW), rect.width - halfW);
+      y = Math.min(Math.max(y, halfH), rect.height - halfH);
+      pos[s.id] = { x, y, tier, halfW, halfH };
+    });
+
+    const orgRect = orgNode.getBoundingClientRect();
+    const org = { x: cx, y: cy, halfW: orgRect.width / 2 + 14, halfH: orgRect.height / 2 + 14, fixed: true };
+
+    const ids = SIGNALS.map(s => s.id);
+    for (let iter = 0; iter < 24; iter++) {
+      ids.forEach(id => {
+        const p = pos[id];
+        const dx = p.x - org.x, dy = p.y - org.y;
+        const overlapX = org.halfW + p.halfW - Math.abs(dx);
+        const overlapY = org.halfH + p.halfH - Math.abs(dy);
+        if (overlapX > 0 && overlapY > 0) {
+          const dist = Math.hypot(dx, dy) || 1;
+          const pushOut = Math.min(overlapX, overlapY) + 2;
+          p.x += (dx / dist) * pushOut;
+          p.y += (dy / dist) * pushOut;
+        }
+      });
+      for (let i = 0; i < ids.length; i++) {
+        for (let j = i + 1; j < ids.length; j++) {
+          const p1 = pos[ids[i]], p2 = pos[ids[j]];
+          const dx = p2.x - p1.x, dy = p2.y - p1.y;
+          const overlapX = p1.halfW + p2.halfW + 10 - Math.abs(dx);
+          const overlapY = p1.halfH + p2.halfH + 6 - Math.abs(dy);
+          if (overlapX > 0 && overlapY > 0) {
+            if (overlapX < overlapY) {
+              const push = (overlapX / 2) * (dx < 0 ? -1 : 1) || overlapX / 2;
+              p1.x -= push; p2.x += push;
+            } else {
+              const push = (overlapY / 2) * (dy < 0 ? -1 : 1) || overlapY / 2;
+              p1.y -= push; p2.y += push;
+            }
+          }
+        }
+      }
+      ids.forEach(id => {
+        const p = pos[id];
+        p.x = Math.min(Math.max(p.x, p.halfW), rect.width - p.halfW);
+        p.y = Math.min(Math.max(p.y, p.halfH), rect.height - p.halfH);
+      });
+    }
+
+    return { pos, cx, cy, maxR };
+  }
+
+  function render() {
+    const rect = canvasWrap.getBoundingClientRect();
+    if (!(rect.width > 0 && rect.height > 0)) {
+      requestAnimationFrame(render);
+      return;
+    }
+    guideSvg.setAttribute("viewBox", "0 0 " + rect.width + " " + rect.height);
+    guideSvg.innerHTML = "";
+
+    const { pos, cx, cy, maxR } = layoutPositions(state.mode, rect);
+
+    if (state.mode === "orbit" || state.mode === "radar") {
+      [0.36, 0.62, 0.85].forEach(f => {
+        const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        c.setAttribute("cx", cx);
+        c.setAttribute("cy", cy);
+        c.setAttribute("r", maxR * f);
+        c.setAttribute("class", "guide-ring");
+        guideSvg.appendChild(c);
+      });
+    }
+
+    if (state.mode === "radar") {
+      for (let a = 0; a < 360; a += 45) {
+        const rad = (a * Math.PI) / 180;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", cx);
+        line.setAttribute("y1", cy);
+        line.setAttribute("x2", cx + Math.cos(rad) * maxR);
+        line.setAttribute("y2", cy + Math.sin(rad) * maxR);
+        line.setAttribute("class", "guide-spoke");
+        guideSvg.appendChild(line);
+      }
+    }
+
+    SIGNALS.forEach(s => {
+      const p = pos[s.id];
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", cx);
+      line.setAttribute("y1", cy);
+      line.setAttribute("x2", p.x);
+      line.setAttribute("y2", p.y);
+      line.setAttribute("class", "conn-line" + (s.unexpected ? " is-unexpected" : ""));
+      guideSvg.appendChild(line);
+
+      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      dot.setAttribute("cx", p.x);
+      dot.setAttribute("cy", p.y);
+      dot.setAttribute("r", 3);
+      dot.setAttribute("class", "conn-dot");
+      guideSvg.appendChild(dot);
+
+      const el = nodeEls[s.id];
+      el.style.left = p.x + "px";
+      el.style.top = p.y + "px";
+    });
+
+    sweepLine.style.left = cx + "px";
+    sweepLine.style.top = cy + "px";
+    sweepLine.style.width = maxR + "px";
+
+    requestAnimationFrame(() => {
+      SIGNALS.forEach(s => nodeEls[s.id].classList.add("is-in"));
+    });
+  }
+
+  function setMode(mode) {
+    state.mode = mode;
+    document.querySelectorAll(".mode-btn").forEach(b => {
+      b.setAttribute("aria-selected", String(b.dataset.mode === mode));
+    });
+    render();
+    if (mode === "radar" && !state.played.radar && !reduceMotion) {
+      state.played.radar = true;
+      requestAnimationFrame(() => {
+        sweepLine.classList.add("is-active");
+        setTimeout(() => {
+          const unexpected = SIGNALS.find(s => s.unexpected);
+          if (unexpected) pulseOnce(nodeEls[unexpected.id]);
+          sweepLine.classList.remove("is-active");
+        }, 1700);
+      });
+    }
+  }
+
+  function pulseOnce(el) {
+    el.style.transition = "transform 0.35s ease";
+    el.style.transform = "translate(-50%, -50%) scale(1.16)";
+    setTimeout(() => { el.style.transform = "translate(-50%, -50%) scale(1)"; }, 350);
+  }
+
+  document.querySelectorAll(".mode-btn").forEach(b => {
+    b.addEventListener("click", () => setMode(b.dataset.mode));
+  });
+
+  function selectSignal(id) {
+    state.selected = id;
+    state.panelStep = "info";
+    canvasWrap.classList.add("has-selection");
+    Object.values(nodeEls).forEach(el => el.classList.remove("is-selected"));
+    nodeEls[id].classList.add("is-selected");
+    if (state.isMobile) {
+      openSheet();
+    } else {
+      renderDetailPanel();
+    }
+  }
+
+  function deselect() {
+    state.selected = null;
+    canvasWrap.classList.remove("has-selection");
+    Object.values(nodeEls).forEach(el => el.classList.remove("is-selected"));
+    detailPanel.classList.remove("is-open");
+    detailPanel.innerHTML = '<p class="detail-empty">Select a signal to see why CHELCIE surfaced it.</p>';
+    closeSheet();
+  }
+
+  function signalById(id) { return SIGNALS.find(s => s.id === id); }
+
+  function renderDetailPanel() {
+    const s = signalById(state.selected);
+    detailPanel.classList.add("is-open");
+    if (state.panelStep === "info") {
+      detailPanel.innerHTML = infoHtml(s);
+    } else if (state.panelStep === "why") {
+      detailPanel.innerHTML = whyHtml(s);
+    }
+    wirePanelActions(detailPanel, s);
+  }
+
+  function infoHtml(s) {
+    return `
+      <button class="detail-close" data-action="close">Close &times;</button>
+      <p class="detail-tag">${s.category}</p>
+      <h3>${s.label}</h3>
+      <p class="detail-desc">${s.description}</p>
+      <div class="detail-actions">
+        <button class="btn-primary" data-action="why">${s.unexpected ? "See why" : "Why this surfaced"}</button>
+      </div>
+    `;
+  }
+
+  function whyHtml(s) {
+    const reasons = s.reasoning.map(r => `<li>${r}</li>`).join("");
+    const primaryLabel = s.type === "partnership" ? "Explore partnership" : "Explore opportunity";
+    return `
+      <button class="panel-back" data-action="back-info">&larr; Back</button>
+      <p class="detail-tag">${s.category}</p>
+      <h3>${s.label}</h3>
+      <p class="why-heading">Why this surfaced</p>
+      <ul class="why-reasons">${reasons}</ul>
+      <div class="detail-actions">
+        <button class="btn-primary" data-action="designer">${primaryLabel}</button>
+      </div>
+    `;
+  }
+
+  function wirePanelActions(root, s) {
+    root.querySelectorAll("[data-action]").forEach(el => {
+      el.addEventListener("click", () => {
+        const a = el.dataset.action;
+        if (a === "close") { deselect(); return; }
+        if (a === "why") { state.panelStep = "why"; renderOrSheet(); return; }
+        if (a === "back-info") { state.panelStep = "info"; renderOrSheet(); return; }
+        if (a === "designer") { openDesigner(s); return; }
+      });
+    });
+  }
+
+  function renderOrSheet() {
+    if (state.isMobile) { renderSheet(); } else { renderDetailPanel(); }
+  }
+
+  function openSheet() {
+    renderSheet();
+    sheetScrim.classList.add("is-open");
+    bottomSheet.classList.add("is-open");
+    bottomSheet.setAttribute("aria-hidden", "false");
+  }
+
+  function closeSheet() {
+    sheetScrim.classList.remove("is-open");
+    bottomSheet.classList.remove("is-open");
+    bottomSheet.setAttribute("aria-hidden", "true");
+  }
+
+  function renderSheet() {
+    const s = signalById(state.selected);
+    if (!s) return;
+    if (state.panelStep === "info") sheetContent.innerHTML = infoHtml(s);
+    else if (state.panelStep === "why") sheetContent.innerHTML = whyHtml(s);
+    wirePanelActions(sheetContent, s);
+    const closeBtn = sheetContent.querySelector('[data-action="close"]');
+    if (closeBtn) closeBtn.addEventListener("click", deselect);
+  }
+
+  sheetScrim.addEventListener("click", deselect);
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+      if (!designerSplit.hidden || mobileDesigner.classList.contains("is-open")) { closeDesigner(); }
+      else { deselect(); }
+    }
+  });
+
+  function draftFor(s) {
+    if (!state.drafts[s.id]) {
+      state.drafts[s.id] = {
+        proposal: defaultProposal(s),
+        whyFits: s.reasoning.map(r => "- " + r).join("\n"),
+        status: "draft"
+      };
+    }
+    return state.drafts[s.id];
+  }
+
+  function defaultProposal(s) {
+    return `${ORG} would like to explore ${s.label.toLowerCase()} with you — starting with a short conversation to understand mutual fit before anything formal.`;
+  }
+
+  function designerHtml(s) {
+    const d = draftFor(s);
+    return `
+      <div class="designer-context">
+        <p class="detail-tag">${s.category}</p>
+        <h3>${s.label}</h3>
+        <p class="detail-desc">${s.description}</p>
+        <p class="why-heading">Why this surfaced</p>
+        <ul class="why-reasons">${s.reasoning.map(r => `<li>${r}</li>`).join("")}</ul>
+      </div>
+      <div class="designer-draft">
+        <h3>Let's explore the connection</h3>
+        <div class="draft-status">
+          <button class="status-pill ${d.status === "sent" ? "is-sent" : ""}" data-action="toggle-status">${d.status === "sent" ? "Sent" : "Draft ready"}</button>
+          <button class="draft-export" data-action="export">Export</button>
+        </div>
+        <div class="doc-section">
+          <label for="fld-proposal">What we're proposing</label>
+          <textarea id="fld-proposal">${d.proposal}</textarea>
+          <button class="redraft-link" data-action="redraft-proposal">Redraft with CHELCIE</button>
+        </div>
+        <div class="doc-section">
+          <label for="fld-why">Why this fits</label>
+          <textarea id="fld-why">${d.whyFits}</textarea>
+          <button class="redraft-link" data-action="redraft-why">Redraft with CHELCIE</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function wireDesigner(root, s) {
+    const d = draftFor(s);
+    const proposalEl = root.querySelector("#fld-proposal");
+    const whyEl = root.querySelector("#fld-why");
+    proposalEl.addEventListener("input", () => { d.proposal = proposalEl.value; });
+    whyEl.addEventListener("input", () => { d.whyFits = whyEl.value; });
+
+    root.querySelector('[data-action="toggle-status"]').addEventListener("click", e => {
+      d.status = d.status === "sent" ? "draft" : "sent";
+      e.target.textContent = d.status === "sent" ? "Sent" : "Draft ready";
+      e.target.classList.toggle("is-sent", d.status === "sent");
+    });
+
+    root.querySelector('[data-action="export"]').addEventListener("click", () => {
+      const text = `${s.label} — ${ORG}\n\nWhat we're proposing:\n${proposalEl.value}\n\nWhy this fits:\n${whyEl.value}\n`;
+      const blob = new Blob([text], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = s.id + "-partnership.txt";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    root.querySelector('[data-action="redraft-proposal"]').addEventListener("click", () => {
+      d.proposal = defaultProposal(s);
+      proposalEl.value = d.proposal;
+    });
+    root.querySelector('[data-action="redraft-why"]').addEventListener("click", () => {
+      d.whyFits = s.reasoning.map(r => "- " + r).join("\n");
+      whyEl.value = d.whyFits;
+    });
+  }
+
+  function openDesigner(s) {
+    if (state.isMobile) {
+      closeSheet();
+      mobileDesigner.innerHTML = `<button class="back-link" data-action="close-designer">&larr; Back to your landscape</button><div class="designer-grid">${designerHtml(s)}</div>`;
+      wireDesigner(mobileDesigner, s);
+      mobileDesigner.querySelector('[data-action="close-designer"]').addEventListener("click", closeDesigner);
+      mobileDesigner.classList.add("is-open");
+      mobileDesigner.setAttribute("aria-hidden", "false");
+    } else {
+      designerGrid.innerHTML = designerHtml(s);
+      wireDesigner(designerGrid, s);
+      designerSplit.hidden = false;
+      canvasWrap.parentElement.style.display = "none";
+      document.querySelector(".landscape-head").style.display = "none";
+    }
+  }
+
+  function closeDesigner() {
+    designerSplit.hidden = true;
+    canvasWrap.parentElement.style.display = "";
+    document.querySelector(".landscape-head").style.display = "";
+    mobileDesigner.classList.remove("is-open");
+    mobileDesigner.setAttribute("aria-hidden", "true");
+    render();
+  }
+
+  designerBack.addEventListener("click", closeDesigner);
+
+  let resizeRaf;
+  window.addEventListener("resize", () => {
+    state.isMobile = window.innerWidth <= 860;
+    cancelAnimationFrame(resizeRaf);
+    resizeRaf = requestAnimationFrame(render);
+  });
+
+  buildNodes();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(render);
+  } else {
+    setTimeout(render, 300);
+  }
+  render();
+})();
+</script>
+</body>
+</html>

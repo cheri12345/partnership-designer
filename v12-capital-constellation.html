@@ -1,0 +1,2280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Capital Constellation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ---------- from a Figma concept ("Concept 1: Floating Right Panel") —
+     a different visual language from the rest of this project on purpose:
+     Instrument Serif for headlines, Instrument Sans for everything else,
+     a dark-teal monochrome badge system instead of hue-coded capital
+     types, dashed connector lines, orbital rings behind the constellation,
+     and the persistent create-panel moved to the right. Kept as its own
+     self-contained skin (no v2-shared.css) rather than bent to match the
+     rest of the project, since the whole point is evaluating this look. ---------- */
+
+  :root {
+    --ink: #111111;
+    --stone: #666666;
+    --paper: #fafafa;
+    --border: #ebebeb;
+    --border-card: #ebebe8;
+    --deep: #083839;
+    --deep2: #143644;
+    --grant: #00636a;
+    --muted-fill: #f4f4f4;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; margin: 0; }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Instrument Sans", system-ui, sans-serif;
+  }
+
+  body.scroll-unlocked {
+    height: auto;
+    min-height: 100%;
+    display: block;
+    overflow: visible;
+  }
+
+  h1, h2, h3, .serif {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--deep);
+  }
+
+  button { font-family: inherit; }
+
+  /* ---------- header ---------- */
+
+  .topbar {
+    flex-shrink: 0;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .wordmark {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--ink);
+  }
+
+  .concept-pill {
+    background: var(--muted-fill);
+    color: var(--stone);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 4px 12px;
+    border-radius: 6px;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .pill-outline {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .pill-outline:hover { border-color: var(--deep); }
+
+  .pill-solid {
+    background: linear-gradient(90deg, var(--deep), var(--deep2));
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .pill-solid:hover { opacity: 0.92; }
+
+  .view-toggle {
+    display: inline-flex;
+    margin-top: 14px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 2px;
+    gap: 1px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
+
+  .view-toggle-btn {
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+    color: var(--stone);
+  }
+
+  .view-toggle-btn.active { background: var(--deep2); color: #fff; }
+
+  /* ---------- list view: an alternative to the constellation, same data,
+     plain scannable rows with generous negative space rather than a dense
+     table. ---------- */
+
+  .list-view {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 4px 8px 24px;
+  }
+
+  .list-view-rows { max-width: 640px; }
+
+  .list-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: 20px 6px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+  }
+
+  .list-row:first-child { border-top: 1px solid var(--border); }
+  .list-row:hover { background: var(--muted-fill); }
+
+  .list-row-left { display: flex; align-items: center; gap: 16px; min-width: 0; }
+  .list-row-badge { flex-shrink: 0; }
+
+  .list-row-name { font-weight: 600; font-size: 14px; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+  .list-row-meta { font-size: 12px; color: var(--stone); margin-top: 3px; }
+
+  .list-row-right { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+  .list-row-fit { font-weight: 700; font-size: 13px; color: var(--ink); }
+  .list-row-amount { font-weight: 600; font-size: 13px; color: var(--deep2); min-width: 78px; text-align: right; }
+
+  .list-empty { padding: 40px 6px; color: var(--stone); font-size: 14px; }
+
+  main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .screen {
+    flex: 1;
+    min-height: 0;
+    display: none;
+  }
+
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ---------- canvas ---------- */
+
+  /* canvas-container and create-panel are SIBLINGS inside map-shell, not
+     parent/child — the panel used to be a child of canvas-container,
+     which trapped it inside the same bounded absolute-positioning box as
+     the constellation itself. At mobile widths, where the panel needs to
+     drop into normal document flow below the canvas, an absolute-only
+     parent (canvas-container has no in-flow content, only absolute
+     children) has zero real height, so "below the canvas" collapsed to
+     "on top of it." Making them siblings of map-shell fixes that. */
+  .map-shell {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .canvas-container {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+    background-image: radial-gradient(#e4e4e4 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .orbit-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .orbit-ring {
+    fill: none;
+    stroke: var(--ink);
+    stroke-opacity: 0.07;
+  }
+
+  .conn-line {
+    stroke: var(--deep2);
+    stroke-opacity: 0.4;
+    stroke-dasharray: 3 4;
+  }
+
+  .conn-dot {
+    fill: var(--paper);
+    stroke: var(--deep2);
+    stroke-opacity: 0.5;
+  }
+
+  .headline-block {
+    flex-shrink: 0;
+    padding: 32px 40px 0;
+    max-width: 560px;
+  }
+
+  .headline-block h1 {
+    font-size: 2rem;
+    line-height: 1.15;
+  }
+
+  .quadrant-label {
+    position: absolute;
+    max-width: 190px;
+    z-index: 2;
+  }
+
+  .quadrant-label h3 {
+    font-family: "Instrument Sans", sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--deep2);
+    margin: 0 0 4px;
+  }
+
+  .quadrant-label p {
+    margin: 0;
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  .quadrant-label.align-right { text-align: right; }
+
+  .center-hub {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    border: none;
+    font-family: inherit;
+    background: linear-gradient(135deg, var(--deep), var(--deep2));
+    box-shadow: 0 8px 18px rgba(8, 56, 57, 0.28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 3;
+    padding: 8px;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .center-hub:hover {
+    box-shadow: 0 10px 22px rgba(8, 56, 57, 0.36);
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+
+  .center-hub span {
+    font-weight: 700;
+    font-size: 0.625rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #fff;
+    line-height: 1.35;
+  }
+
+  .opp-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.2s ease;
+  }
+
+  .opp-node.shown { opacity: 1; }
+
+  .node-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 190px;
+    padding: 12px 12px 12px 14px;
+    background: #fff;
+    border: 1px solid var(--border-card);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    cursor: pointer;
+    text-align: left;
+    /* --card-scale is set per-card by renderMap() based on distance from
+       the org hub — closer reads a little bigger, farther a little smaller,
+       a depth cue layered on top of the hover lift below. */
+    transform: scale(var(--card-scale, 1));
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .node-card:hover {
+    transform: scale(var(--card-scale, 1)) translateY(-1px);
+    box-shadow: 0 8px 16px rgba(8, 56, 57, 0.1);
+  }
+
+  .node-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .node-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+  }
+
+  .node-fit {
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--ink);
+  }
+
+  .node-right-group { display: flex; align-items: center; gap: 4px; }
+
+  .node-fav { font-size: 10px; color: #d4a24a; line-height: 1; }
+
+  .node-name {
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+
+  .node-amount {
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--deep2);
+  }
+
+  /* ---------- opportunities beyond the CARD_LIMIT: small solid dots,
+     still a specific real opportunity, still clickable — a warm, solid,
+     non-animated colour deliberately unlike the pulsing discovery dots
+     below, so the two kinds of dot don't read as the same affordance. */
+
+  .opp-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background: var(--grant);
+    /* A soft glow in the brand's own teal, not a hard-edged marker
+       outline — reads as a small point of light in the constellation,
+       not a map pin or a contact blip on a scope. */
+    box-shadow: 0 0 5px 1px rgba(0, 99, 106, 0.45), 0 1px 2px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .opp-dot:hover {
+    transform: scale(1.4);
+    box-shadow: 0 0 9px 2px rgba(0, 99, 106, 0.65), 0 2px 5px rgba(0, 0, 0, 0.12);
+  }
+
+  /* ---------- floating right panel ---------- */
+
+  .create-panel {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    /* Hugs its content (matching the Figma concept) rather than stretching
+       to fill the canvas — a short sponsor list left a wall of empty white
+       space below it otherwise. Centered vertically so that leftover space
+       splits evenly above and below instead of piling up underneath.
+       max-height is a safety cap for when the describe-your-own-program
+       section is expanded. */
+    max-height: calc(100% - 40px);
+    width: 360px;
+    z-index: 5;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+    padding: 24px;
+    overflow-y: auto;
+  }
+
+  .create-panel h2 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+
+  .create-panel .panel-sub {
+    margin: 8px 0 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--stone);
+  }
+
+  .sponsor-list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sponsor-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .sponsor-row.selected {
+    border-color: var(--deep);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .sponsor-row-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sponsor-logo-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sponsor-logo {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 9px;
+    flex-shrink: 0;
+  }
+
+  .sponsor-company {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+  }
+
+  .sponsor-row.selected .sponsor-company { color: var(--deep); }
+
+  .sponsor-unit {
+    margin: 8px 0 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--stone);
+  }
+
+  .sponsor-check {
+    margin: 6px 0 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .panel-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .panel-header-row .btn-secondary {
+    padding: 8px 16px;
+    font-size: 12.5px;
+    flex-shrink: 0;
+  }
+
+
+  .sponsor-detail {
+    margin-top: 0;
+    border: 1px solid var(--deep);
+    border-top: none;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    padding: 14px 16px 16px;
+  }
+
+  .sponsor-detail p { margin: 0 0 10px; font-size: 12.5px; line-height: 1.5; }
+  .sponsor-detail p:last-child { margin-bottom: 0; }
+
+  .field-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin: 0 0 4px;
+  }
+
+  .design-meta {
+    font-size: 11.5px;
+    color: var(--stone);
+    margin: 10px 0 0;
+  }
+
+  /* ---------- shared buttons ---------- */
+
+  .btn-primary {
+    background: linear-gradient(90deg, var(--deep), var(--deep2));
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 12px 22px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover { opacity: 0.92; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-secondary {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 11px 20px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .btn-secondary:hover { border-color: var(--deep); }
+
+  .back-link {
+    background: none;
+    border: none;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--stone);
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .back-link:hover { color: var(--deep); }
+
+  /* ---------- build screen ---------- */
+
+  .build-wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 40px 24px 100px;
+    width: 100%;
+  }
+
+  .build-columns {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-top: 20px;
+  }
+
+  @media (min-width: 820px) {
+    .build-columns { grid-template-columns: 320px 1fr; align-items: start; }
+  }
+
+  .build-summary {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    background: #fff;
+  }
+
+  @media (min-width: 820px) {
+    .build-summary { position: sticky; top: 24px; }
+  }
+
+  .build-eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--stone);
+    margin: 0 0 6px;
+  }
+
+  .build-name { font-size: 1.375rem; margin: 0 0 10px; }
+
+  .build-sub { font-size: 12.5px; color: var(--stone); margin: 0 0 16px; }
+
+  .gain-callout {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+    margin: 16px 0;
+  }
+
+  .gain-callout blockquote {
+    margin: 0 0 8px;
+    font-family: "Instrument Serif", serif;
+    font-size: 1.1875rem;
+    line-height: 1.35;
+    color: var(--deep);
+  }
+
+  .gain-callout .works-with { font-size: 12px; color: var(--stone); margin: 0; }
+
+  .build-terms { font-size: 12.5px; color: var(--stone); line-height: 1.6; }
+
+  .field-group { margin-bottom: 20px; }
+
+  .field-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .field-group input[type="text"],
+  .field-group textarea {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .field-group textarea { resize: vertical; min-height: 80px; }
+
+  .doc-section { margin-bottom: 20px; }
+
+  .doc-section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .doc-section-head label { font-size: 13px; font-weight: 600; }
+
+  .doc-section textarea,
+  .doc-section input[type="text"] {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    resize: vertical;
+  }
+
+  .regen-link {
+    background: none;
+    border: none;
+    font-size: 11.5px;
+    color: var(--deep2);
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .drafting-state { font-size: 13px; color: var(--stone); }
+
+  .draft-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--stone);
+    margin: 0 0 6px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d4a24a;
+  }
+
+  .status-dot.sent { background: var(--deep); }
+
+  .autosave-note {
+    font-size: 11.5px;
+    color: var(--stone);
+    opacity: 0.75;
+    margin: 0 0 16px;
+    min-height: 14px;
+  }
+
+  .draft-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  /* ---------- overlays ---------- */
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--paper);
+    z-index: 50;
+    display: none;
+    flex-direction: column;
+  }
+
+  .overlay.active { display: flex; }
+
+  .overlay-body {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 48px 24px 100px;
+    width: 100%;
+  }
+
+  .refine-section { margin-bottom: 32px; }
+
+  .refine-section .label { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+
+  .pill-group { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .pill {
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 999px;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--ink);
+  }
+
+  .pill.selected { border-color: var(--deep); background: rgba(8, 56, 57, 0.07); font-weight: 600; }
+
+  .side-options { display: grid; gap: 10px; }
+
+  .side-option {
+    text-align: left;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .side-option.selected { border-color: var(--deep); background: rgba(8, 56, 57, 0.05); }
+
+  .tracker-item {
+    border-top: 1px solid var(--border);
+    padding: 20px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .tracker-item:last-child { border-bottom: 1px solid var(--border); }
+
+  .tracker-kind { font-size: 11px; font-weight: 600; color: var(--stone); margin: 0 0 4px; }
+  .tracker-title { font-weight: 700; font-size: 15px; margin: 0 0 4px; }
+  .tracker-sub { font-size: 12px; color: var(--stone); margin: 0; }
+
+  .tracker-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+
+  .status-pill {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(212, 162, 74, 0.18);
+    color: #8a5a1e;
+  }
+
+  .status-pill.sent { background: rgba(8, 56, 57, 0.12); color: var(--deep); }
+
+  .tracker-empty { font-size: 14px; color: var(--stone); line-height: 1.6; }
+
+  /* ---------- quick view: a lightweight "before you draft" preview card,
+     opened on a node click instead of jumping straight into the builder.
+     Matches the Figma concept's own treatment — a small card anchored
+     right where the clicked node was, no dimmed backdrop or full-screen
+     takeover — with Airbnb's polish applied to the surface itself: soft
+     shadow, light gray stat tiles, a thin divider, a circular close
+     button, a secondary text link paired with a solid pill CTA. ---------- */
+
+  .quickview-card {
+    display: none;
+    position: absolute;
+    width: min(300px, calc(100vw - 32px));
+    z-index: 9;
+    background: #fff;
+    border: 1px solid var(--border-card);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(8, 56, 57, 0.16), 0 4px 12px rgba(0, 0, 0, 0.06);
+    padding: 18px;
+  }
+
+  .quickview-card.active { display: block; }
+
+  .quickview-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid #d7e7e8;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--deep2);
+    cursor: pointer;
+  }
+
+  .quickview-close:hover { border-color: var(--deep); background: var(--muted-fill); }
+
+  .quickview-fit {
+    display: inline-flex;
+    background: #eaf7f8;
+    color: var(--deep);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+
+  .quickview-title { font-size: 1.0625rem; line-height: 1.25; margin: 0 0 8px; padding-right: 54px; }
+
+  .quickview-badge {
+    display: block;
+    margin: 0 0 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--stone);
+  }
+
+  .quickview-desc { font-size: 12.5px; line-height: 1.5; color: var(--stone); margin: 0 0 14px; }
+
+  .quickview-stats {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .quickview-stat { flex: 1; min-width: 0; background: var(--muted-fill); border-radius: 10px; padding: 9px 10px; }
+
+  .quickview-stat .stat-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--stone);
+    margin: 0 0 2px;
+  }
+
+  .quickview-stat .stat-value { font-size: 12px; font-weight: 700; color: var(--ink); margin: 0; line-height: 1.3; }
+
+  .quickview-why { margin-bottom: 14px; }
+
+  .quickview-why .why-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--deep2);
+    margin: 0 0 8px;
+  }
+
+  .quickview-why-row { display: flex; align-items: flex-start; gap: 8px; }
+
+  .quickview-why-row .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--grant); margin-top: 6px; flex-shrink: 0; }
+
+  .quickview-why-row p { margin: 0; font-size: 12px; line-height: 1.45; color: var(--ink); }
+
+  .quickview-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .quickview-fav {
+    position: absolute;
+    top: 12px;
+    right: 44px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid #d7e7e8;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    line-height: 1;
+    color: #d7d7d4;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .quickview-fav:hover { border-color: var(--deep); color: var(--stone); background: var(--muted-fill); }
+  .quickview-fav.active { color: #d4a24a; border-color: #f0dcb8; background: #fdf6e8; }
+
+  .quickview-skip {
+    background: none;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--stone);
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .quickview-skip:hover { color: var(--ink); }
+
+  .quickview-actions .btn-primary { padding: 9px 16px; font-size: 12.5px; }
+
+  /* ---------- onboarding profile: a true centered modal (unlike the
+     quick-view's small anchored popover, or Refine/Tracker's full-page
+     takeover) — a dimmed backdrop behind a fixed-size card, since this is
+     reviewing and editing a standing profile, not a glance at one card. ---------- */
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 17, 17, 0.5);
+    z-index: 70;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-backdrop.active { display: flex; }
+
+  .onboarding-modal {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 24px 48px rgba(8, 56, 57, 0.18), 0 4px 16px rgba(0, 0, 0, 0.08);
+    padding: 32px;
+  }
+
+  .onboarding-modal h2 { margin: 0 0 8px; }
+
+  .onboarding-modal .panel-sub { margin: 0 0 26px; font-size: 13px; line-height: 1.55; color: var(--stone); padding-right: 26px; }
+
+  .onboarding-field { margin-bottom: 28px; }
+
+  .onboarding-field label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .onboarding-field input[type="text"] {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  /* ---------- mobile / narrower desktop: scroll unlocks below 860px ---------- */
+
+  @media (max-width: 860px) {
+    .canvas-container { min-height: 760px; }
+    .create-panel {
+      position: static;
+      width: 100%;
+      margin: 20px;
+      inset: auto;
+      transform: none;
+    }
+    /* The right-side labels are offset to clear the floating panel, which
+       no longer floats at this width, so pull them back to the edge. */
+    #qlCorporate, #qlEquity {
+      right: 16px;
+    }
+    .quadrant-label { max-width: 130px; }
+    .headline-block { max-width: 78%; }
+    .headline-block h1 { font-size: 1.5rem; }
+
+    /* Same fix round 11's capital-landscape needed at this width: a fixed
+       190px card is wider than a phone screen once you need several of
+       them around a center point. Shrink it and let the name wrap instead
+       of fighting for single-line horizontal space — the JS layout uses
+       the same 132/94 figures for its own collision math at this width. */
+    .node-card { width: 118px; padding: 8px 9px; gap: 4px; }
+    .node-name { font-size: 11px; }
+    .node-amount, .node-fit { font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="wordmark">CHELCIE</span>
+    <span class="concept-pill">ROUND 12 · FLOATING RIGHT PANEL</span>
+  </div>
+  <div class="topbar-right">
+    <button class="pill-outline" id="trackerBtn">Your partnerships</button>
+  </div>
+</header>
+
+<main>
+
+  <section class="screen active" data-screen="map">
+    <div class="map-shell">
+    <div class="headline-block">
+      <h1 id="headline">Northstar Labs: rising opportunities</h1>
+      <div class="view-toggle" id="viewToggle">
+        <button class="view-toggle-btn active" data-view="constellation">Constellation</button>
+        <button class="view-toggle-btn" data-view="list">List</button>
+      </div>
+    </div>
+    <div class="canvas-container" id="canvasContainer">
+      <svg class="orbit-svg" id="orbitSvg"></svg>
+
+      <div class="quadrant-label" id="qlGrant" style="left:40px; top:150px;">
+        <h3>Grant Funds</h3>
+        <p>Non-dilutive community capital and foundation support.</p>
+      </div>
+      <div class="quadrant-label align-right" id="qlCorporate" style="right:420px; top:150px;">
+        <h3>Corporate Sponsors</h3>
+        <p>Strategic commercial alignments and brand value.</p>
+      </div>
+      <div class="quadrant-label" id="qlLoan" style="left:40px; bottom:56px;">
+        <h3>Loans &amp; Debt</h3>
+        <p>Flexible debt partnerships and cooperative lending.</p>
+      </div>
+      <div class="quadrant-label align-right" id="qlEquity" style="right:420px; bottom:56px;">
+        <h3>Equity Partners</h3>
+        <p>Direct capital injection for scaling development.</p>
+      </div>
+
+      <button class="center-hub" id="centerHub" aria-label="View and edit your organization profile"><span>Northstar<br />Labs</span></button>
+    </div>
+
+    <div class="list-view" id="listView" hidden>
+      <div class="list-view-rows" id="listViewRows"></div>
+    </div>
+
+    <!-- A sibling of both canvas-container and list-view (not nested in
+         either) so it works — and positions correctly — no matter which
+         view is active; positionQuickView() anchors it to map-shell. -->
+    <div class="quickview-card" id="quickViewCard">
+      <button class="quickview-fav" id="quickViewFav" aria-label="Save for later" aria-pressed="false">☆</button>
+      <button class="quickview-close" id="quickViewClose" aria-label="Close">&times;</button>
+      <div id="quickViewBody"></div>
+    </div>
+
+    <aside class="create-panel">
+      <div class="panel-header-row">
+        <h2 class="serif">Partnerships ready for you</h2>
+        <button class="btn-secondary" id="refineProgramBtn">Refine</button>
+      </div>
+      <p class="panel-sub">These teams are already looking for work like yours — reach out directly, no grant queue to wait in.</p>
+
+      <div class="sponsor-list" id="sponsorList"></div>
+      <button class="btn-secondary" id="moreCompaniesBtn" style="width:100%; margin-top:14px;" hidden>Show me more company matches</button>
+    </aside>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="build">
+    <div class="build-wrap">
+      <button class="back-link" id="buildBackLink">← Back to your constellation</button>
+      <div class="build-columns">
+        <aside class="build-summary">
+          <p class="build-eyebrow" id="buildEyebrow"></p>
+          <h2 class="build-name" id="buildName"></h2>
+          <p class="build-sub" id="buildSub"></p>
+          <div class="gain-callout">
+            <blockquote id="buildGainText"></blockquote>
+            <p class="works-with" id="buildGainSub"></p>
+          </div>
+          <p class="build-terms" id="buildTerms"></p>
+        </aside>
+
+        <div class="build-draft">
+          <p class="build-eyebrow">Design your partnership</p>
+          <p class="build-sub" style="max-width:40ch;">CHELCIE drafts each section below to start. Edit anything directly, or redraft one section at a time if it's not quite right.</p>
+
+          <div class="field-group">
+            <label>Your organization</label>
+            <input type="text" class="pitch-org" value="Northstar Labs" />
+          </div>
+
+          <p class="drafting-state" id="buildLoading" hidden>CHELCIE is drafting this document…</p>
+
+          <div id="buildSections" hidden>
+            <div class="doc-section" id="sectionAsk">
+              <div class="doc-section-head"><label>What we are asking</label><button class="regen-link" data-field="ask">Redraft with CHELCIE</button></div>
+              <textarea class="pitch-ask" rows="3"></textarea>
+            </div>
+            <div class="doc-section" id="sectionUse">
+              <div class="doc-section-head"><label>How the funds will be used</label><button class="regen-link" data-field="use">Redraft with CHELCIE</button></div>
+              <textarea class="pitch-use" rows="3"></textarea>
+            </div>
+            <div class="doc-section" id="sectionFit">
+              <div class="doc-section-head"><label>Why this fits</label><button class="regen-link" data-field="fit">Redraft with CHELCIE</button></div>
+              <textarea class="pitch-fit" rows="3"></textarea>
+            </div>
+            <div class="doc-section" id="sectionTerms">
+              <div class="doc-section-head"><label>Terms under discussion</label><button class="regen-link" data-field="terms">Redraft with CHELCIE</button></div>
+              <textarea class="pitch-terms" rows="2"></textarea>
+            </div>
+            <!-- Sponsor/company outreach drafts a real VP email (subject +
+                 body) instead — matching Amy's actual C-CHANGE demo, which
+                 drafts an email for a company target, not a multi-section
+                 one-pager. Same shared status/export/tracker footer below. -->
+            <div class="doc-section" id="sectionSubject" hidden>
+              <div class="doc-section-head"><label>Subject</label><button class="regen-link" data-field="subject">Redraft with CHELCIE</button></div>
+              <input type="text" class="pitch-subject" />
+            </div>
+            <div class="doc-section" id="sectionBody" hidden>
+              <div class="doc-section-head"><label>Body</label><button class="regen-link" data-field="body">Redraft with CHELCIE</button></div>
+              <textarea class="pitch-body" rows="16"></textarea>
+            </div>
+            <div style="border-top:1px solid var(--border); padding-top:18px;">
+              <p class="draft-status" id="draftStatus"></p>
+              <p class="autosave-note" id="autosaveNote"></p>
+              <div class="draft-actions">
+                <button class="btn-secondary" id="exportDraftBtn">Export .txt</button>
+                <button class="btn-secondary" id="markSentBtn">Mark as sent</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="overlay" id="trackerOverlay">
+  <header class="topbar">
+    <span class="wordmark">Your partnerships</span>
+    <button class="back-link" id="trackerClose">Close</button>
+  </header>
+  <div class="overlay-body" id="trackerBody"></div>
+</div>
+
+<div class="modal-backdrop" id="onboardingOverlay">
+  <div class="onboarding-modal">
+    <button class="quickview-close" id="onboardingClose" aria-label="Close">&times;</button>
+    <h2 class="serif">Your organization profile</h2>
+    <p class="panel-sub">This is what Northstar Labs told CHELCIE when you joined — the answers behind everything matched here. Edit anytime; your constellation updates to match.</p>
+
+    <div class="onboarding-field">
+      <label>Organization name</label>
+      <input type="text" id="onboardOrgName" value="Northstar Labs" />
+    </div>
+
+    <div class="refine-section">
+      <p class="label">Capital types you'll consider</p>
+      <div class="pill-group" id="onboardTypeGroup">
+        <button class="pill" data-value="loan">Loans</button>
+        <button class="pill" data-value="grant">Grants</button>
+        <button class="pill" data-value="corporate">Corporate partnerships</button>
+        <button class="pill" data-value="equity">Equity</button>
+      </div>
+    </div>
+    <div class="refine-section">
+      <p class="label">Funding range you're working with</p>
+      <div class="side-options" id="onboardRangeGroup">
+        <button class="side-option" data-value="0">Any amount</button>
+        <button class="side-option" data-value="250000">At least $250K</button>
+        <button class="side-option" data-value="1000000">At least $1M</button>
+      </div>
+    </div>
+    <div class="refine-section" style="margin-bottom: 0;">
+      <p class="label">Fine-tune</p>
+      <div class="pill-group" id="onboardExtraGroup">
+        <button class="pill" data-value="hideDilutive">Hide dilutive capital</button>
+        <button class="pill" data-value="under500k">Only under $500K</button>
+        <button class="pill" data-value="rollingOnly">Only rolling deadlines</button>
+      </div>
+    </div>
+
+    <div class="quickview-actions" style="margin-top: 26px;">
+      <button class="quickview-skip" id="onboardingCancel">Cancel</button>
+      <button class="btn-primary" id="onboardingSave">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="describeOverlay">
+  <div class="onboarding-modal">
+    <button class="quickview-close" id="describeClose" aria-label="Close">&times;</button>
+    <h2 class="serif">Describe your own program</h2>
+    <p class="panel-sub">A few sentences about what you're working on gets a sharper match than the constellation alone — CHELCIE suggests companies whose strategic interests line up with it directly.</p>
+    <textarea id="studyInput" placeholder="e.g. A 400-patient trial testing HEPA purifiers in COPD patients' homes..." style="width:100%; min-height:120px; font-family:inherit; font-size:14px; padding:12px 14px; border:1px solid var(--border); border-radius:8px; resize:vertical;"></textarea>
+    <button class="btn-primary" id="designBtn" style="width:100%; margin-top:14px;" disabled>Find who should fund this</button>
+    <p class="design-meta" id="designMeta"></p>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="partnership-lib.js"></script>
+<script>
+  let ORG = "Northstar Labs";
+  const prefs = { types: new Set(["loan", "grant", "corporate", "equity"]), minRange: 0, hideDilutive: false, under500k: false, rollingOnly: false };
+  let filtered = [];
+  let currentTrackedEntry = null;
+  const tracked = [];
+  const favorites = new Set();
+  const dismissed = new Set();
+
+  const canvas = document.getElementById("canvasContainer");
+  const orbitSvg = document.getElementById("orbitSvg");
+  const screens = Array.from(document.querySelectorAll(".screen"));
+
+  function slug(text) {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  }
+
+  function showScreen(id) {
+    screens.forEach((s) => s.classList.toggle("active", s.dataset.screen === id));
+    window.scrollTo(0, 0);
+    syncScrollLock();
+  }
+
+  function recompute() {
+    filtered = OPPORTUNITIES.filter((o) => {
+      if (dismissed.has(o.id)) return false;
+      if (!prefs.types.has(o.type)) return false;
+      if (prefs.minRange && o.max < prefs.minRange) return false;
+      if (prefs.hideDilutive && o.dilutive) return false;
+      if (prefs.under500k && o.max > 500000) return false;
+      if (prefs.rollingOnly && !isRolling(o)) return false;
+      return true;
+    }).sort((a, b) => b.fit - a.fit);
+    renderMap();
+    renderListView();
+  }
+
+  const TYPES_ORDER = ["loan", "grant", "corporate", "equity"];
+  const BADGE_BG = {
+    grant: "var(--grant)",
+    corporate: "var(--deep2)",
+    loan: "linear-gradient(90deg, var(--deep), var(--deep2))",
+    equity: "var(--deep)",
+  };
+  // Fixed compass quadrant per capital type, matching the Figma concept:
+  // grant upper-left, corporate upper-right, loan lower-left, equity
+  // lower-right. Angle convention: 0 = right, 90 = down, -90 = up.
+  const QUADRANT = {
+    grant: -135,
+    corporate: -45,
+    loan: 135,
+    equity: 45,
+  };
+  const QUADRANT_SPAN = 68;
+  const CARD_LIMIT = 6;
+
+  function renderMap() {
+    const preRect = canvas.getBoundingClientRect();
+    if (!(preRect.width > 0 && preRect.height > 0)) {
+      requestAnimationFrame(renderMap);
+      return;
+    }
+
+    canvas.querySelectorAll(".opp-node").forEach((n) => n.remove());
+    orbitSvg.innerHTML = "";
+
+    const rect = canvas.getBoundingClientRect();
+    orbitSvg.setAttribute("viewBox", "0 0 " + rect.width + " " + rect.height);
+
+    // The floating panel sits on top of the canvas rather than shrinking it
+    // (it's a sibling, absolutely positioned), so centering on rect.width
+    // alone centers on the FULL width including the space the panel
+    // occupies — the constellation reads as shoved left. Center it instead
+    // on the space actually left over once the panel's width is excluded.
+    const panelRect = document.querySelector(".create-panel").getBoundingClientRect();
+    const panelFloats = panelRect.width > 0 && window.innerWidth > 860;
+    const availW = panelFloats ? panelRect.left - rect.left : rect.width;
+
+    const cx = availW / 2, cy = rect.height / 2;
+    const maxR = Math.min(availW, rect.height) / 2 - 90;
+
+    // The hub itself was still pinned at a static CSS left:50%/top:50%
+    // (the true center of the full canvas) while everything drawn around
+    // it now orbits the recentered cx/cy — pull it along too, or the ring
+    // of cards ends up centered on empty space next to an off-centre hub.
+    const centerHubEl = document.getElementById("centerHub");
+    centerHubEl.style.left = (cx / rect.width) * 100 + "%";
+    centerHubEl.style.top = (cy / rect.height) * 100 + "%";
+
+
+    [0.32, 0.55, 0.78, 1].forEach((f) => {
+      const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      ring.setAttribute("cx", cx);
+      ring.setAttribute("cy", cy);
+      ring.setAttribute("r", maxR * f);
+      ring.setAttribute("class", "orbit-ring");
+      orbitSvg.appendChild(ring);
+    });
+
+    const groups = TYPES_ORDER
+      .map((type) => ({ type, all: filtered.filter((o) => o.type === type) }))
+      .filter((g) => g.all.length > 0);
+
+    const isMobile = window.innerWidth <= 860;
+    const margin = 88;
+    const maxRxPx = Math.max(isMobile ? 70 : 150, availW / 2 - margin);
+    const maxRyPx = Math.max(isMobile ? 130 : 96, rect.height / 2 - margin);
+
+    const CARD_W = isMobile ? 118 : 190;
+    const CARD_H = isMobile ? 100 : 78;
+    const DOT_SIZE = 16;
+    const GAP = isMobile ? 16 : 52;
+    // Only the top CARD_LIMIT opportunities overall (globally by fit, not
+    // per type — `filtered` is already sorted this way) render as full
+    // cards; everything else still shows, but as a small clickable dot
+    // rather than competing for space as another shrunk-down card.
+    const cardIds = new Set(filtered.slice(0, CARD_LIMIT).map((o) => o.id));
+
+    const positions = [];
+    groups.forEach((g) => {
+      const shown = g.all;
+      const n = shown.length;
+      const ringCount = Math.max(1, Math.ceil(n / 3));
+      const itemsPerRing = Math.ceil(n / ringCount);
+      const ringFrac = (r) => (ringCount === 1 ? 0.5 : 0.42 + (r / (ringCount - 1)) * 0.5);
+      const centerRad = (QUADRANT[g.type] * Math.PI) / 180;
+      const halfSpanRad = (QUADRANT_SPAN * Math.PI) / 180 / 2;
+
+      shown.forEach((o, i) => {
+        const ring = Math.min(ringCount - 1, Math.floor(i / itemsPerRing));
+        const ringStart = ring * itemsPerRing;
+        const ringLen = Math.min(itemsPerRing, n - ringStart);
+        const posInRing = i - ringStart;
+        const angle = ringLen > 1
+          ? centerRad - halfSpanRad + (posInRing / (ringLen - 1)) * (halfSpanRad * 2)
+          : centerRad;
+        const t = ringFrac(ring);
+        const isCard = cardIds.has(o.id);
+        positions.push({
+          o,
+          type: g.type,
+          x: cx + Math.cos(angle) * maxRxPx * t,
+          y: cy + Math.sin(angle) * maxRyPx * t,
+          w: isCard ? CARD_W : DOT_SIZE,
+          h: isCard ? CARD_H : DOT_SIZE,
+          isCard,
+        });
+      });
+    });
+
+    const org = { x: cx, y: cy, w: 92 + 20, h: 92 + 20 };
+    // The floating panel is a real 2D obstacle now (a plain "stay left of
+    // it" line only worked back when the panel spanned the full canvas
+    // height — now that it's a shorter, vertically-centered card, a rule
+    // that's supposed to keep every element out from under it has to know
+    // its actual top/bottom too, not just its left edge). Desktop only —
+    // on mobile the panel un-floats below the canvas and never overlaps it.
+    const panelObstacle = panelFloats
+      ? { x: panelRect.left - rect.left + panelRect.width / 2, y: panelRect.top - rect.top + panelRect.height / 2, w: panelRect.width + 32, h: panelRect.height + 32 }
+      : null;
+    // The four quadrant labels are fixed obstacles too, same as the org
+    // hub — without this a corner card can land right on top of a label
+    // (found via screenshot: the corporate card overlapping "Corporate
+    // Sponsors"), since they were invisible to the relaxation pass.
+    const fixedObstacles = [org].concat(panelObstacle ? [panelObstacle] : []).concat(
+      Array.from(document.querySelectorAll(".quadrant-label")).map((el) => {
+        const r = el.getBoundingClientRect();
+        return { x: r.x - rect.left + r.width / 2, y: r.y - rect.top + r.height / 2, w: r.width + 44, h: r.height + 32 };
+      })
+    );
+
+    // Per-item w/h (not just a uniform CARD_W/CARD_H) so the depth-cue
+    // sizing below can be baked in without reopening overlaps.
+    function relax(iterations) {
+      for (let iter = 0; iter < iterations; iter++) {
+        let moved = false;
+        for (const p of positions) {
+          const halfW = p.w / 2, halfH = p.h / 2;
+          const minX = halfW + 12, maxX = rect.width - halfW - 12;
+          const clampedX = Math.min(Math.max(p.x, minX), maxX);
+          const clampedY = Math.min(Math.max(p.y, halfH + 12), rect.height - halfH - 12);
+          if (clampedX !== p.x || clampedY !== p.y) moved = true;
+          p.x = clampedX;
+          p.y = clampedY;
+
+          for (const obstacle of fixedObstacles) {
+            const dx = p.x - obstacle.x, dy = p.y - obstacle.y;
+            const overlapX = (obstacle.w + p.w) / 2 - Math.abs(dx);
+            const overlapY = (obstacle.h + p.h) / 2 - Math.abs(dy);
+            if (overlapX > 0 && overlapY > 0) {
+              moved = true;
+              const dist = Math.hypot(dx, dy) || 1;
+              const pushOut = Math.min(overlapX, overlapY) + 2;
+              p.x += (dx / dist) * pushOut;
+              p.y += (dy / dist) * pushOut;
+            }
+          }
+        }
+        for (let i = 0; i < positions.length; i++) {
+          for (let j = i + 1; j < positions.length; j++) {
+            const p1 = positions[i], p2 = positions[j];
+            const dx = p2.x - p1.x, dy = p2.y - p1.y;
+            const overlapX = (p1.w + p2.w) / 2 + GAP - Math.abs(dx);
+            const overlapY = (p1.h + p2.h) / 2 + GAP - Math.abs(dy);
+            if (overlapX > 0 && overlapY > 0) {
+              moved = true;
+              if (overlapX < overlapY) {
+                const push = (overlapX / 2) * (dx < 0 ? -1 : 1) || overlapX / 2;
+                p1.x -= push; p2.x += push;
+              } else {
+                const push = (overlapY / 2) * (dy < 0 ? -1 : 1) || overlapY / 2;
+                p1.y -= push; p2.y += push;
+              }
+            }
+          }
+        }
+        if (!moved) break;
+      }
+    }
+
+    relax(500);
+
+    // Depth cue, cards only: distance from the org hub (taken from where a
+    // card actually settled, not just its original ring) maps to size —
+    // closer reads a little bigger, farther a little smaller. Every shown
+    // card is fully opaque now; opacity is reserved as the card-vs-dot
+    // signal instead of also doing double duty as a distance fade.
+    // At mobile, some quadrants are already packed within a couple of
+    // pixels of the tightest fit the canvas allows (the org hub, canvas
+    // edges and the panel leave no slack to spare), so the range there
+    // only shrinks far cards rather than growing near ones — growth is
+    // what needs the spare room this width doesn't have.
+    const scaleRange = isMobile ? [0.9, 1] : [0.85, 1.15];
+    // Plain Euclidean pixel distance, not the elliptical per-axis one used
+    // for placement — "closer to the sun" means visual proximity, and the
+    // x/y budgets differ enough (a wide canvas, a short one) that dividing
+    // each axis by its own budget stopped tracking actual on-screen distance
+    // once the relaxation pass pushed cards off the clean ellipse.
+    const refR = (maxRxPx + maxRyPx) / 2;
+    positions.forEach((p) => {
+      if (!p.isCard) {
+        p.opacity = 1;
+        return;
+      }
+      const t = Math.hypot(p.x - cx, p.y - cy) / refR;
+      const closeness = Math.min(1, Math.max(0, 1 - (t - 0.42) / 0.63));
+      p.scale = scaleRange[0] + closeness * (scaleRange[1] - scaleRange[0]);
+      p.opacity = 1;
+      p.w = CARD_W * p.scale;
+      p.h = CARD_H * p.scale;
+    });
+
+    relax(500);
+
+    // Dots land exactly on one of the drawn orbit rings, not adrift in the
+    // empty space between them — snapped to the nearest ring radius along
+    // whatever angle collision-avoidance already settled it at, so it
+    // reads as a point sitting on the map rather than floating.
+    const ringRadii = [0.32, 0.55, 0.78, 1].map((f) => maxR * f).filter((r) => r > 70);
+    positions.forEach((p) => {
+      if (p.isCard) return;
+      const dist = Math.hypot(p.x - cx, p.y - cy) || 1;
+      const angle = Math.atan2(p.y - cy, p.x - cx);
+      let nearest = ringRadii[0];
+      for (const r of ringRadii) {
+        if (Math.abs(dist - r) < Math.abs(dist - nearest)) nearest = r;
+      }
+      p.x = cx + Math.cos(angle) * nearest;
+      p.y = cy + Math.sin(angle) * nearest;
+    });
+
+    positions.forEach((p) => {
+      const o = p.o;
+      const x = (p.x / rect.width) * 100;
+      const y = (p.y / rect.height) * 100;
+      const cardOpacity = p.opacity;
+
+      // Connector lines only make sense for the real cards — drawing one
+      // to every small opportunity-dot too just turns the whole canvas
+      // into a hairball, and the dots already read as "part of this
+      // constellation" from their position alone.
+      if (p.isCard) {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", cx);
+        line.setAttribute("y1", cy);
+        line.setAttribute("x2", p.x);
+        line.setAttribute("y2", p.y);
+        line.setAttribute("class", "conn-line");
+        orbitSvg.appendChild(line);
+
+        const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        dot.setAttribute("cx", p.x);
+        dot.setAttribute("cy", p.y);
+        dot.setAttribute("r", 3);
+        dot.setAttribute("class", "conn-dot");
+        orbitSvg.appendChild(dot);
+      }
+
+      const node = document.createElement("div");
+      node.className = "opp-node shown";
+      node.style.left = x + "%";
+      node.style.top = y + "%";
+      node.style.opacity = cardOpacity.toFixed(3);
+
+      if (p.isCard) {
+        node.innerHTML = `
+          <button class="node-card" data-opp-id="${o.id}">
+            <span class="node-card-top">
+              <span class="node-badge" style="background:${BADGE_BG[o.type]}">${TYPE_LABEL[o.type].toUpperCase()}</span>
+              <span class="node-right-group">
+                ${favorites.has(o.id) ? '<span class="node-fav">★</span>' : ""}
+                <span class="node-fit">${o.fit}</span>
+              </span>
+            </span>
+            <span class="node-name">${o.name}</span>
+            <span class="node-amount">Up to ${fmtMoney(o.max)}</span>
+          </button>
+        `;
+        const cardBtn = node.querySelector(".node-card");
+        cardBtn.style.setProperty("--card-scale", p.scale.toFixed(3));
+        cardBtn.addEventListener("click", () => openQuickView(o, cardBtn));
+      } else {
+        // Beyond the CARD_LIMIT cards, an opportunity is still real and
+        // still clickable — just a small solid dot instead of competing
+        // for space as another shrunk card. A distinct, non-animated
+        // colour (unlike the pulsing "discover more" dots) marks it as
+        // a specific opportunity you can open, not a generic prompt.
+        node.innerHTML = `<button class="opp-dot" data-opp-id="${o.id}" aria-label="${o.name}" title="${o.name} — ${TYPE_LABEL[o.type]}, fit ${o.fit}"></button>`;
+        const dotBtn = node.querySelector(".opp-dot");
+        dotBtn.addEventListener("click", () => openQuickView(o, dotBtn));
+      }
+      canvas.appendChild(node);
+    });
+  }
+
+  // The list-view alternative to the constellation — same `filtered` data,
+  // same click-through to the quick-view, just plain scannable rows for
+  // anyone who'd rather not read a radial map.
+  function renderListView() {
+    const rows = document.getElementById("listViewRows");
+    if (filtered.length === 0) {
+      rows.innerHTML = `<p class="list-empty">No opportunities match your current filters.</p>`;
+      return;
+    }
+    rows.innerHTML = filtered.map((o) => `
+      <button class="list-row" data-opp-id="${o.id}">
+        <span class="list-row-left">
+          <span class="node-badge list-row-badge" style="background:${BADGE_BG[o.type]}">${TYPE_LABEL[o.type].toUpperCase()}</span>
+          <span>
+            <span class="list-row-name">${o.name}${favorites.has(o.id) ? ' <span class="node-fav">★</span>' : ""}</span>
+            <div class="list-row-meta">${o.timeline}</div>
+          </span>
+        </span>
+        <span class="list-row-right">
+          <span class="list-row-fit">${o.fit} fit</span>
+          <span class="list-row-amount">Up to ${fmtMoney(o.max)}</span>
+        </span>
+      </button>
+    `).join("");
+    rows.querySelectorAll(".list-row").forEach((row) => {
+      const o = filtered.find((x) => x.id === row.dataset.oppId);
+      row.addEventListener("click", () => openQuickView(o, row));
+    });
+  }
+
+  document.querySelectorAll("#viewToggle .view-toggle-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#viewToggle .view-toggle-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const isList = btn.dataset.view === "list";
+      canvas.hidden = isList;
+      document.getElementById("listView").hidden = !isList;
+    });
+  });
+
+  /* ---------- generalized designable ---------- */
+
+  let currentDesignable = null;
+
+  function fromOpportunity(o) {
+    return {
+      kind: "onepager",
+      eyebrow: TYPE_LABEL[o.type] + " · Fit " + o.fit,
+      name: o.name,
+      sub: amountRange(o) + " · " + o.timeline,
+      gainQuote: o.gain,
+      gainSub: o.worksWith,
+      termsLine: o.terms.join(", ") + ".",
+      defaultAskText: defaultAsk(o),
+      defaultUseText: defaultUseOfFunds(o),
+      draftSubLine: () => "Partnership request to " + o.name,
+      filenameBase: (org) => slug(org) + "-" + slug(o.name) + "-one-pager",
+      trackerKind: "onepager",
+      trackerTitle: o.name,
+      trackerSubtitle: amountRange(o) + " · " + o.timeline,
+    };
+  }
+
+  function fromSponsor(t, design) {
+    // A sponsor's "draft" is a real VP outreach email (subject + body),
+    // not the ask/use/fit/terms one-pager an opportunity gets — matching
+    // Amy's actual C-CHANGE demo, which drafts exactly this for a company
+    // target. vpEmailFor (partnership-lib.js) already builds it from the
+    // same strategic_hook/entry_vehicle/check_size data shown above.
+    const email = vpEmailFor(design, t, ORG);
+    return {
+      kind: "email",
+      eyebrow: "CORPORATE · " + t.business_unit,
+      name: t.company,
+      sub: t.check_size,
+      gainQuote: t.strategic_hook,
+      gainSub: t.why_them,
+      termsLine: `${t.entry_vehicle} Typical structure: ${t.check_size}.`,
+      emailSubject: email.subject,
+      emailBody: email.body,
+      draftSubLine: () => `Outreach to ${t.company}, ${t.business_unit}`,
+      filenameBase: (org) => slug(org) + "-" + slug(t.company) + "-outreach",
+      trackerKind: "vpemail",
+      trackerTitle: t.company + " outreach",
+      trackerSubtitle: t.business_unit,
+    };
+  }
+
+  function openDetail(d) {
+    currentDesignable = d;
+    currentTrackedEntry = null;
+    document.getElementById("autosaveNote").textContent = "";
+    showScreen("build");
+
+    document.getElementById("buildEyebrow").textContent = d.eyebrow;
+    document.getElementById("buildName").textContent = d.name;
+    document.getElementById("buildSub").textContent = d.sub;
+    document.getElementById("buildGainText").textContent = d.gainQuote;
+    document.getElementById("buildGainSub").textContent = d.gainSub;
+    document.getElementById("buildTerms").textContent = d.termsLine;
+
+    document.getElementById("buildSections").hidden = true;
+    document.getElementById("buildLoading").hidden = false;
+
+    const isEmail = d.kind === "email";
+    ["sectionAsk", "sectionUse", "sectionFit", "sectionTerms"].forEach((id) => {
+      document.getElementById(id).hidden = isEmail;
+    });
+    ["sectionSubject", "sectionBody"].forEach((id) => {
+      document.getElementById(id).hidden = !isEmail;
+    });
+
+    setTimeout(() => {
+      if (isEmail) {
+        document.querySelector(".pitch-subject").value = d.emailSubject;
+        document.querySelector(".pitch-body").value = d.emailBody;
+      } else {
+        document.querySelector(".pitch-ask").value = d.defaultAskText;
+        document.querySelector(".pitch-use").value = d.defaultUseText;
+        document.querySelector(".pitch-fit").value = d.gainQuote;
+        document.querySelector(".pitch-terms").value = d.termsLine;
+      }
+
+      document.getElementById("buildLoading").hidden = true;
+      document.getElementById("buildSections").hidden = false;
+
+      const { text, org } = currentDocumentText();
+      currentTrackedEntry = addTracked({
+        kind: d.trackerKind,
+        title: d.trackerTitle,
+        subtitle: d.trackerSubtitle,
+        exportText: text,
+        filename: d.filenameBase(org) + ".txt",
+      });
+      renderDraftStatus();
+      noteAutosaved();
+    }, 900);
+  }
+
+  function openOpportunity(o) {
+    openDetail(fromOpportunity(o));
+  }
+
+  /* ---------- quick view: shown on a node click, before drafting starts ---------- */
+
+  function whyMatchLine(o) {
+    return `Their funding priorities center on ${o.focusArea} — directly in line with what ${ORG} is building, part of why this scored a ${o.fit} fit.`;
+  }
+
+  const quickViewCard = document.getElementById("quickViewCard");
+  const quickViewFav = document.getElementById("quickViewFav");
+  let currentQuickViewOpp = null;
+
+  // Positions the popover anchored at the clicked card's own spot, matching
+  // the Figma concept (a small card in place, not a centered takeover),
+  // clamped to stay inside the canvas and clear of the floating panel —
+  // the same panel-avoidance limit renderMap() already uses for nodes.
+  function positionQuickView(anchorEl) {
+    // map-shell, not canvas — canvas-container is display:none in list
+    // view, and a hidden element's rect is all zeros, which would send
+    // the popover to (0,0) instead of anchoring near the clicked row.
+    const canvasRect = document.querySelector(".map-shell").getBoundingClientRect();
+    const cardRect = anchorEl.getBoundingClientRect();
+    const margin = 14;
+    const panelBox = document.querySelector(".create-panel").getBoundingClientRect();
+    const rightLimit = (panelBox.width > 0 && window.innerWidth > 860)
+      ? panelBox.left - margin
+      : canvasRect.right - margin;
+
+    quickViewCard.style.left = "0px";
+    quickViewCard.style.top = "0px";
+    const pw = quickViewCard.offsetWidth;
+    const ph = quickViewCard.offsetHeight;
+
+    let left = cardRect.left;
+    let top = cardRect.top;
+    if (left + pw > rightLimit) left = rightLimit - pw;
+    if (left < canvasRect.left + margin) left = canvasRect.left + margin;
+    if (top + ph > canvasRect.bottom - margin) top = canvasRect.bottom - margin - ph;
+    if (top < canvasRect.top + margin) top = canvasRect.top + margin;
+
+    quickViewCard.style.left = (left - canvasRect.left) + "px";
+    quickViewCard.style.top = (top - canvasRect.top) + "px";
+  }
+
+  function openQuickView(o, anchorEl) {
+    document.getElementById("quickViewBody").innerHTML = `
+      <span class="quickview-fit">${o.fit} FIT</span>
+      <h2 class="quickview-title">${o.name}</h2>
+      <span class="quickview-badge">${TYPE_LABEL[o.type].toUpperCase()}</span>
+      <p class="quickview-desc">Supports ${o.focusArea}.</p>
+      <div class="quickview-stats">
+        <div class="quickview-stat">
+          <p class="stat-label">Funding</p>
+          <p class="stat-value">Up to ${fmtMoney(o.max)}</p>
+        </div>
+        <div class="quickview-stat">
+          <p class="stat-label">Timeline</p>
+          <p class="stat-value">${o.timeline}</p>
+        </div>
+      </div>
+      <div class="quickview-why">
+        <p class="why-label">Why ${ORG} is a strong match</p>
+        <div class="quickview-why-row">
+          <span class="dot"></span>
+          <p>${whyMatchLine(o)}</p>
+        </div>
+      </div>
+      <div class="quickview-actions">
+        <button class="quickview-skip" id="quickViewSkip">Not interested</button>
+        <button class="btn-primary" id="quickViewStart">Start drafting</button>
+      </div>
+    `;
+    document.getElementById("quickViewStart").addEventListener("click", () => {
+      closeQuickView();
+      openOpportunity(o);
+    });
+    document.getElementById("quickViewSkip").addEventListener("click", () => {
+      dismissed.add(o.id);
+      closeQuickView();
+      recompute();
+    });
+
+    currentQuickViewOpp = o;
+    renderFavButton(quickViewFav, o);
+
+    quickViewCard.classList.add("active");
+    positionQuickView(anchorEl);
+  }
+
+  function renderFavButton(btn, o) {
+    const active = favorites.has(o.id);
+    btn.textContent = active ? "★" : "☆";
+    btn.classList.toggle("active", active);
+    btn.setAttribute("aria-pressed", String(active));
+  }
+
+  // Echoes a favorite toggle onto that opportunity's node-card on the map,
+  // if it's currently rendered — a full renderMap() re-run would work too,
+  // but is overkill for a purely decorative badge and would also re-run
+  // the collision relaxation pass for no reason.
+  function syncFavBadge(o) {
+    const card = canvas.querySelector(`.node-card[data-opp-id="${o.id}"]`);
+    if (!card) return;
+    const group = card.querySelector(".node-right-group");
+    let star = group.querySelector(".node-fav");
+    if (favorites.has(o.id) && !star) {
+      star = document.createElement("span");
+      star.className = "node-fav";
+      star.textContent = "★";
+      group.insertBefore(star, group.firstChild);
+    } else if (!favorites.has(o.id) && star) {
+      star.remove();
+    }
+  }
+
+  function closeQuickView() {
+    quickViewCard.classList.remove("active");
+  }
+
+  document.getElementById("quickViewClose").addEventListener("click", closeQuickView);
+  // A single persistent listener, not rebuilt on every open — quickViewFav
+  // is static markup (sibling of the close button), unlike the rest of the
+  // popover's content which is rebuilt via innerHTML each time.
+  quickViewFav.addEventListener("click", () => {
+    const o = currentQuickViewOpp;
+    if (!o) return;
+    if (favorites.has(o.id)) favorites.delete(o.id);
+    else favorites.add(o.id);
+    renderFavButton(quickViewFav, o);
+    syncFavBadge(o);
+  });
+  // No backdrop — dismiss on a click anywhere outside the popover, except a
+  // node-card click (that has its own handler, which opens/repositions the
+  // popover for the newly clicked card instead of closing it).
+  document.addEventListener("click", (e) => {
+    if (!quickViewCard.classList.contains("active")) return;
+    if (e.target.closest("#quickViewCard") || e.target.closest(".node-card") || e.target.closest(".opp-dot") || e.target.closest(".list-row")) return;
+    closeQuickView();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && quickViewCard.classList.contains("active")) closeQuickView();
+  });
+  window.addEventListener("resize", () => {
+    if (quickViewCard.classList.contains("active")) closeQuickView();
+  });
+
+  function currentDocumentText() {
+    const d = currentDesignable;
+    const org = document.querySelector(".pitch-org").value.trim() || ORG;
+    if (d.kind === "email") {
+      const subject = document.querySelector(".pitch-subject").value.trim();
+      const body = document.querySelector(".pitch-body").value.trim();
+      const text = [`Subject: ${subject}`, ``, body].join("\n");
+      return { org, text };
+    }
+    const ask = document.querySelector(".pitch-ask").value.trim();
+    const use = document.querySelector(".pitch-use").value.trim();
+    const fit = document.querySelector(".pitch-fit").value.trim();
+    const terms = document.querySelector(".pitch-terms").value.trim();
+    const text = [org, d.draftSubLine(), ``, `WHAT WE ARE ASKING`, ask, ``, `HOW THE FUNDS WILL BE USED`, use, ``, `WHY THIS FITS`, fit, ``, `TERMS UNDER DISCUSSION`, terms].join("\n");
+    return { org, text };
+  }
+
+  document.querySelectorAll(".regen-link").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const d = currentDesignable;
+      const field = btn.dataset.field;
+      if (field === "ask") document.querySelector(".pitch-ask").value = d.defaultAskText;
+      else if (field === "use") document.querySelector(".pitch-use").value = d.defaultUseText;
+      else if (field === "fit") document.querySelector(".pitch-fit").value = d.gainQuote;
+      else if (field === "terms") document.querySelector(".pitch-terms").value = d.termsLine;
+      else if (field === "subject") document.querySelector(".pitch-subject").value = d.emailSubject;
+      else if (field === "body") document.querySelector(".pitch-body").value = d.emailBody;
+    });
+  });
+
+  document.getElementById("buildBackLink").addEventListener("click", () => showScreen("map"));
+
+  /* ---------- shared prefs controls: Refine Map and the onboarding
+     profile modal both read/write the exact same `prefs` object (it's the
+     one thing driving what's matched), so each just needs to stay in sync
+     with whichever one the person used last — wire once, sync on open. ---------- */
+
+  const CAPITAL_TYPES = ["loan", "grant", "corporate", "equity"];
+
+  function wirePrefsControls(root) {
+    root.querySelectorAll(".pill[data-value]").forEach((p) => {
+      const v = p.dataset.value;
+      p.addEventListener("click", () => {
+        if (CAPITAL_TYPES.includes(v)) {
+          if (prefs.types.has(v)) { prefs.types.delete(v); p.classList.remove("selected"); }
+          else { prefs.types.add(v); p.classList.add("selected"); }
+        } else {
+          prefs[v] = !prefs[v];
+          p.classList.toggle("selected", prefs[v]);
+        }
+      });
+    });
+    const sideOptions = root.querySelectorAll(".side-option[data-value]");
+    sideOptions.forEach((b) => {
+      b.addEventListener("click", () => {
+        sideOptions.forEach((o) => o.classList.remove("selected"));
+        b.classList.add("selected");
+        prefs.minRange = Number(b.dataset.value);
+      });
+    });
+  }
+
+  function syncPrefsUI(root) {
+    root.querySelectorAll(".pill[data-value]").forEach((p) => {
+      const v = p.dataset.value;
+      p.classList.toggle("selected", CAPITAL_TYPES.includes(v) ? prefs.types.has(v) : !!prefs[v]);
+    });
+    root.querySelectorAll(".side-option[data-value]").forEach((b) => {
+      b.classList.toggle("selected", Number(b.dataset.value) === prefs.minRange);
+    });
+  }
+
+  /* ---------- onboarding profile modal ---------- */
+
+  const onboardingOverlay = document.getElementById("onboardingOverlay");
+  wirePrefsControls(onboardingOverlay);
+
+  function applyOrgName(name) {
+    ORG = name;
+    document.getElementById("headline").textContent = `${name}: rising opportunities`;
+    document.querySelector("#centerHub span").textContent = name;
+    const orgInput = document.querySelector(".pitch-org");
+    if (orgInput) orgInput.value = name;
+  }
+
+  function openOnboardingModal() {
+    document.getElementById("onboardOrgName").value = ORG;
+    syncPrefsUI(onboardingOverlay);
+    onboardingOverlay.classList.add("active");
+  }
+
+  document.getElementById("centerHub").addEventListener("click", openOnboardingModal);
+  document.getElementById("onboardingClose").addEventListener("click", () => onboardingOverlay.classList.remove("active"));
+  document.getElementById("onboardingCancel").addEventListener("click", () => onboardingOverlay.classList.remove("active"));
+  onboardingOverlay.addEventListener("click", (e) => {
+    if (e.target === onboardingOverlay) onboardingOverlay.classList.remove("active");
+  });
+  document.getElementById("onboardingSave").addEventListener("click", () => {
+    const newName = document.getElementById("onboardOrgName").value.trim();
+    if (newName) applyOrgName(newName);
+    recompute();
+    onboardingOverlay.classList.remove("active");
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && onboardingOverlay.classList.contains("active")) onboardingOverlay.classList.remove("active");
+  });
+
+  /* ---------- status + export tracker ---------- */
+
+  function addTracked(entry) {
+    const record = { id: Date.now() + Math.random(), status: "draft", createdAt: new Date(), ...entry };
+    tracked.unshift(record);
+    updateTrackerBadge();
+    return record;
+  }
+
+  function updateTrackerBadge() {
+    document.getElementById("trackerBtn").textContent = tracked.length ? `Your partnerships (${tracked.length})` : "Your partnerships";
+  }
+
+  function exportEntry(entry) {
+    const blob = new Blob([entry.exportText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = entry.filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function renderDraftStatus() {
+    if (!currentTrackedEntry) return;
+    const s = document.getElementById("draftStatus");
+    const btn = document.getElementById("markSentBtn");
+    s.innerHTML = `<span class="status-dot ${currentTrackedEntry.status}"></span> ${currentTrackedEntry.status === "sent" ? "Marked as sent" : "Draft ready, not sent yet"}`;
+    btn.textContent = currentTrackedEntry.status === "sent" ? "Mark as not sent" : "Mark as sent";
+  }
+
+  // Edits to the draft fields are never lost — every keystroke keeps the
+  // tracked entry (and its export text) current, not just the Export and
+  // Mark Sent buttons — with a small "Autosaved" note as the visible cue,
+  // debounced so it doesn't flicker on every keystroke.
+  let autosaveTimer = null;
+  function noteAutosaved() {
+    const note = document.getElementById("autosaveNote");
+    if (!note) return;
+    note.textContent = "Autosaved just now";
+  }
+  function scheduleAutosave() {
+    if (!currentTrackedEntry) return;
+    clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(() => {
+      currentTrackedEntry.exportText = currentDocumentText().text;
+      noteAutosaved();
+    }, 500);
+  }
+  document.querySelectorAll(".pitch-org, .pitch-ask, .pitch-use, .pitch-fit, .pitch-terms, .pitch-subject, .pitch-body").forEach((el) => {
+    el.addEventListener("input", scheduleAutosave);
+  });
+
+  document.getElementById("exportDraftBtn").addEventListener("click", () => {
+    if (!currentTrackedEntry) return;
+    const { org, text } = currentDocumentText();
+    currentTrackedEntry.exportText = text;
+    currentTrackedEntry.filename = currentDesignable.filenameBase(org) + ".txt";
+    exportEntry(currentTrackedEntry);
+  });
+
+  document.getElementById("markSentBtn").addEventListener("click", () => {
+    if (!currentTrackedEntry) return;
+    currentTrackedEntry.exportText = currentDocumentText().text;
+    currentTrackedEntry.status = currentTrackedEntry.status === "sent" ? "draft" : "sent";
+    renderDraftStatus();
+  });
+
+  const trackerOverlay = document.getElementById("trackerOverlay");
+  document.getElementById("trackerBtn").addEventListener("click", () => {
+    renderTracker();
+    trackerOverlay.classList.add("active");
+  });
+  document.getElementById("trackerClose").addEventListener("click", () => trackerOverlay.classList.remove("active"));
+
+  function renderTracker() {
+    const body = document.getElementById("trackerBody");
+    if (tracked.length === 0) {
+      body.innerHTML = `<p class="tracker-empty">Nothing drafted yet. Design a partnership from your constellation, or describe a program under "Partnerships ready for you," and it'll show up here with a status and an export.</p>`;
+      return;
+    }
+    body.innerHTML = tracked.map((t, i) => `
+      <div class="tracker-item">
+        <div>
+          <p class="tracker-kind">${t.kind === "onepager" ? "ONE-PAGER" : "OUTREACH EMAIL"}</p>
+          <p class="tracker-title">${t.title}</p>
+          <p class="tracker-sub">${t.subtitle}</p>
+        </div>
+        <div class="tracker-actions">
+          <span class="status-pill ${t.status}">${t.status === "sent" ? "Sent" : "Draft ready"}</span>
+          <button class="btn-secondary" data-idx="${i}" data-act="export">Export</button>
+          <button class="back-link" data-idx="${i}" data-act="toggle">${t.status === "sent" ? "Mark as not sent" : "Mark as sent"}</button>
+        </div>
+      </div>
+    `).join("");
+
+    body.querySelectorAll('[data-act="export"]').forEach((btn) => {
+      btn.addEventListener("click", () => exportEntry(tracked[Number(btn.dataset.idx)]));
+    });
+    body.querySelectorAll('[data-act="toggle"]').forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const t = tracked[Number(btn.dataset.idx)];
+        t.status = t.status === "sent" ? "draft" : "sent";
+        renderTracker();
+      });
+    });
+  }
+
+  /* ---------- create-your-own-partnership panel ---------- */
+
+  const LOGO_META = {
+    Dyson: { letter: "D", bg: "linear-gradient(135deg, #083839, #143644)", color: "#fff" },
+    IQAir: { letter: "IQ", bg: "linear-gradient(135deg, #00919b, #00b3c7)", color: "#111" },
+    "Trane Technologies": { letter: "T", bg: "linear-gradient(135deg, #083839, #143644)", color: "#fff" },
+  };
+  function logoMeta(company) {
+    return LOGO_META[company] || { letter: company.charAt(0).toUpperCase(), bg: "linear-gradient(135deg, #083839, #143644)", color: "#fff" };
+  }
+
+  const studyInput = document.getElementById("studyInput");
+  const designBtn = document.getElementById("designBtn");
+  studyInput.addEventListener("input", () => { designBtn.disabled = !studyInput.value.trim(); });
+  designBtn.addEventListener("click", () => {
+    runDesign(studyInput.value);
+    // Closes back to the panel so the freshly-matched companies are
+    // immediately visible, instead of leaving the modal open over them.
+    describeOverlay.classList.remove("active");
+  });
+
+  const describeOverlay = document.getElementById("describeOverlay");
+  document.getElementById("refineProgramBtn").addEventListener("click", () => describeOverlay.classList.add("active"));
+  document.getElementById("describeClose").addEventListener("click", () => describeOverlay.classList.remove("active"));
+  describeOverlay.addEventListener("click", (e) => {
+    if (e.target === describeOverlay) describeOverlay.classList.remove("active");
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && describeOverlay.classList.contains("active")) describeOverlay.classList.remove("active");
+  });
+
+  let currentDesign = null;
+  let selectedTargetIdx = -1;
+
+  function runDesign(text) {
+    const trimmed = (text || "").trim();
+    currentDesign = designPartnership(trimmed);
+    selectedTargetIdx = -1;
+    document.getElementById("designMeta").textContent = trimmed
+      ? `${currentDesign.targets.length} target${currentDesign.targets.length === 1 ? "" : "s"} · themes: ${currentDesign.themes.slice(0, 4).join(", ") || "—"}`
+      : "";
+    renderSponsorList();
+    syncMoreCompaniesBtn();
+  }
+
+  // Beyond the initial handful, the full SPONSORS roster (partnership-lib.js)
+  // has real entries — AstraZeneca, 3M, Google.org, Apple, Kaiser Permanente —
+  // that designPartnership() only surfaces if the description happens to hit
+  // their specific themes. This is a lower-friction path to the same
+  // companies: no describing anything, just see who else is there.
+  function syncMoreCompaniesBtn() {
+    const shown = new Set(currentDesign.targets.map((t) => t.company));
+    const remaining = SPONSORS.filter((s) => !shown.has(s.entry.company));
+    document.getElementById("moreCompaniesBtn").hidden = remaining.length === 0;
+  }
+
+  document.getElementById("moreCompaniesBtn").addEventListener("click", () => {
+    const shown = new Set(currentDesign.targets.map((t) => t.company));
+    const remaining = SPONSORS.filter((s) => !shown.has(s.entry.company)).map((s) => s.entry);
+    currentDesign.targets = currentDesign.targets.concat(remaining);
+    renderSponsorList();
+    syncMoreCompaniesBtn();
+  });
+
+  function renderSponsorList() {
+    const list = document.getElementById("sponsorList");
+    list.innerHTML = currentDesign.targets.map((t, i) => {
+      const meta = logoMeta(t.company);
+      const isSelected = i === selectedTargetIdx;
+      // The detail renders INSIDE the same wrapper as its row, directly
+      // after it — not as a single fixed box after the whole list — so it
+      // reads as that row expanding, not a detached card further down.
+      return `
+        <div class="sponsor-item">
+          <button class="sponsor-row ${isSelected ? "selected" : ""}" data-idx="${i}">
+            <span class="sponsor-row-top">
+              <span class="sponsor-logo-name">
+                <span class="sponsor-logo" style="background:${meta.bg}; color:${meta.color}">${meta.letter}</span>
+                <span class="sponsor-company">${t.company}</span>
+              </span>
+            </span>
+            <p class="sponsor-unit">${t.business_unit}</p>
+            <p class="sponsor-check">${t.check_size.split(" ")[0]} Target</p>
+          </button>
+          ${isSelected ? '<div class="sponsor-detail" id="sponsorDetailWrap"></div>' : ""}
+        </div>
+      `;
+    }).join("");
+    list.querySelectorAll(".sponsor-row").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        selectedTargetIdx = Number(btn.dataset.idx);
+        renderSponsorList();
+        renderSponsorDetail();
+      });
+    });
+  }
+
+  function renderSponsorDetail() {
+    const t = currentDesign.targets[selectedTargetIdx];
+    const design = currentDesign;
+    const detail = document.getElementById("sponsorDetailWrap");
+    detail.innerHTML = `
+      <p class="field-label">Strategic hook</p>
+      <p>${t.strategic_hook}</p>
+      <p class="field-label">Entry vehicle</p>
+      <p>${t.entry_vehicle}</p>
+      <p class="field-label">Check size</p>
+      <p>${t.check_size}</p>
+      <p class="field-label">Decision maker</p>
+      <p>${t.decision_maker.role}</p>
+      <p class="field-label">Why them</p>
+      <p>${t.why_them}</p>
+      <p class="field-label">How to find them</p>
+      <p style="font-style:italic;">${t.decision_maker.name_hint}</p>
+      <p class="field-label">Verify · public sources</p>
+      <p>${t.sources.map((s) => `<a href="${s.url}" target="_blank" rel="noopener" style="color:var(--deep2);">${s.label}</a>`).join("<br>")}</p>
+      <button class="btn-primary" id="designThisBtn" style="margin-top:4px;">Design this partnership →</button>
+    `;
+    document.getElementById("designThisBtn").addEventListener("click", () => {
+      openDetail(fromSponsor(t, design));
+    });
+  }
+
+  /* ---------- scroll lock: canvas screen is one viewport on desktop
+     (≥860px); below that, everything unlocks and stacks normally. ---------- */
+
+  function syncScrollLock() {
+    const active = document.querySelector(".screen.active");
+    const isMap = active && active.dataset.screen === "map";
+    const desktop = window.innerWidth >= 860;
+    document.body.classList.toggle("scroll-unlocked", !(isMap && desktop));
+  }
+
+  window.addEventListener("resize", syncScrollLock);
+
+  recompute();
+  runDesign("");
+  syncScrollLock();
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(renderMap);
+  } else {
+    setTimeout(renderMap, 300);
+  }
+</script>
+</body>
+</html>

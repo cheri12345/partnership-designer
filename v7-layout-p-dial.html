@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Layout P: Dial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v2-shared.css" />
+<link rel="stylesheet" href="builder-shared.css" />
+<style>
+  .dial-head {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 40px 24px 8px;
+    text-align: center;
+  }
+
+  .dial-head h1 {
+    font-size: 2rem;
+    margin: 4px 0 10px;
+  }
+
+  .dial-sub {
+    font-size: 0.9375rem;
+    color: hsl(var(--stone));
+    max-width: 42rem;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .dial-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 24px 60px;
+  }
+
+  .dial-stage {
+    position: relative;
+    width: 320px;
+    height: 320px;
+  }
+
+  .dial {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 3px;
+    box-shadow: 0 14px 32px hsl(var(--ink) / 0.14);
+  }
+
+  .dial-wedge {
+    border: none;
+    cursor: pointer;
+    display: flex;
+    padding: 18px;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #fff;
+    transition: filter 0.15s ease, opacity 0.15s ease;
+    opacity: 0.82;
+  }
+
+  .dial-wedge.active {
+    opacity: 1;
+  }
+
+  .dial-wedge:hover {
+    filter: brightness(1.08);
+  }
+
+  .dial-wedge.nw {
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+
+  .dial-wedge.ne {
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+
+  .dial-wedge.sw {
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  .dial-wedge.se {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .dial-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid hsl(var(--ink));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    z-index: 2;
+  }
+
+  .dial-results {
+    width: 100%;
+    max-width: 900px;
+    margin-top: 36px;
+  }
+
+  .dial-results-head {
+    text-align: center;
+    font-size: 1.125rem;
+    margin: 0 0 16px;
+  }
+
+  .dial-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .dial-card {
+    width: 220px;
+    border: 1px solid hsl(var(--border));
+    border-radius: 10px;
+    padding: 16px;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .dial-card:hover {
+    border-color: hsl(var(--ink) / 0.5);
+    transform: translateY(-1px);
+  }
+
+  .dial-card-fit {
+    display: inline-block;
+    border: 1.5px solid hsl(var(--ink));
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 0.8125rem;
+    margin-bottom: 10px;
+  }
+
+  .dial-card-name {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    line-height: 1.3;
+    margin: 0 0 6px;
+  }
+
+  .dial-card-amount {
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="wordmark" href="index.html">CHELCIE</a>
+  <button class="pill-link" id="trackerBtn">Your partnerships<span class="badge" id="trackerBadge" hidden>0</span></button>
+</header>
+
+<main>
+
+  <section class="screen active" data-screen="browse">
+    <div class="dial-head">
+      <h1>Build toward a more resilient future.</h1>
+      <p class="dial-sub">One dial, four kinds of capital. Pick a quadrant to see what's there.</p>
+    </div>
+    <div class="dial-wrap">
+      <div class="dial-stage">
+        <div class="dial" id="dial"></div>
+        <div class="dial-center">YOUR<br />ORG</div>
+      </div>
+      <div class="dial-results">
+        <h2 class="dial-results-head" id="dialResultsHead"></h2>
+        <div class="dial-row" id="dialRow"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="builder">
+    <div class="builder-shell">
+      <aside class="builder-nav">
+        <button class="back-link builder-back-link" id="builderBackToBrowse">← Back to the dial</button>
+        <ul class="section-list" id="sectionList"></ul>
+      </aside>
+      <div class="builder-main" id="builderMain"></div>
+    </div>
+    <div class="builder-footer">
+      <button class="back-link" id="builderBack">Back</button>
+      <p class="builder-progress" id="builderProgress"></p>
+      <button class="btn-primary" id="builderNext">Continue</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="overlay" id="trackerOverlay">
+  <header class="topbar">
+    <span class="wordmark">Your partnerships</span>
+    <button class="pill-link" id="trackerClose">Close</button>
+  </header>
+  <div class="tracker-body" id="trackerBody" style="max-width:560px; margin:0 auto; padding:48px 24px 100px; width:100%;"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="partnership-lib.js"></script>
+<script src="builder-shared.js"></script>
+<script>
+  /* ---------- radial dial: four quadrants, one per kind of capital,
+     pick a quadrant to see what's there. ---------- */
+
+  const DIAL_TYPES = [
+    { type: "loan", pos: "nw", label: "Loans", color: "hsl(212 45% 42%)" },
+    { type: "grant", pos: "ne", label: "Grants", color: "hsl(142 38% 34%)" },
+    { type: "equity", pos: "sw", label: "Equity", color: "hsl(35 55% 42%)" },
+    { type: "corporate", pos: "se", label: "Corporate", color: "hsl(159 50% 30%)" },
+  ];
+
+  let selectedDialType = "loan";
+
+  function buildDialWedges() {
+    const dial = document.getElementById("dial");
+    dial.innerHTML = DIAL_TYPES.map((d) => `
+      <button class="dial-wedge ${d.pos} ${d.type === selectedDialType ? "active" : ""}" data-type="${d.type}" style="background:${d.color}">${d.label}</button>
+    `).join("");
+    dial.querySelectorAll(".dial-wedge").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        selectedDialType = btn.dataset.type;
+        buildDialWedges();
+        renderDialResults();
+      });
+    });
+  }
+
+  function dialCardHtml(item) {
+    return `
+      <button class="dial-card">
+        <span class="dial-card-fit">${item.badge}</span>
+        <p class="dial-card-name">${item.name}</p>
+        <p class="dial-card-amount">${item.amount}</p>
+      </button>
+    `;
+  }
+
+  function renderDialResults() {
+    const meta = DIAL_TYPES.find((d) => d.type === selectedDialType);
+    document.getElementById("dialResultsHead").textContent = meta.label;
+    const row = document.getElementById("dialRow");
+
+    let items;
+    if (selectedDialType === "corporate") {
+      const corpOpps = OPPORTUNITIES.filter((o) => o.type === "corporate").sort((a, b) => b.fit - a.fit);
+      const design = designPartnership("");
+      items = [
+        ...corpOpps.map((o) => ({ badge: o.fit, name: o.name, amount: amountRange(o), designable: fromOpportunity(o) })),
+        ...design.targets.map((t) => ({ badge: t.check_size.split(" ")[0], name: t.company, amount: t.business_unit, designable: fromSponsor(t, design) })),
+      ];
+    } else {
+      items = OPPORTUNITIES.filter((o) => o.type === selectedDialType).sort((a, b) => b.fit - a.fit)
+        .map((o) => ({ badge: o.fit, name: o.name, amount: amountRange(o), designable: fromOpportunity(o) }));
+    }
+
+    row.innerHTML = items.map(dialCardHtml).join("");
+    row.querySelectorAll(".dial-card").forEach((el, i) => {
+      el.addEventListener("click", () => openBuilder(items[i].designable));
+    });
+  }
+
+  buildDialWedges();
+  renderDialResults();
+</script>
+</body>
+</html>

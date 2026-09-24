@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Layout F: Constellation + Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v3-shared.css" />
+<style>
+  .split-fused {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 860px) {
+    .split-fused {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* ---------- dark panel: the opportunity landscape ---------- */
+
+  .panel-dark {
+    background: hsl(var(--ink));
+    color: hsl(var(--ink-foreground));
+    display: flex;
+    flex-direction: column;
+    padding: 32px 24px;
+  }
+
+  @media (min-width: 860px) {
+    .panel-dark {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 32px 40px;
+    }
+  }
+
+  .panel-dark header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .panel-dark .wordmark {
+    color: hsl(var(--ink-foreground));
+    font-size: 1rem;
+  }
+
+  .fused-eyebrow-dark {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: hsl(var(--ink-muted));
+    margin: 0;
+  }
+
+  .landscape-line {
+    font-size: 0.8125rem;
+    color: hsl(var(--ink-muted));
+    margin: 14px 0 0;
+    max-width: 26rem;
+  }
+
+  .constellation-wrap {
+    position: relative;
+    flex: 1;
+    min-height: 420px;
+    margin-top: 18px;
+  }
+
+  .constellation-wrap svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .constellation-wrap svg line {
+    stroke: hsl(var(--ink-foreground));
+  }
+
+  .center-node-dark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    border: 1.5px dashed hsl(var(--ink-foreground) / 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.6875rem;
+    letter-spacing: 0.02em;
+    background: hsl(var(--ink));
+    z-index: 2;
+  }
+
+  .dark-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 132px;
+    text-align: center;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .dark-node.shown {
+    opacity: 1;
+  }
+
+  .dark-node.dimmed {
+    opacity: 0.32;
+  }
+
+  .dark-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    border-radius: 50%;
+    border: 1.5px solid hsl(var(--ink-foreground));
+    background: hsl(var(--ink));
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 800;
+    color: hsl(var(--ink-foreground));
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+
+  .dark-circle:hover {
+    background: hsl(var(--ink-foreground) / 0.14);
+    transform: scale(1.06);
+  }
+
+  .dark-node.active .dark-circle {
+    background: hsl(var(--ink-foreground));
+    color: hsl(var(--ink));
+  }
+
+  .dark-node-name {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .dark-node-type {
+    display: block;
+    font-size: 0.6875rem;
+    color: hsl(var(--ink-muted));
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+
+  .show-more-link {
+    align-self: flex-start;
+    margin-top: 14px;
+    background: none;
+    border: none;
+    font-size: 0.8125rem;
+    text-decoration: underline;
+    color: hsl(var(--ink-muted));
+    cursor: pointer;
+  }
+
+  /* ---------- light panel: the designer ---------- */
+
+  .panel-light {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .light-inner {
+    padding: 48px 24px 110px;
+    max-width: 640px;
+    width: 100%;
+  }
+
+  @media (min-width: 860px) {
+    .light-inner {
+      padding: 56px 48px 110px;
+    }
+  }
+
+  .fused-headline {
+    font-size: 1.75rem;
+    margin: 10px 0 14px;
+  }
+
+  @media (min-width: 860px) {
+    .fused-headline {
+      font-size: 2.125rem;
+    }
+  }
+
+  .fused-sub {
+    font-size: 0.9375rem;
+    color: hsl(var(--stone));
+    max-width: 34rem;
+    margin: 0 0 26px;
+    line-height: 1.6;
+  }
+
+  .design-meta {
+    display: inline-block;
+    margin-left: 12px;
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+  }
+
+  .design-results {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 26px;
+  }
+
+  @media (min-width: 640px) {
+    .design-results {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+    }
+  }
+
+  .sponsor-list,
+  .sponsor-detail {
+    border: 1px solid hsl(var(--border));
+    border-radius: 4px;
+  }
+
+  .sponsor-list-head {
+    padding: 12px 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: hsl(var(--stone));
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .sponsor-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid hsl(var(--border));
+    padding: 13px 16px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .sponsor-row:last-child {
+    border-bottom: none;
+  }
+
+  .sponsor-row.selected {
+    background: hsl(var(--ink));
+  }
+
+  .sponsor-row.selected .sponsor-company,
+  .sponsor-row.selected .sponsor-unit,
+  .sponsor-row.selected .sponsor-check {
+    color: hsl(var(--paper));
+  }
+
+  .sponsor-company {
+    display: block;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.9375rem;
+  }
+
+  .sponsor-unit {
+    display: block;
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    margin-top: 2px;
+  }
+
+  .sponsor-check {
+    display: block;
+    font-size: 0.75rem;
+    color: hsl(var(--stone));
+    margin-top: 6px;
+  }
+
+  .sponsor-detail-body {
+    padding: 16px;
+  }
+
+  .sponsor-field {
+    margin-bottom: 14px;
+  }
+
+  .sponsor-field-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: hsl(var(--stone));
+    margin: 0 0 4px;
+  }
+
+  .sponsor-field p {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .sponsor-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .muted-italic {
+    font-style: italic;
+    color: hsl(var(--stone));
+  }
+
+  .source-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .source-list a {
+    font-size: 0.8125rem;
+    text-decoration: underline;
+  }
+
+  .vp-email-output {
+    margin-top: 6px;
+    border-top: 1px solid hsl(var(--border));
+    padding-top: 14px;
+  }
+
+  .vp-email-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .copy-row {
+    display: flex;
+    gap: 6px;
+  }
+
+  .copy-btn {
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--paper));
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .copy-btn:hover {
+    border-color: hsl(var(--ink));
+  }
+
+  .vp-subject {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.9375rem;
+  }
+
+  .vp-body {
+    white-space: pre-wrap;
+    font-family: inherit;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="split-fused">
+  <aside class="panel-dark">
+    <header>
+      <a class="wordmark" href="index.html">CHELCIE</a>
+    </header>
+    <p class="fused-eyebrow-dark" style="margin-top:28px;">Your opportunity landscape</p>
+    <p class="landscape-line">Everything already in reach, mapped around your organization. Click one to design a partnership with it directly.</p>
+
+    <div class="constellation-wrap" id="constellationWrap">
+      <svg id="linesSvg"></svg>
+      <div class="center-node-dark">YOUR<br />ORG</div>
+    </div>
+    <button class="show-more-link" id="showMoreBtn">Show 7 more</button>
+  </aside>
+
+  <div class="panel-light">
+    <div class="light-inner" id="designerView">
+      <p class="work-eyebrow">Partnership Designer</p>
+      <h1 class="fused-headline">Wait, I hadn't thought about this.</h1>
+      <p class="fused-sub">Describe what you're working on. CHELCIE surfaces who should fund it that isn't already sitting in your landscape on the left, plus a draft outreach email to the person who'd actually say yes.</p>
+
+      <div class="pill-group" id="sampleGroup"></div>
+
+      <div class="field-group" style="margin-top:16px; margin-bottom:12px;">
+        <textarea id="studyInput" rows="3" placeholder="e.g. A 400-patient trial testing HEPA purifiers in COPD patients' homes, measuring exacerbations, ER visits, and 12-month mortality."></textarea>
+      </div>
+      <button class="btn-primary" id="designBtn" disabled>Find who should fund this</button>
+      <span class="design-meta" id="designMeta"></span>
+
+      <div class="design-results" id="designResults" hidden>
+        <div class="sponsor-list">
+          <div class="sponsor-list-head">SPONSOR SLATE</div>
+          <div id="sponsorList"></div>
+        </div>
+        <div class="sponsor-detail">
+          <div class="sponsor-detail-body" id="sponsorDetail"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="light-inner" id="nodeDetailView" hidden>
+      <button class="back-link" id="backToDesigner">← Back to Partnership Designer</button>
+      <p class="work-eyebrow" id="nodeEyebrow" style="margin-top:20px;"></p>
+      <h2 class="fused-headline" id="nodeName" style="font-size:1.625rem;"></h2>
+      <p class="fused-sub" id="nodeSub" style="margin-bottom:4px;"></p>
+
+      <div class="gain-callout">
+        <blockquote id="nodeGainText"></blockquote>
+        <p class="works-with" id="nodeWorksWith"></p>
+      </div>
+
+      <div class="field-group">
+        <label>Your organization</label>
+        <input type="text" id="nodeOrg" value="Your organization" />
+      </div>
+      <div class="field-group">
+        <label>What you are asking for</label>
+        <textarea id="nodeAsk" rows="3"></textarea>
+      </div>
+      <div class="field-group">
+        <label>How the funds will be used</label>
+        <textarea id="nodeUse" rows="3"></textarea>
+      </div>
+
+      <button class="btn-primary" id="nodeDraftBtn">Draft with CHELCIE</button>
+
+      <div id="nodeDraftWrap" hidden style="margin-top:22px;">
+        <p class="draft-status" id="nodeDraftStatus"></p>
+        <div class="draft-actions">
+          <button class="btn-secondary" id="nodeExportBtn">Export .txt</button>
+          <button class="btn-secondary" id="nodeMarkSentBtn">Mark as sent</button>
+        </div>
+        <div class="draft-output" id="nodeDraftOutput"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="partnership-lib.js"></script>
+<script>
+  function slug(text) {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  }
+
+  /* ---------- constellation ---------- */
+
+  const wrap = document.getElementById("constellationWrap");
+  const linesSvg = document.getElementById("linesSvg");
+  linesSvg.setAttribute("viewBox", "0 0 100 100");
+  linesSvg.setAttribute("preserveAspectRatio", "none");
+
+  const sorted = [...OPPORTUNITIES].sort((a, b) => b.fit - a.fit);
+  let visibleCount = 6;
+
+  /* Angle slots are assigned by an interleaved stride, not sort rank, so
+     the first few nodes shown (highest fit) land spread around the full
+     circle instead of clustered in one arc. Stride 5 is coprime with 13,
+     so it visits every slot exactly once. */
+  const n = sorted.length;
+  const STRIDE = 5;
+  const angleSlots = sorted.map((_, i) => (i * STRIDE) % n);
+
+  function renderConstellation() {
+    wrap.querySelectorAll(".dark-node").forEach((n) => n.remove());
+    linesSvg.innerHTML = "";
+
+    sorted.forEach((o, i) => {
+      const angle = (angleSlots[i] / n) * Math.PI * 2 - Math.PI / 2;
+      const radius = 28 + (100 - o.fit) * 0.28;
+      const x = 50 + Math.cos(angle) * radius;
+      const y = 50 + Math.sin(angle) * radius;
+
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", 50);
+      line.setAttribute("y1", 50);
+      line.setAttribute("x2", x);
+      line.setAttribute("y2", y);
+      line.setAttribute("stroke-width", 0.3);
+      line.setAttribute("opacity", (o.fit / 100) * 0.55);
+      linesSvg.appendChild(line);
+
+      const diameter = Math.round(16 + o.fit * 0.14) * 2;
+      const node = document.createElement("div");
+      node.className = "dark-node";
+      node.dataset.id = o.id;
+      node.style.left = x + "%";
+      node.style.top = y + "%";
+      node.innerHTML = `
+        <button class="dark-circle" style="width:${diameter}px;height:${diameter}px;">${o.fit}</button>
+        <span class="dark-node-name">${o.name}</span>
+        <span class="dark-node-type">${TYPE_LABEL[o.type]}</span>
+      `;
+      node.querySelector(".dark-circle").addEventListener("click", () => openNode(o, node));
+      wrap.appendChild(node);
+    });
+
+    updateVisible();
+  }
+
+  function updateVisible() {
+    const nodes = Array.from(wrap.querySelectorAll(".dark-node"));
+    nodes.forEach((node, i) => node.classList.toggle("shown", i < visibleCount));
+    const remaining = sorted.length - visibleCount;
+    const btn = document.getElementById("showMoreBtn");
+    if (remaining > 0) {
+      btn.style.display = "inline";
+      btn.textContent = `Show ${remaining} more`;
+    } else {
+      btn.style.display = "none";
+    }
+  }
+
+  document.getElementById("showMoreBtn").addEventListener("click", () => {
+    visibleCount = sorted.length;
+    updateVisible();
+  });
+
+  /* ---------- node detail (left click -> right panel) ---------- */
+
+  const designerView = document.getElementById("designerView");
+  const nodeDetailView = document.getElementById("nodeDetailView");
+  let activeNodeEl = null;
+
+  function openNode(o, nodeEl) {
+    if (activeNodeEl) activeNodeEl.classList.remove("active");
+    activeNodeEl = nodeEl;
+    nodeEl.classList.add("active");
+
+    designerView.hidden = true;
+    nodeDetailView.hidden = false;
+    window.scrollTo(0, 0);
+
+    document.getElementById("nodeEyebrow").textContent = TYPE_LABEL[o.type] + " · Fit " + o.fit + " · already in your landscape";
+    document.getElementById("nodeName").textContent = o.name;
+    document.getElementById("nodeSub").textContent = amountRange(o) + " · " + o.timeline;
+    document.getElementById("nodeGainText").textContent = o.gain;
+    document.getElementById("nodeWorksWith").textContent = o.worksWith;
+    document.getElementById("nodeOrg").value = "Your organization";
+    document.getElementById("nodeAsk").value = defaultAsk(o);
+    document.getElementById("nodeUse").value = defaultUseOfFunds(o);
+    document.getElementById("nodeDraftWrap").hidden = true;
+
+    const btn = document.getElementById("nodeDraftBtn");
+    btn.disabled = false;
+    btn.textContent = "Draft with CHELCIE";
+    btn.onclick = () => runNodeDraft(o);
+  }
+
+  document.getElementById("backToDesigner").addEventListener("click", () => {
+    if (activeNodeEl) { activeNodeEl.classList.remove("active"); activeNodeEl = null; }
+    nodeDetailView.hidden = true;
+    designerView.hidden = false;
+    window.scrollTo(0, 0);
+  });
+
+  let nodeTrackedEntry = null;
+
+  function exportEntry(entry) {
+    const blob = new Blob([entry.exportText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = entry.filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function renderNodeDraftStatus() {
+    if (!nodeTrackedEntry) return;
+    const s = document.getElementById("nodeDraftStatus");
+    const btn = document.getElementById("nodeMarkSentBtn");
+    s.innerHTML = `<span class="status-dot ${nodeTrackedEntry.status}"></span> ${nodeTrackedEntry.status === "sent" ? "Marked as sent" : "Draft ready, not sent yet"}`;
+    btn.textContent = nodeTrackedEntry.status === "sent" ? "Mark as not sent" : "Mark as sent";
+  }
+
+  document.getElementById("nodeExportBtn").addEventListener("click", () => { if (nodeTrackedEntry) exportEntry(nodeTrackedEntry); });
+  document.getElementById("nodeMarkSentBtn").addEventListener("click", () => {
+    if (!nodeTrackedEntry) return;
+    nodeTrackedEntry.status = nodeTrackedEntry.status === "sent" ? "draft" : "sent";
+    renderNodeDraftStatus();
+  });
+
+  function runNodeDraft(o) {
+    const org = document.getElementById("nodeOrg").value.trim() || "Your organization";
+    const ask = document.getElementById("nodeAsk").value.trim();
+    const use = document.getElementById("nodeUse").value.trim();
+
+    const btn = document.getElementById("nodeDraftBtn");
+    btn.disabled = true;
+    btn.textContent = "Drafting…";
+
+    setTimeout(() => {
+      document.getElementById("nodeDraftOutput").innerHTML = `
+        <p class="draft-label">One-pager · draft</p>
+        <p class="draft-doc-title">${org}</p>
+        <p class="draft-doc-sub">Partnership request to ${o.name}</p>
+        <p class="draft-doc-h">What we are asking</p>
+        <p>${ask}</p>
+        <p class="draft-doc-h">How the funds will be used</p>
+        <p>${use}</p>
+        <p class="draft-doc-h">Why this fits</p>
+        <p>${o.gain}</p>
+        <p class="draft-doc-h">Terms under discussion</p>
+        <p>${o.terms.join(", ")}.</p>
+      `;
+      const exportText = [org, `Partnership request to ${o.name}`, ``, `WHAT WE ARE ASKING`, ask, ``, `HOW THE FUNDS WILL BE USED`, use, ``, `WHY THIS FITS`, o.gain, ``, `TERMS UNDER DISCUSSION`, o.terms.join(", ") + "."].join("\n");
+      nodeTrackedEntry = { status: "draft", exportText, filename: slug(org) + "-" + slug(o.name) + "-one-pager.txt" };
+      renderNodeDraftStatus();
+      document.getElementById("nodeDraftWrap").hidden = false;
+      btn.disabled = false;
+      btn.textContent = "Regenerate";
+    }, 1100);
+  }
+
+  /* ---------- partnership designer (the discovery engine) ---------- */
+
+  const sampleGroup = document.getElementById("sampleGroup");
+  SAMPLE_STUDIES.forEach((s) => {
+    const btn = document.createElement("button");
+    btn.className = "pill";
+    btn.textContent = s.label;
+    btn.addEventListener("click", () => {
+      studyInput.value = s.text;
+      designBtn.disabled = false;
+      runDesign(s.text);
+    });
+    sampleGroup.appendChild(btn);
+  });
+
+  const studyInput = document.getElementById("studyInput");
+  const designBtn = document.getElementById("designBtn");
+  studyInput.addEventListener("input", () => { designBtn.disabled = !studyInput.value.trim(); });
+  designBtn.addEventListener("click", () => runDesign(studyInput.value));
+
+  let currentDesign = null;
+  let selectedTargetIdx = 0;
+
+  function runDesign(text) {
+    if (!text || !text.trim()) return;
+    currentDesign = designPartnership(text);
+    selectedTargetIdx = 0;
+    document.getElementById("designResults").hidden = false;
+    document.getElementById("designMeta").textContent =
+      `${currentDesign.targets.length} target${currentDesign.targets.length === 1 ? "" : "s"}, none of them already on your map · themes: ${currentDesign.themes.slice(0, 4).join(", ") || "—"}`;
+    renderSponsorList();
+    renderSponsorDetail();
+  }
+
+  function renderSponsorList() {
+    const list = document.getElementById("sponsorList");
+    list.innerHTML = currentDesign.targets.map((t, i) => `
+      <button class="sponsor-row ${i === selectedTargetIdx ? "selected" : ""}" data-idx="${i}">
+        <span class="sponsor-company">${t.company}</span>
+        <span class="sponsor-unit">${t.business_unit}</span>
+        <span class="sponsor-check">${t.check_size.split(" ")[0]}</span>
+      </button>
+    `).join("");
+    list.querySelectorAll(".sponsor-row").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        selectedTargetIdx = Number(btn.dataset.idx);
+        renderSponsorList();
+        renderSponsorDetail();
+      });
+    });
+  }
+
+  function renderSponsorDetail() {
+    const t = currentDesign.targets[selectedTargetIdx];
+    const detail = document.getElementById("sponsorDetail");
+    detail.innerHTML = `
+      <p class="work-eyebrow" style="margin-bottom:14px;">ENTRY DESIGN · ${t.company}</p>
+      <div class="sponsor-field"><p class="sponsor-field-label">Strategic hook</p><p>${t.strategic_hook}</p></div>
+      <div class="sponsor-field"><p class="sponsor-field-label">Entry vehicle</p><p>${t.entry_vehicle}</p></div>
+      <div class="sponsor-field-row">
+        <div class="sponsor-field"><p class="sponsor-field-label">Check size</p><p>${t.check_size}</p></div>
+        <div class="sponsor-field"><p class="sponsor-field-label">Decision maker</p><p>${t.decision_maker.role}</p></div>
+      </div>
+      <div class="sponsor-field"><p class="sponsor-field-label">Why them</p><p>${t.why_them}</p></div>
+      <div class="sponsor-field"><p class="sponsor-field-label">How to find them</p><p class="muted-italic">${t.decision_maker.name_hint}</p></div>
+      ${t.sources && t.sources.length ? `<div class="sponsor-field"><p class="sponsor-field-label">Verify · public sources</p><ul class="source-list">${t.sources.map((s) => `<li><a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.label}</a></li>`).join("")}</ul></div>` : ""}
+      <button class="btn-primary" id="draftEmailBtn">Draft email with CHELCIE</button>
+      <div class="vp-email-output" id="vpEmailOutput" hidden></div>
+    `;
+
+    document.getElementById("draftEmailBtn").addEventListener("click", () => {
+      const email = vpEmailFor(currentDesign, t);
+      const out = document.getElementById("vpEmailOutput");
+      out.innerHTML = `
+        <div class="vp-email-head">
+          <p class="draft-label" style="margin:0;">DRAFT · OUTREACH EMAIL</p>
+          <div class="copy-row">
+            <button class="copy-btn" data-copy="subject">Subject</button>
+            <button class="copy-btn" data-copy="body">Body</button>
+            <button class="copy-btn" data-copy="all">All</button>
+          </div>
+        </div>
+        <p class="sponsor-field-label" style="margin-top:14px;">Subject</p>
+        <p class="vp-subject">${email.subject}</p>
+        <p class="sponsor-field-label" style="margin-top:14px;">Body</p>
+        <pre class="vp-body">${email.body}</pre>
+      `;
+      out.hidden = false;
+      out.querySelectorAll(".copy-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const what = btn.dataset.copy;
+          const text = what === "subject" ? email.subject : what === "body" ? email.body : `Subject: ${email.subject}\n\n${email.body}`;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).catch(() => {});
+          }
+          const original = btn.textContent;
+          btn.textContent = "Copied";
+          setTimeout(() => { btn.textContent = original; }, 1400);
+        });
+      });
+    });
+  }
+
+  renderConstellation();
+</script>
+</body>
+</html>

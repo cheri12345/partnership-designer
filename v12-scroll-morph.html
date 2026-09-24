@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Round 12b: Scroll to List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ---------- second option for "what if you don't want the constellation":
+     instead of a click-to-toggle (see v12-capital-constellation.html's
+     Constellation/List switch), this scrolls from one into the other. The
+     same cards you see scattered at the top are the exact same cards
+     stacked into a list by the time you reach the bottom — nothing is
+     re-rendered, they're the same elements, just moved. ---------- */
+
+  :root {
+    --ink: #111111;
+    --stone: #666666;
+    --paper: #fafafa;
+    --border: #ebebeb;
+    --border-card: #ebebe8;
+    --deep: #083839;
+    --deep2: #143644;
+    --grant: #00636a;
+    --muted-fill: #f4f4f4;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Instrument Sans", system-ui, sans-serif;
+  }
+
+  h1, h2, .serif {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-weight: 400;
+    margin: 0;
+    color: var(--deep);
+  }
+
+  .topbar {
+    position: relative;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
+  .wordmark { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.01em; }
+  .concept-pill {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--stone);
+    background: var(--muted-fill);
+    padding: 4px 12px;
+    border-radius: 6px;
+  }
+
+  .back-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--stone);
+    text-decoration: none;
+  }
+  .back-link:hover { color: var(--deep); }
+
+  /* ---------- sticky stage: the constellation, pinned while you scroll
+     through .scroll-track beneath it ---------- */
+
+  .sticky-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    background-image: radial-gradient(#e4e4e4 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .stage-canvas { position: absolute; inset: 0; }
+
+  .orbit-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .orbit-ring { fill: none; stroke: #dcdcd9; stroke-width: 1; }
+  .conn-line { stroke: #c9c9c6; stroke-width: 1; stroke-dasharray: 3 4; }
+
+  .headline-block { position: absolute; left: 40px; top: 32px; max-width: 480px; }
+  .headline-block h1 { font-size: 1.9rem; line-height: 1.15; }
+  .headline-block .sub { margin: 8px 0 0; font-size: 0.875rem; color: var(--stone); }
+
+  .quadrant-label { position: absolute; max-width: 190px; }
+  .quadrant-label h3 {
+    font-family: "Instrument Sans", sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--deep2);
+    margin: 0 0 4px;
+  }
+  .quadrant-label p { margin: 0; font-size: 0.6875rem; line-height: 1.4; color: var(--ink); }
+  .quadrant-label.align-right { text-align: right; }
+
+  .center-hub {
+    position: absolute;
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--deep), var(--deep2));
+    box-shadow: 0 8px 18px rgba(8, 56, 57, 0.28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8px;
+  }
+  .center-hub span { font-weight: 700; font-size: 0.625rem; letter-spacing: 0.03em; text-transform: uppercase; color: #fff; line-height: 1.35; }
+
+  .scroll-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    margin: 0;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--stone);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .scroll-hint .arrow { animation: bob 1.6s ease-in-out infinite; }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+  @media (prefers-reduced-motion: reduce) { .scroll-hint .arrow { animation: none; } }
+
+  /* ---------- the card, identical whether it's scattered in the
+     constellation or stacked in the list — same element, just moved ---------- */
+
+  .morph-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid var(--border-card);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+    will-change: transform;
+    cursor: pointer;
+  }
+
+  .morph-card-top { display: flex; align-items: center; justify-content: space-between; }
+  .morph-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+  }
+  .morph-fit { font-weight: 700; font-size: 11px; }
+  .morph-name { font-weight: 600; font-size: 13px; line-height: 1.3; }
+  .morph-amount { font-weight: 600; font-size: 11.5px; color: var(--deep2); }
+
+  .morph-card.pulse { animation: card-pulse 0.4s ease; }
+  @keyframes card-pulse {
+    0% { box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+    50% { box-shadow: 0 0 0 4px rgba(8,56,57,0.15); }
+    100% { box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+  }
+
+  .scroll-track { height: 220vh; }
+
+  .list-landing {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 60px 24px 120px;
+  }
+
+  .list-landing .eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin: 0 0 10px;
+  }
+
+  .list-landing h2 { font-size: 1.6rem; margin-bottom: 28px; }
+
+  .landing-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .landing-row:first-of-type { border-top: 1px solid var(--border); }
+  .landing-row-name { font-weight: 600; font-size: 14px; }
+  .landing-row-meta { font-size: 12px; color: var(--stone); margin-top: 3px; }
+  .landing-row-right { display: flex; align-items: center; gap: 18px; }
+  .landing-row-fit { font-weight: 700; font-size: 13px; }
+  .landing-row-amount { font-weight: 600; font-size: 13px; color: var(--deep2); min-width: 76px; text-align: right; }
+
+  @media (max-width: 860px) {
+    .headline-block { max-width: 78%; }
+    .headline-block h1 { font-size: 1.4rem; }
+    .quadrant-label { display: none; }
+    .morph-card { width: 150px; padding: 10px 12px; }
+    .morph-name { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="wordmark">CHELCIE</span>
+    <span class="concept-pill">ROUND 12B · SCROLL TO LIST</span>
+  </div>
+  <a class="back-link" href="v12-capital-constellation.html">← Constellation (with a click-to-toggle List view)</a>
+</header>
+
+<main>
+  <div class="morph-zone">
+  <div class="sticky-stage" id="stickyStage">
+    <div class="stage-canvas" id="stageCanvas">
+      <svg class="orbit-svg" id="orbitSvg"></svg>
+
+      <div class="headline-block" id="headlineBlock">
+        <h1>Opportunities aligned to Northstar Labs.</h1>
+        <p class="sub">Keep scrolling — the same cards settle into a list.</p>
+      </div>
+
+      <div class="quadrant-label" id="qlGrant" style="left:40px; top:150px;">
+        <h3>Grant Funds</h3>
+        <p>Non-dilutive community capital and foundation support.</p>
+      </div>
+      <div class="quadrant-label align-right" id="qlCorporate" style="right:40px; top:150px;">
+        <h3>Corporate Sponsors</h3>
+        <p>Strategic commercial alignments and brand value.</p>
+      </div>
+      <div class="quadrant-label" id="qlLoan" style="left:40px; bottom:56px;">
+        <h3>Loans &amp; Debt</h3>
+        <p>Flexible debt partnerships and cooperative lending.</p>
+      </div>
+      <div class="quadrant-label align-right" id="qlEquity" style="right:40px; bottom:56px;">
+        <h3>Equity Partners</h3>
+        <p>Direct capital injection for scaling development.</p>
+      </div>
+
+      <div class="center-hub" id="centerHub"><span>Northstar<br />Labs</span></div>
+    </div>
+    <p class="scroll-hint"><span class="arrow">↓</span> Scroll to see this become a list <span class="arrow">↓</span></p>
+  </div>
+
+  <div class="scroll-track" id="scrollTrack"></div>
+  </div>
+
+  <div class="list-landing">
+    <p class="eyebrow">Same 13 opportunities, still sorted by fit</p>
+    <h2 class="serif">Opportunities aligned to Northstar Labs.</h2>
+    <div id="landingRows"></div>
+  </div>
+</main>
+
+<script src="data.js"></script>
+<script>
+  const TYPE_COLOR = {
+    grant: "var(--grant)",
+    corporate: "var(--deep2)",
+    loan: "linear-gradient(90deg, var(--deep), var(--deep2))",
+    equity: "var(--deep)",
+  };
+  const QUADRANT = { grant: -135, corporate: -45, loan: 135, equity: 45 };
+  const QUADRANT_SPAN = 68;
+  const TYPES_ORDER = ["loan", "grant", "corporate", "equity"];
+
+  const items = OPPORTUNITIES.slice().sort((a, b) => b.fit - a.fit);
+
+  const stage = document.getElementById("stageCanvas");
+  const orbitSvg = document.getElementById("orbitSvg");
+  const stickyStage = document.getElementById("stickyStage");
+
+  // ---------- constellation placement: same ring/angle + pairwise
+  // relaxation pattern used across this project's other node-based layouts.
+  function layoutConstellation() {
+    const rect = stickyStage.getBoundingClientRect();
+    const cx = rect.width / 2, cy = rect.height / 2;
+    const isMobile = rect.width <= 860;
+    const CARD_W = isMobile ? 150 : 220, CARD_H = isMobile ? 84 : 96, GAP = 30;
+    const margin = 90;
+    const maxRxPx = Math.max(isMobile ? 90 : 160, rect.width / 2 - margin);
+    const maxRyPx = Math.max(isMobile ? 140 : 110, rect.height / 2 - margin);
+
+    document.getElementById("centerHub").style.left = cx + "px";
+    document.getElementById("centerHub").style.top = cy + "px";
+    document.getElementById("centerHub").style.transform = "translate(-50%, -50%)";
+
+    const groups = TYPES_ORDER.map((t) => ({ type: t, all: items.filter((o) => o.type === t) })).filter((g) => g.all.length);
+    const positions = [];
+    groups.forEach((g) => {
+      const n = g.all.length;
+      const ringCount = Math.max(1, Math.ceil(n / 3));
+      const itemsPerRing = Math.ceil(n / ringCount);
+      const ringFrac = (r) => (ringCount === 1 ? 0.5 : 0.42 + (r / (ringCount - 1)) * 0.5);
+      const centerRad = (QUADRANT[g.type] * Math.PI) / 180;
+      const halfSpan = ((QUADRANT_SPAN * Math.PI) / 180) / 2;
+      g.all.forEach((o, i) => {
+        const ring = Math.min(ringCount - 1, Math.floor(i / itemsPerRing));
+        const ringStart = ring * itemsPerRing;
+        const ringLen = Math.min(itemsPerRing, n - ringStart);
+        const posInRing = i - ringStart;
+        const angle = ringLen > 1 ? centerRad - halfSpan + (posInRing / (ringLen - 1)) * (halfSpan * 2) : centerRad;
+        const t = ringFrac(ring);
+        positions.push({ o, x: cx + Math.cos(angle) * maxRxPx * t, y: cy + Math.sin(angle) * maxRyPx * t, w: CARD_W, h: CARD_H });
+      });
+    });
+
+    const org = { x: cx, y: cy, w: 112, h: 112 };
+    const fixedObstacles = [org].concat(
+      Array.from(document.querySelectorAll(".quadrant-label")).map((el) => {
+        const r = el.getBoundingClientRect();
+        return { x: r.x - rect.x + r.width / 2, y: r.y - rect.y + r.height / 2, w: r.width + 40, h: r.height + 30 };
+      })
+    );
+
+    for (let iter = 0; iter < 400; iter++) {
+      let moved = false;
+      for (const p of positions) {
+        const halfW = p.w / 2, halfH = p.h / 2;
+        const cx2 = Math.min(Math.max(p.x, halfW + 12), rect.width - halfW - 12);
+        const cy2 = Math.min(Math.max(p.y, halfH + 12), rect.height - halfH - 12);
+        if (cx2 !== p.x || cy2 !== p.y) moved = true;
+        p.x = cx2; p.y = cy2;
+        for (const ob of fixedObstacles) {
+          const dx = p.x - ob.x, dy = p.y - ob.y;
+          const ox = (ob.w + p.w) / 2 - Math.abs(dx), oy = (ob.h + p.h) / 2 - Math.abs(dy);
+          if (ox > 0 && oy > 0) {
+            moved = true;
+            const dist = Math.hypot(dx, dy) || 1, push = Math.min(ox, oy) + 2;
+            p.x += (dx / dist) * push; p.y += (dy / dist) * push;
+          }
+        }
+      }
+      for (let i = 0; i < positions.length; i++) {
+        for (let j = i + 1; j < positions.length; j++) {
+          const p1 = positions[i], p2 = positions[j];
+          const dx = p2.x - p1.x, dy = p2.y - p1.y;
+          const ox = p1.w / 2 + p2.w / 2 + GAP - Math.abs(dx), oy = p1.h / 2 + p2.h / 2 + GAP - Math.abs(dy);
+          if (ox > 0 && oy > 0) {
+            moved = true;
+            if (ox < oy) { const push = (ox / 2) * (dx < 0 ? -1 : 1) || ox / 2; p1.x -= push; p2.x += push; }
+            else { const push = (oy / 2) * (dy < 0 ? -1 : 1) || oy / 2; p1.y -= push; p2.y += push; }
+          }
+        }
+      }
+      if (!moved) break;
+    }
+
+    orbitSvg.setAttribute("viewBox", "0 0 " + rect.width + " " + rect.height);
+    orbitSvg.innerHTML = "";
+    [0.34, 0.58, 0.82, 1].forEach((f) => {
+      const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      ring.setAttribute("cx", cx); ring.setAttribute("cy", cy);
+      ring.setAttribute("r", Math.min(rect.width, rect.height) / 2 - 90 * f);
+      ring.setAttribute("class", "orbit-ring");
+      orbitSvg.appendChild(ring);
+    });
+    positions.forEach((p) => {
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", cx); line.setAttribute("y1", cy);
+      line.setAttribute("x2", p.x); line.setAttribute("y2", p.y);
+      line.setAttribute("class", "conn-line");
+      orbitSvg.appendChild(line);
+    });
+
+    return positions;
+  }
+
+  // ---------- list target: a centered column, same fit-sorted order ----------
+  function layoutListTargets(rect) {
+    const isMobile = rect.width <= 860;
+    const rowW = isMobile ? 150 : 220, rowH = isMobile ? 84 : 74, gap = 14;
+    const totalH = items.length * rowH + (items.length - 1) * gap;
+    const startY = Math.max(120, rect.height / 2 - totalH / 2);
+    const cx = rect.width / 2;
+    const map = {};
+    items.forEach((o, i) => {
+      map[o.id] = { x: cx, y: startY + i * (rowH + gap), w: rowW, h: rowH };
+    });
+    return map;
+  }
+
+  let constellationPositions = [];
+  let listTargets = {};
+  const cardEls = {};
+
+  function buildCards() {
+    stage.querySelectorAll(".morph-card").forEach((c) => c.remove());
+    constellationPositions.forEach((p) => {
+      const o = p.o;
+      const el = document.createElement("button");
+      el.className = "morph-card";
+      el.innerHTML = `
+        <span class="morph-card-top">
+          <span class="morph-badge" style="background:${TYPE_COLOR[o.type]}">${TYPE_LABEL[o.type].toUpperCase()}</span>
+          <span class="morph-fit">${o.fit}</span>
+        </span>
+        <span class="morph-name">${o.name}</span>
+        <span class="morph-amount">Up to ${fmtMoney(o.max)}</span>
+      `;
+      el.addEventListener("click", () => {
+        el.classList.remove("pulse");
+        void el.offsetWidth;
+        el.classList.add("pulse");
+      });
+      stage.appendChild(el);
+      cardEls[o.id] = { el, x0: p.x - p.w / 2, y0: p.y - p.h / 2, w: p.w, h: p.h };
+    });
+  }
+
+  function layout() {
+    const rect = stickyStage.getBoundingClientRect();
+    constellationPositions = layoutConstellation();
+    listTargets = layoutListTargets(rect);
+    buildCards();
+    renderLandingRows();
+    applyScrollProgress();
+  }
+
+  function renderLandingRows() {
+    const wrap = document.getElementById("landingRows");
+    wrap.innerHTML = items.map((o) => `
+      <div class="landing-row">
+        <div>
+          <div class="landing-row-name">${o.name}</div>
+          <div class="landing-row-meta">${TYPE_LABEL[o.type]} · ${o.timeline}</div>
+        </div>
+        <div class="landing-row-right">
+          <span class="landing-row-fit">${o.fit} fit</span>
+          <span class="landing-row-amount">Up to ${fmtMoney(o.max)}</span>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function applyScrollProgress() {
+    // The sticky stage un-sticks once you've scrolled past (morph-zone
+    // height − stage height), which is exactly one stage-height EARLIER
+    // than the bottom of #scrollTrack — so progress has to be measured
+    // from where the sticky stage's own natural position starts (where
+    // .morph-zone begins), not from where the spacer starts.
+    const zone = document.querySelector(".morph-zone");
+    const zoneRect = zone.getBoundingClientRect();
+    const zoneTop = window.scrollY + zoneRect.top;
+    const track = document.getElementById("scrollTrack");
+    const trackLen = track.getBoundingClientRect().height;
+    const t = Math.min(1, Math.max(0, (window.scrollY - zoneTop) / trackLen));
+
+    const decoOpacity = Math.max(0, 1 - t / 0.55);
+    document.getElementById("headlineBlock").style.opacity = decoOpacity;
+    document.querySelectorAll(".quadrant-label").forEach((el) => (el.style.opacity = decoOpacity));
+    document.getElementById("centerHub").style.opacity = decoOpacity;
+    orbitSvg.style.opacity = decoOpacity;
+
+    // Different cards travel different distances to converge on the same
+    // column, so mid-transit their paths can cross and briefly overlap —
+    // fading in the back half (not just the very end) keeps that crossing
+    // mostly hidden instead of landing right when everything's still fully
+    // opaque and visibly jumbled.
+    const cardFade = t > 0.5 ? Math.max(0, 1 - (t - 0.5) / 0.5) : 1;
+
+    Object.keys(cardEls).forEach((id) => {
+      const c = cardEls[id];
+      const target = listTargets[id];
+      const x = c.x0 + (target.x - target.w / 2 - c.x0) * t;
+      const y = c.y0 + (target.y - target.h / 2 - c.y0) * t;
+      const scale = 1 - 0.35 * t;
+      c.el.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+      c.el.style.opacity = cardFade;
+    });
+  }
+
+  let ticking = false;
+  window.addEventListener("scroll", () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { applyScrollProgress(); ticking = false; });
+  });
+
+  window.addEventListener("resize", layout);
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(layout);
+  } else {
+    setTimeout(layout, 300);
+  }
+  layout();
+</script>
+</body>
+</html>

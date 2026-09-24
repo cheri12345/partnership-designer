@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Round 8 B: The builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v2-shared.css" />
+<link rel="stylesheet" href="builder-shared.css" />
+<link rel="stylesheet" href="v8-shared.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <a class="wordmark" href="index.html">CHELCIE</a>
+  <button class="pill-link" id="trackerBtn">Your partnerships<span class="badge" id="trackerBadge" hidden>0</span></button>
+</header>
+
+<main>
+
+  <section class="screen active" data-screen="browse">
+    <div class="v8-page">
+      <section id="fitMount"></section>
+      <section class="v8-section ruled" id="toldMount"></section>
+      <section class="v8-section ruled" id="describeMount"></section>
+      <section class="v8-section ruled" id="listMount"></section>
+      <section class="v8-section ruled" id="tellMount"></section>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="builder">
+    <div class="builder-shell">
+      <aside class="builder-nav">
+        <button class="back-link builder-back-link" id="builderBackToBrowse">← Back to the list</button>
+        <ul class="section-list" id="sectionList"></ul>
+      </aside>
+      <div class="builder-main" id="builderMain"></div>
+    </div>
+    <div class="builder-footer">
+      <button class="back-link" id="builderBack">Back</button>
+      <p class="builder-progress" id="builderProgress"></p>
+      <button class="btn-primary" id="builderNext">Continue</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="overlay" id="trackerOverlay">
+  <header class="topbar">
+    <span class="wordmark">Your partnerships</span>
+    <button class="pill-link" id="trackerClose">Close</button>
+  </header>
+  <div class="tracker-body" id="trackerBody" style="max-width:560px; margin:0 auto; padding:48px 24px 100px; width:100%;"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="partnership-lib.js"></script>
+<script src="builder-shared.js"></script>
+<script src="v8-shared.js"></script>
+<script>
+  /* Layout B — the builder, flowing into A.
+
+     Onboarding v2 collects selects, sliders and pills. It never asks for
+     prose. So this box is not "what you told us" played back — it is the
+     one new thing this page asks for, sitting above the same list Layout A
+     shows. Type nothing and the list still works off the intake answers. */
+
+  renderFit();
+  renderTold();
+  renderDescribe();
+  renderList();
+  renderTell();
+
+  applyDescribe(intakeQuery());
+
+  function renderDescribe() {
+    const mount = document.getElementById("describeMount");
+    mount.innerHTML = `
+      <p class="told-label">Working on something specific?</p>
+      <p class="describe-lead">Say it in a line. CHELCIE looks for companies with a reason to fund that exact thing, and adds them to the list below.</p>
+      <textarea id="describeField" rows="2" placeholder="e.g. a home-visit programme for families with asthma across three neighbourhoods"></textarea>
+      <div class="describe-actions">
+        <button class="btn-primary" id="describeRun">Find who wants this</button>
+        <p class="describe-status" id="describeStatus"></p>
+      </div>
+      <div class="describe-samples" id="describeSamples"></div>
+    `;
+
+    document.getElementById("describeSamples").innerHTML =
+      `<span class="describe-or">Or try:</span>` +
+      SAMPLE_STUDIES.map((s, i) => `<button class="sample-chip" data-i="${i}">${s.label}</button>`).join("");
+
+    mount.querySelectorAll(".sample-chip").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.getElementById("describeField").value = SAMPLE_STUDIES[Number(btn.dataset.i)].text;
+        run();
+      });
+    });
+    document.getElementById("describeRun").addEventListener("click", run);
+  }
+
+  function run() {
+    const text = document.getElementById("describeField").value.trim();
+    const status = document.getElementById("describeStatus");
+    status.textContent = "Looking\u2026";
+    setTimeout(() => {
+      applyDescribe(text || intakeQuery());
+      const n = v8.discovered.length;
+      status.textContent = n
+        ? `${n} added to the list below.`
+        : "Nothing new. Try saying more about the work itself.";
+    }, 650);
+  }
+</script>
+</body>
+</html>

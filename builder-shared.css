@@ -1,0 +1,290 @@
+/* Shared builder + tracker styles, used by every layout round from G
+   onward. Extracted out of per-file <style> blocks so new prototypes
+   don't have to re-paste ~300 lines of identical CSS every time.
+   Load after v2-shared.css. */
+
+/* ---------- builder: section outline (left) + focused editor (right) ---------- */
+
+.builder-shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  padding-bottom: 84px;
+}
+
+@media (min-width: 860px) {
+  .builder-shell {
+    grid-template-columns: 300px 1fr;
+  }
+}
+
+.builder-nav {
+  padding: 28px 24px;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+@media (min-width: 860px) {
+  .builder-nav {
+    border-bottom: none;
+    border-right: 1px solid hsl(var(--border));
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: calc(100vh - 73px);
+    overflow-y: auto;
+  }
+}
+
+.builder-back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.section-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.section-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: #fff;
+  border: 1px solid hsl(var(--border));
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.section-item.current {
+  border-color: hsl(var(--ink));
+}
+
+.section-mark {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid hsl(var(--border));
+  position: relative;
+}
+
+.section-mark.done {
+  border-color: #0f766e;
+  background: #0f766e;
+}
+
+.section-mark.done::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+
+.section-item-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.builder-main {
+  padding: 40px 24px 60px;
+  max-width: 640px;
+  width: 100%;
+}
+
+@media (min-width: 860px) {
+  .builder-main {
+    padding: 48px 56px 60px;
+  }
+}
+
+.builder-eyebrow {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: hsl(var(--stone));
+  margin: 0 0 8px;
+}
+
+.builder-title {
+  font-size: 1.625rem;
+  margin-bottom: 12px;
+}
+
+.builder-helper {
+  font-size: 0.875rem;
+  color: hsl(var(--stone));
+  line-height: 1.6;
+  margin: 0 0 24px;
+  max-width: 46ch;
+}
+
+.builder-redraft {
+  margin: -14px 0 20px;
+}
+
+.builder-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: hsl(var(--paper) / 0.96);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid hsl(var(--border));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  z-index: 10;
+}
+
+@media (min-width: 860px) {
+  .builder-footer {
+    padding: 16px 56px;
+  }
+}
+
+.builder-progress {
+  font-size: 0.8125rem;
+  color: hsl(var(--stone));
+  margin: 0;
+}
+
+/* ---------- header badge + status/export + tracker (not in v2-shared.css) ---------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: hsl(var(--teal));
+  color: hsl(var(--ink));
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.draft-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: hsl(var(--stone));
+  margin: 0 0 20px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: hsl(38 92% 55%);
+  flex-shrink: 0;
+}
+
+.status-dot.sent {
+  background: #0f766e;
+}
+
+.draft-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.tracker-empty {
+  font-size: 0.9375rem;
+  color: hsl(var(--stone));
+  line-height: 1.6;
+}
+
+.tracker-item {
+  border-top: 1px solid hsl(var(--border));
+  padding: 22px 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.tracker-item:last-child {
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.tracker-kind {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: hsl(var(--stone));
+  margin: 0 0 6px;
+}
+
+.tracker-title {
+  font-family: "Archivo", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  margin: 0 0 4px;
+}
+
+.tracker-sub {
+  font-size: 0.8125rem;
+  color: hsl(var(--stone));
+  margin: 0;
+}
+
+.tracker-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.status-pill {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: hsl(38 92% 55% / 0.18);
+  color: hsl(30 70% 32%);
+}
+
+.status-pill.sent {
+  background: hsl(var(--teal) / 0.2);
+  color: #0f766e;
+}
+
+.tracker-export {
+  padding: 8px 16px;
+  font-size: 0.8125rem;
+}
+
+.regen-link {
+  display: inline-block;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0f766e;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.regen-link:hover {
+  opacity: 0.75;
+}

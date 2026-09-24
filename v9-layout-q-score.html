@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Round 9, Layout Q: Score</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v2-shared.css" />
+<link rel="stylesheet" href="builder-shared.css" />
+<style>
+  /* ---------- one viewport on desktop, no page scroll. Only the matches
+     list gets its own internal scroll, since that's discovery content
+     (browsing opportunities), not a page you'd otherwise scroll through.
+     Below 860px there's too much to fit edge to edge, so scroll unlocks. ---------- */
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  body.scroll-unlocked {
+    height: auto;
+    min-height: 100%;
+    display: block;
+    overflow: visible;
+  }
+
+  .topbar {
+    flex-shrink: 0;
+  }
+
+  main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .screen[data-screen="browse"] {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  body.scroll-unlocked .screen[data-screen="browse"] {
+    overflow: visible;
+  }
+
+  .q-shell {
+    width: 100%;
+    max-width: 1280px;
+    height: 100%;
+    margin: 0 auto;
+    padding: 28px 40px 32px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  @media (max-width: 860px) {
+    .q-shell {
+      height: auto;
+      padding: 28px 24px 60px;
+    }
+  }
+
+  /* ---------- hero + score, compact single row ---------- */
+
+  .q-hero-row {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  @media (max-width: 860px) {
+    .q-hero-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 24px;
+    }
+  }
+
+  .q-hero-text .eyebrow {
+    margin: 0 0 8px;
+  }
+
+  .q-hero-text h1 {
+    font-size: 1.625rem;
+    line-height: 1.15;
+    margin: 0 0 8px;
+  }
+
+  .q-hero-sub {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: hsl(var(--stone));
+    margin: 0;
+    max-width: 40ch;
+  }
+
+  .q-score-compact {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .q-ring-wrap {
+    position: relative;
+    width: 112px;
+    height: 112px;
+    flex-shrink: 0;
+  }
+
+  .q-ring {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .q-ring-track {
+    fill: none;
+    stroke: hsl(var(--border));
+    stroke-width: 10;
+  }
+
+  .q-ring-fill {
+    fill: none;
+    stroke: #0f766e;
+    stroke-width: 10;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .q-ring-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .q-ring-num {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .q-ring-label {
+    font-size: 0.5625rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: hsl(var(--stone));
+    margin-top: 4px;
+  }
+
+  .q-dims {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 200px;
+  }
+
+  .q-dim-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+  }
+
+  .q-dim-name {
+    font-weight: 600;
+  }
+
+  .q-dim-num {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    color: hsl(var(--stone));
+  }
+
+  .q-dim-bar {
+    height: 4px;
+    background: hsl(var(--border));
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 3px;
+  }
+
+  .q-dim-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: hsl(var(--teal));
+  }
+
+  @media (max-width: 860px) {
+    .q-score-compact {
+      justify-content: space-between;
+    }
+    .q-dims {
+      width: auto;
+      flex: 1;
+    }
+  }
+
+  /* ---------- split: matches (scrolls, discovery content) + empower (fixed) ---------- */
+
+  .q-split {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    gap: 32px;
+    padding-top: 24px;
+  }
+
+  @media (max-width: 860px) {
+    .q-split {
+      flex-direction: column;
+      min-height: auto;
+    }
+  }
+
+  .q-matches-panel {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .q-panel-head {
+    flex-shrink: 0;
+    margin-bottom: 4px;
+  }
+
+  .q-panel-head .eyebrow {
+    margin: 0 0 6px;
+  }
+
+  .q-panel-head h2 {
+    font-size: 1.1875rem;
+    margin: 0;
+  }
+
+  .q-match-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    margin-top: 4px;
+  }
+
+  @media (max-width: 860px) {
+    .q-match-scroll {
+      overflow-y: visible;
+    }
+  }
+
+  /* ---------- empower: fixed panel, dark, visually distinct from the
+     passive match list beside it ---------- */
+
+  .q-empower-panel {
+    flex: 0 0 320px;
+    background: hsl(var(--ink));
+    color: hsl(var(--paper));
+    border-radius: 16px;
+    padding: 28px 26px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  @media (max-width: 860px) {
+    .q-empower-panel {
+      flex: 0 0 auto;
+    }
+  }
+
+  .q-empower-panel .eyebrow.accent {
+    color: hsl(var(--teal));
+    margin: 0 0 10px;
+  }
+
+  .q-empower-panel h2 {
+    color: hsl(var(--paper));
+    font-size: 1.25rem;
+    margin: 0 0 10px;
+    line-height: 1.2;
+  }
+
+  .q-empower-sub {
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    color: hsl(var(--paper) / 0.72);
+    margin: 0 0 20px;
+  }
+
+  .q-empower-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .q-empower-form input[type="text"] {
+    background: hsl(var(--paper) / 0.08);
+    border: 1px solid hsl(var(--paper) / 0.28);
+    color: hsl(var(--paper));
+    padding: 12px 14px;
+    font-size: 0.875rem;
+  }
+
+  .q-empower-form input[type="text"]::placeholder {
+    color: hsl(var(--paper) / 0.5);
+  }
+
+  .q-empower-form input[type="text"]:focus {
+    border-color: hsl(var(--teal));
+    box-shadow: 0 0 0 2px hsl(var(--teal) / 0.3);
+  }
+
+  .q-empower-form .btn-primary {
+    padding: 12px 20px;
+    font-size: 0.875rem;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="wordmark" href="index.html">CHELCIE</a>
+  <button class="pill-link" id="trackerBtn">Your partnerships<span class="badge" id="trackerBadge" hidden>0</span></button>
+</header>
+
+<main>
+
+  <section class="screen active" data-screen="browse">
+    <div class="q-shell">
+      <div class="q-hero-row">
+        <div class="q-hero-text">
+          <p class="eyebrow accent">Onboarding complete</p>
+          <h1>Welcome to CHELCIE.</h1>
+          <p class="q-hero-sub">Here's what your setup adds up to, and how much room there is to grow.</p>
+        </div>
+        <div class="q-score-compact">
+          <div class="q-ring-wrap">
+            <svg class="q-ring" viewBox="0 0 120 120">
+              <circle class="q-ring-track" cx="60" cy="60" r="50" />
+              <circle class="q-ring-fill" id="ringFill" cx="60" cy="60" r="50" />
+            </svg>
+            <div class="q-ring-center">
+              <span class="q-ring-num" id="scoreNum">0</span>
+              <span class="q-ring-label">Resilience</span>
+            </div>
+          </div>
+          <div class="q-dims" id="qDims"></div>
+        </div>
+      </div>
+
+      <div class="q-split">
+        <div class="q-matches-panel">
+          <div class="q-panel-head">
+            <p class="eyebrow">While you were finishing setup</p>
+            <h2>We already lined up your best matches.</h2>
+          </div>
+          <div class="q-match-scroll">
+            <div class="row-list" id="matchList"></div>
+          </div>
+        </div>
+
+        <div class="q-empower-panel">
+          <p class="eyebrow accent">Realise your financial potential</p>
+          <h2>Your relationships are worth building too.</h2>
+          <p class="q-empower-sub">Matches are a start, not the ceiling. You know people CHELCIE hasn't found yet, design an approach for any of them.</p>
+          <form class="q-empower-form" id="empowerForm">
+            <input type="text" id="empowerInput" placeholder="Type a company, funder, or describe your work" />
+            <button type="submit" class="btn-primary">Design this partnership</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="builder">
+    <div class="builder-shell">
+      <aside class="builder-nav">
+        <button class="back-link builder-back-link" id="builderBackToBrowse">← Back to your dashboard</button>
+        <ul class="section-list" id="sectionList"></ul>
+      </aside>
+      <div class="builder-main" id="builderMain"></div>
+    </div>
+    <div class="builder-footer">
+      <button class="back-link" id="builderBack">Back</button>
+      <p class="builder-progress" id="builderProgress"></p>
+      <button class="btn-primary" id="builderNext">Continue</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="overlay" id="trackerOverlay">
+  <header class="topbar">
+    <span class="wordmark">Your partnerships</span>
+    <button class="pill-link" id="trackerClose">Close</button>
+  </header>
+  <div class="tracker-body" id="trackerBody" style="max-width:560px; margin:0 auto; padding:48px 24px 100px; width:100%;"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="partnership-lib.js"></script>
+<script src="builder-shared.js"></script>
+<script>
+  /* ---------- score: how strong your options are, spread across every
+     kind of capital, not just the one you're most used to. Built from the
+     same fit numbers every other round already shows per-opportunity, an
+     average of your best match in each of the four types. Score low in
+     one type and it visibly pulls the whole number down, that's the
+     point, the "versatile fintech, not just grants" narrative made into
+     an actual metric instead of a claim. ---------- */
+
+  const TYPES_ORDER = ["loan", "grant", "corporate", "equity"];
+  const DIM_LABEL = { loan: "Loans", grant: "Grants", corporate: "Corporates", equity: "Equities" };
+
+  const bestByType = TYPES_ORDER.map((type) => {
+    const best = OPPORTUNITIES.filter((o) => o.type === type).sort((a, b) => b.fit - a.fit)[0];
+    return { type, label: DIM_LABEL[type], fit: best.fit, best };
+  });
+
+  const overallScore = Math.round(bestByType.reduce((sum, d) => sum + d.fit, 0) / bestByType.length);
+
+  const RING_R = 50;
+  const RING_CIRC = 2 * Math.PI * RING_R;
+
+  function paintRing(score) {
+    const fill = document.getElementById("ringFill");
+    fill.style.strokeDasharray = String(RING_CIRC);
+    fill.style.strokeDashoffset = String(RING_CIRC * (1 - score / 100));
+  }
+
+  function animateScore(target) {
+    const el = document.getElementById("scoreNum");
+    const start = performance.now();
+    const duration = 800;
+    function tick(now) {
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  paintRing(overallScore);
+  animateScore(overallScore);
+
+  document.getElementById("qDims").innerHTML = bestByType.map((d) => `
+    <div class="q-dim">
+      <div class="q-dim-head">
+        <span class="q-dim-name">${d.label}</span>
+        <span class="q-dim-num">${d.fit}</span>
+      </div>
+      <div class="q-dim-bar"><div class="q-dim-bar-fill" style="width:${d.fit}%"></div></div>
+    </div>
+  `).join("");
+
+  /* ---------- matches: five strongest, mixed by design so the list itself
+     proves "more than grants" instead of just claiming it ---------- */
+
+  const topMatches = [...OPPORTUNITIES].sort((a, b) => b.fit - a.fit).slice(0, 5);
+
+  document.getElementById("matchList").innerHTML = topMatches.map((o, i) => `
+    <button class="row-item" data-idx="${i}">
+      <div class="row-main">
+        <p class="row-eyebrow">${TYPE_LABEL[o.type]}</p>
+        <p class="row-name">${o.name}</p>
+        <p class="row-sub">${amountRange(o)} · ${o.timeline}</p>
+      </div>
+      <div class="row-fit">
+        <span class="row-fit-num">${o.fit}</span>
+        <span class="row-fit-label">Fit</span>
+      </div>
+    </button>
+  `).join("");
+
+  document.querySelectorAll("#matchList .row-item").forEach((el, i) => {
+    el.addEventListener("click", () => openBuilder(fromOpportunity(topMatches[i])));
+  });
+
+  /* ---------- empowerment: same designPartnership() engine every other
+     round uses for "describe your work", framed here as the active,
+     agency-forward counterpart to the passive matches list beside it ---------- */
+
+  document.getElementById("empowerForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const input = document.getElementById("empowerInput").value;
+    const design = designPartnership(input);
+    openBuilder(fromSponsor(design.targets[0], design));
+  });
+
+  /* ---------- scroll lock: browse screen is one viewport on desktop
+     (≥860px), matches panel scrolls internally instead. Builder screen
+     and the tracker overlay both need normal scrolling, so unlock there,
+     and unlock everywhere below 860px where there isn't room to fit the
+     hero row + split side by side without it. ---------- */
+
+  function syncScrollLock() {
+    const active = document.querySelector(".screen.active");
+    const isBrowse = active && active.dataset.screen === "browse" && !trackerOverlay.classList.contains("active");
+    const desktop = window.innerWidth >= 860;
+    document.body.classList.toggle("scroll-unlocked", !(isBrowse && desktop));
+  }
+
+  const _showScreen = showScreen;
+  showScreen = function (id) {
+    _showScreen(id);
+    syncScrollLock();
+  };
+
+  document.getElementById("trackerBtn").addEventListener("click", syncScrollLock);
+  document.getElementById("trackerClose").addEventListener("click", syncScrollLock);
+  window.addEventListener("resize", syncScrollLock);
+
+  syncScrollLock();
+</script>
+</body>
+</html>

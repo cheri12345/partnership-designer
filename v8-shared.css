@@ -1,0 +1,873 @@
+/* Round 8 — the arrival page: the screen straight after onboarding v2's
+   "Go to my workspace".
+
+   Editorial, not boxy. Three references drive this:
+
+   Onboarding v2 and request access — the CHELCIE UX that already works:
+   one thing at a time, a narrow column, plain language, easy to follow.
+   Same tokens, same column, so arriving here reads as the same product
+   continuing rather than a different page.
+
+   Airbnb (search results and listing detail, pulled from Mobbin) — the
+   list has no card borders at all: strongest line first, grey detail
+   underneath, air between entries. The detail page separates facts with
+   hairlines, never a card inside a card. That is what kills the clutter.
+
+   Monzo — one idea per surface, a lot of room around it, quiet grey
+   labels over large dark values, exactly one accent colour.
+
+   Layered on v2-shared.css (paper/ink/teal, Archivo + Inter) and
+   builder-shared.css (the section builder + status tracker). */
+
+.v8-page {
+  width: 100%;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 32px 24px 140px;
+}
+
+/* Sections are set apart by air first, a hairline only where the eye needs
+   the help. Airbnb's spacing, not a border around every group. */
+.v8-section {
+  margin-top: 64px;
+}
+
+.v8-section.ruled {
+  padding-top: 64px;
+  border-top: 1px solid hsl(var(--border));
+}
+
+/* ---------- 1. arrival ---------- */
+
+.v8-hero .eyebrow {
+  margin: 0 0 14px;
+}
+
+.v8-hero h1 {
+  font-size: 2rem;
+  line-height: 1.1;
+  margin: 0 0 16px;
+}
+
+@media (min-width: 640px) {
+  .v8-hero h1 {
+    font-size: 2.5rem;
+  }
+}
+
+/* Desktop: the same single column, given more room to breathe rather than
+   more things to look at. */
+@media (min-width: 900px) {
+  .v8-page {
+    max-width: 760px;
+    padding: 56px 40px 160px;
+  }
+
+  .v8-section {
+    margin-top: 80px;
+  }
+
+  .v8-section.ruled {
+    padding-top: 80px;
+  }
+
+  .v8-hero h1 {
+    font-size: 3rem;
+  }
+
+  .v8-hero-sub {
+    font-size: 1.0625rem;
+  }
+
+  .card-why {
+    font-size: 1.25rem;
+  }
+
+  .card-head {
+    padding: 28px 0;
+  }
+
+  /* Short facts sit two-up so an opened entry stays inside one screen. */
+  .card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 40px;
+  }
+
+  .card-body > .body-row:first-child,
+  .card-body > .card-actions {
+    grid-column: 1 / -1;
+  }
+
+  .card-amount {
+    font-size: 1.125rem;
+  }
+}
+
+.v8-hero-sub {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: hsl(var(--stone));
+  margin: 0;
+  max-width: 40ch;
+}
+
+/* ---------- 1. the money on the table ---------- */
+/* The arrival moment answers "realise your financial potential" with an
+   actual figure, then its composition — Monzo's balance-then-breakdown.
+   This replaced a progress meter that was about CHELCIE, not about money. */
+
+.potential {
+  margin-top: 24px;
+}
+
+.potential-figure {
+  font-family: "Archivo", system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 2.25rem;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+}
+
+.potential-figure span {
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: hsl(var(--stone));
+  letter-spacing: 0;
+}
+
+@media (min-width: 640px) {
+  .potential-figure {
+    font-size: 3rem;
+  }
+}
+
+.potential-sub {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: hsl(var(--stone));
+  margin: 12px 0 0;
+  max-width: 38ch;
+}
+
+.comp-bar {
+  display: flex;
+  gap: 4px;
+  margin-top: 28px;
+}
+
+.comp-seg {
+  height: 10px;
+  min-width: 0;
+  border-radius: 99px;
+}
+
+.comp-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-top: 14px;
+  font-size: 0.8125rem;
+  color: hsl(var(--stone));
+}
+
+.comp-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.comp-key i {
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  display: inline-block;
+}
+
+/* One colour per kind of money, used everywhere it appears. */
+.comp-seg.grant,     .comp-key i.grant,     .kind-mark.grant     { background: hsl(159 50% 62%); }
+.comp-seg.loan,      .comp-key i.loan,      .kind-mark.loan      { background: hsl(210 42% 66%); }
+.comp-seg.corporate, .comp-key i.corporate, .kind-mark.corporate { background: hsl(42 62% 66%); }
+.comp-seg.equity,    .comp-key i.equity,    .kind-mark.equity    { background: hsl(24 58% 64%); }
+
+.potential-note {
+  margin: 28px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: hsl(var(--stone));
+}
+
+/* ---------- 2. what you told us ---------- */
+/* Onboarding v2 asks in selects, sliders and pills — never prose. So this
+   reads back as values you scan, not a sentence you read. */
+
+.told-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.told-label {
+  font-size: 0.8125rem;
+  color: hsl(var(--stone));
+  margin: 0 0 20px;
+}
+
+.told-change {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  color: hsl(var(--stone));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.told-change:hover {
+  color: hsl(var(--ink));
+}
+
+.fact-grid {
+  margin: 0;
+  display: grid;
+  gap: 20px 40px;
+}
+
+@media (min-width: 560px) {
+  .fact-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.fact dt {
+  font-size: 0.8125rem;
+  color: hsl(var(--stone));
+  margin: 0 0 4px;
+}
+
+.fact dd {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: hsl(var(--ink));
+}
+
+.chips-label {
+  font-size: 0.8125rem;
+  color: hsl(var(--stone));
+  margin: 36px 0 0;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.chip {
+  border: 1px solid hsl(var(--border));
+  background: transparent;
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--stone));
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+
+.chip:hover {
+  border-color: hsl(var(--ink) / 0.35);
+  color: hsl(var(--ink));
+}
+
+.chip.on {
+  border-color: hsl(var(--teal));
+  background: hsl(var(--teal) / 0.16);
+  color: hsl(var(--ink));
+  font-weight: 600;
+}
+
+.chip.chip-out.on {
+  border-color: hsl(var(--ink) / 0.5);
+  background: transparent;
+  color: hsl(var(--ink));
+}
+
+/* What you've ruled out stays folded away until you want to change it. */
+.ruled-out {
+  margin-top: 22px;
+}
+
+.ruled-out summary {
+  list-style: none;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  color: hsl(var(--stone));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: hsl(var(--border));
+}
+
+.ruled-out summary::-webkit-details-marker {
+  display: none;
+}
+
+.ruled-out summary:hover {
+  color: hsl(var(--ink));
+}
+
+.ruled-out .chip-row {
+  margin-top: 14px;
+}
+
+/* ---------- 3. the one list ---------- */
+
+.list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
+.list-head h2 {
+  font-size: 1.375rem;
+  margin: 0;
+}
+
+.list-count {
+  font-size: 0.8125rem;
+  color: hsl(var(--stone));
+  white-space: nowrap;
+}
+
+.money-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.money-card {
+  border-top: 1px solid hsl(var(--border));
+}
+
+.money-card:first-child {
+  border-top: 0;
+}
+
+.money-card.open {
+  background: transparent;
+}
+
+.money-card.decided-pass .card-head {
+  opacity: 0.45;
+}
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font-family: inherit;
+  padding: 22px 0;
+  cursor: pointer;
+}
+
+.kind-mark {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  margin-top: 8px;
+}
+
+/* min-width:0 so the text column can shrink instead of shoving the money
+   figure off the row. */
+.card-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: block;
+}
+
+.card-money {
+  flex: 0 0 auto;
+  display: block;
+  text-align: right;
+  padding-left: 8px;
+}
+
+.money-card.open .card-head {
+  cursor: default;
+}
+
+/* The line that does the work: what they get out of you. */
+.card-why {
+  display: -webkit-box;
+  font-family: "Archivo", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  line-height: 1.45;
+  letter-spacing: -0.015em;
+  margin: 0;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-meta {
+  display: block;
+  margin: 6px 0 0;
+  font-size: 0.875rem;
+  color: hsl(var(--stone));
+}
+
+
+.card-amount {
+  display: block;
+  font-family: "Archivo", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.card-sample {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.6875rem;
+  color: hsl(var(--destructive));
+}
+
+.card-decided {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 8px 0 0;
+}
+
+.card-decided.pursue {
+  color: hsl(159 60% 28%);
+}
+
+.card-decided.hold {
+  color: hsl(35 70% 32%);
+}
+
+.card-decided.pass {
+  color: hsl(var(--stone));
+}
+
+/* in-place expand — hairline rows, the way Airbnb stacks a listing's facts */
+
+.card-body {
+  padding: 0 0 36px;
+}
+
+.body-row {
+  padding: 24px 0;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.body-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: hsl(var(--stone));
+  margin: 0 0 10px;
+}
+
+.body-text {
+  font-size: 1rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.card-when {
+  font-size: 0.875rem;
+  color: hsl(var(--stone));
+  margin: 8px 0 0;
+}
+
+.body-list {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: hsl(var(--stone));
+}
+
+.source-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.9375rem;
+  line-height: 2;
+}
+
+.source-list a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.source-empty {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: hsl(var(--destructive));
+  margin: 0;
+}
+
+.card-actions {
+  padding-top: 26px;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.decide-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.decide-btn {
+  border: 1px solid hsl(var(--border));
+  background: transparent;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--stone));
+  cursor: pointer;
+}
+
+.decide-btn:hover {
+  border-color: hsl(var(--ink) / 0.4);
+  color: hsl(var(--ink));
+}
+
+.decide-btn.on {
+  background: hsl(var(--ink));
+  color: hsl(var(--paper));
+  border-color: hsl(var(--ink));
+  font-weight: 600;
+}
+
+.decide-panel {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.decide-panel p {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: hsl(var(--stone));
+  margin: 0 0 18px;
+}
+
+.decide-panel label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: hsl(var(--stone));
+  margin-bottom: 10px;
+}
+
+.decide-panel input,
+.decide-panel select,
+.decide-panel textarea {
+  font-size: 0.9375rem;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+}
+
+.empty-note {
+  padding: 48px 0;
+  font-size: 1rem;
+  color: hsl(var(--stone));
+}
+
+/* ---------- 4. tell CHELCIE + keeps looking ---------- */
+
+.tell-box h2 {
+  font-size: 1.375rem;
+  margin: 0 0 10px;
+}
+
+.tell-box p.tell-sub {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: hsl(var(--stone));
+  margin: 0 0 20px;
+  max-width: 44ch;
+}
+
+.tell-sent {
+  font-size: 0.9375rem;
+  color: hsl(159 60% 28%);
+  font-weight: 500;
+}
+
+.keeps-looking {
+  margin-top: 48px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.keeps-pulse {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  background: hsl(var(--teal));
+  margin-top: 8px;
+  animation: keeps-blink 2.6s ease-in-out infinite;
+}
+
+@keyframes keeps-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.keeps-looking p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: hsl(var(--stone));
+  max-width: 46ch;
+}
+
+.keeps-looking strong {
+  font-family: "Archivo", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: hsl(var(--ink));
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* ---------- B: describe your work ---------- */
+
+.describe-samples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 0;
+}
+
+.sample-chip {
+  border: 1px solid hsl(var(--border));
+  background: transparent;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: hsl(var(--stone));
+  cursor: pointer;
+}
+
+.sample-chip:hover {
+  border-color: hsl(var(--teal));
+  color: hsl(var(--ink));
+}
+
+.describe-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.describe-status {
+  font-size: 0.875rem;
+  color: hsl(var(--stone));
+  margin: 0;
+}
+
+.describe-more {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  color: hsl(var(--stone));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.describe-more:hover {
+  color: hsl(var(--ink));
+}
+
+
+/* ---------- B: the one thing this page asks for ---------- */
+
+.describe-lead {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: hsl(var(--stone));
+  margin: 10px 0 18px;
+  max-width: 48ch;
+}
+
+#describeField {
+  font-size: 1rem;
+  line-height: 1.6;
+  padding: 16px 18px;
+  border-radius: 12px;
+}
+
+.describe-or {
+  font-size: 0.8125rem;
+  color: hsl(var(--stone));
+  align-self: center;
+}
+
+/* ---------- C: the stack ---------- */
+
+.view-toggle {
+  display: inline-flex;
+  border: 1px solid hsl(var(--border));
+  border-radius: 999px;
+  padding: 3px;
+}
+
+.view-toggle button {
+  border: 0;
+  background: transparent;
+  border-radius: 999px;
+  padding: 7px 18px;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: hsl(var(--stone));
+}
+
+.view-toggle button.on {
+  background: hsl(var(--ink));
+  color: hsl(var(--paper));
+  font-weight: 600;
+}
+
+
+.stack-intro {
+  font-size: 0.875rem;
+  color: hsl(var(--stone));
+  margin: 0 0 20px;
+  max-width: 46ch;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stack-band {
+  position: relative;
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.band-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 12px;
+  transition: width 0.25s ease, opacity 0.2s ease;
+}
+
+.stack-band.grant .band-fill     { background: hsl(159 50% 62% / 0.32); }
+.stack-band.loan .band-fill      { background: hsl(210 42% 66% / 0.32); }
+.stack-band.corporate .band-fill { background: hsl(42 62% 66% / 0.34); }
+.stack-band.equity .band-fill    { background: hsl(24 58% 64% / 0.32); }
+
+.stack-band.off .band-fill {
+  opacity: 0.3;
+}
+
+.stack-band.off .band-body {
+  opacity: 0.5;
+}
+
+.stack-band:hover .band-fill {
+  filter: brightness(0.96);
+}
+
+.band-body {
+  position: relative;
+  display: block;
+  padding: 18px 20px;
+}
+
+.band-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.band-kind {
+  font-family: "Archivo", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  letter-spacing: -0.01em;
+}
+
+.band-amount {
+  font-family: "Archivo", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.band-cost {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.875rem;
+  color: hsl(var(--ink) / 0.72);
+}
+
+.band-count {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8125rem;
+  color: hsl(var(--ink) / 0.55);
+}
+
+.view-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}

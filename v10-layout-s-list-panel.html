@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Round 10, Layout S: List + Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v2-shared.css" />
+<style>
+  /* ---------- one viewport on desktop. The list is the whiteboard-style
+     discovery here (browsing opportunities), so it's the one panel that
+     scrolls internally; the create-panel beside it never needs to, it's
+     short and fixed. Below 860px, stack and unlock normal scroll. ---------- */
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  body.scroll-unlocked {
+    height: auto;
+    min-height: 100%;
+    display: block;
+    overflow: visible;
+  }
+
+  .topbar {
+    flex-shrink: 0;
+  }
+
+  main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .screen[data-screen="map"] {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .map-shell {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px 40px 24px;
+  }
+
+  @media (max-width: 860px) {
+    .map-shell {
+      display: block;
+      height: auto;
+      padding: 20px 24px 60px;
+    }
+  }
+
+  .map-head {
+    flex-shrink: 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .map-head h1 {
+    font-size: 1.5rem;
+    margin: 4px 0 6px;
+  }
+
+  .map-head p {
+    font-size: 0.875rem;
+    color: hsl(var(--stone));
+    margin: 0;
+    max-width: 52ch;
+  }
+
+  .map-split {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    gap: 32px;
+    padding-top: 20px;
+  }
+
+  @media (max-width: 860px) {
+    .map-split {
+      flex-direction: column;
+      min-height: auto;
+    }
+  }
+
+  .list-col {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .list-col-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .list-col-head h2 {
+    font-size: 1.0625rem;
+    margin: 0;
+  }
+
+  .list-count {
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+  }
+
+  .list-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  @media (max-width: 860px) {
+    .list-scroll {
+      overflow-y: visible;
+    }
+  }
+
+  .list-scroll .row-item .row-eyebrow {
+    color: hsl(var(--stone));
+  }
+
+  .map-footer-links {
+    flex-shrink: 0;
+    padding-top: 10px;
+  }
+
+  .map-footer-links button {
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    text-decoration: underline;
+    color: hsl(var(--stone));
+    cursor: pointer;
+  }
+
+  /* ---------- create panel, now a fixed sidebar next to the list rather
+     than floating over a canvas ---------- */
+
+  .create-panel {
+    flex: 0 0 340px;
+    background: #fff;
+    border: 1px solid hsl(var(--border));
+    border-radius: 12px;
+    padding: 22px;
+    overflow-y: auto;
+  }
+
+  @media (max-width: 860px) {
+    .create-panel {
+      flex: 0 0 auto;
+      margin-bottom: 24px;
+    }
+  }
+
+  .create-panel-title {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin: 0 0 8px;
+  }
+
+  .create-panel-sub {
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    line-height: 1.5;
+    margin: 0 0 16px;
+  }
+
+  .create-panel-refine {
+    margin-top: 20px;
+    border-top: 1px solid hsl(var(--border));
+    padding-top: 16px;
+  }
+
+  .create-panel-refine summary {
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: hsl(var(--stone));
+    list-style: none;
+  }
+
+  .create-panel-refine summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .create-panel-refine summary:hover {
+    color: #0f766e;
+  }
+
+  .create-panel-refine[open] summary {
+    margin-bottom: 14px;
+  }
+
+  .refine-body,
+  .tracker-body {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 48px 24px 120px;
+    width: 100%;
+  }
+
+  .refine-section {
+    margin-bottom: 36px;
+  }
+
+  .refine-section .label {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  /* ---------- build screen: details left, draft it out right ---------- */
+
+  .build-wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 48px 24px 120px;
+    width: 100%;
+  }
+
+  .build-columns {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-top: 22px;
+  }
+
+  @media (min-width: 820px) {
+    .build-columns {
+      grid-template-columns: 340px 1fr;
+      align-items: start;
+    }
+  }
+
+  .build-summary {
+    border: 1px solid hsl(var(--border));
+    border-radius: 10px;
+    padding: 22px;
+    background: #fff;
+  }
+
+  @media (min-width: 820px) {
+    .build-summary {
+      position: sticky;
+      top: 24px;
+    }
+  }
+
+  .build-name {
+    font-size: 1.375rem;
+    margin: 6px 0 12px;
+  }
+
+  .build-sub {
+    font-family: var(--font-mono, monospace);
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    margin: 0 0 18px;
+  }
+
+  .build-summary .gain-callout {
+    margin: 0 0 18px;
+    padding-top: 18px;
+  }
+
+  .build-terms {
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .build-draft {
+    min-width: 0;
+  }
+
+  .build-draft-sub {
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    margin: 6px 0 24px;
+    line-height: 1.5;
+    max-width: 40ch;
+  }
+
+  .drafting-state {
+    font-size: 0.875rem;
+    color: hsl(var(--stone));
+  }
+
+  .doc-section {
+    margin-bottom: 22px;
+  }
+
+  .doc-section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .doc-section-head label {
+    margin: 0;
+  }
+
+  .build-actions {
+    border-top: 1px solid hsl(var(--border));
+    padding-top: 20px;
+    margin-top: 8px;
+  }
+
+  /* ---------- create-your-own-partnership panel content ---------- */
+
+  .design-meta {
+    display: block;
+    margin: 10px 0 0;
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+  }
+
+  .design-results {
+    margin-top: 18px;
+  }
+
+  #sponsorList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .sponsor-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    border: 1px solid hsl(var(--border));
+    border-radius: 4px;
+    padding: 14px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .sponsor-row.selected {
+    border-color: hsl(var(--ink));
+  }
+
+  .sponsor-company {
+    display: block;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .sponsor-row.selected .sponsor-company {
+    color: #0f766e;
+  }
+
+  .sponsor-unit {
+    display: block;
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    margin-top: 4px;
+  }
+
+  .sponsor-check {
+    display: block;
+    font-size: 0.75rem;
+    color: hsl(var(--stone));
+    margin-top: 8px;
+  }
+
+  .sponsor-detail {
+    margin-top: 16px;
+    border: 1px solid hsl(var(--border));
+    border-radius: 4px;
+    background: #fff;
+  }
+
+  .sponsor-detail-body {
+    padding: 16px;
+  }
+
+  .sponsor-field {
+    margin-bottom: 16px;
+  }
+
+  .sponsor-field-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: hsl(var(--stone));
+    margin: 0 0 4px;
+  }
+
+  .sponsor-field p {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .sponsor-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .muted-italic {
+    font-style: italic;
+    color: hsl(var(--stone));
+  }
+
+  .source-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .source-list a {
+    font-size: 0.8125rem;
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="wordmark" href="index.html">CHELCIE</a>
+  <div class="top-actions">
+    <button class="pill-link" id="trackerBtn">Your partnerships<span class="badge" id="trackerBadge" hidden>0</span></button>
+    <button class="pill-link" id="refineBtn">Refine</button>
+  </div>
+</header>
+
+<main>
+
+  <section class="screen active" data-screen="map">
+    <div class="map-shell">
+      <div class="map-head">
+        <p class="eyebrow">Your closest matches</p>
+        <h1>What you're responsible for, mapped to who can help.</h1>
+        <p>Best fit first. Everything on the right is a company already aligned with you, not on this list yet.</p>
+      </div>
+
+      <div class="map-split">
+        <div class="list-col">
+          <div class="list-col-head">
+            <h2>Best fit first</h2>
+            <p class="list-count" id="listCount"></p>
+          </div>
+          <div class="list-scroll">
+            <div class="row-list" id="oppList"></div>
+          </div>
+          <div class="map-footer-links">
+            <button id="showMoreBtn">Show 7 more opportunities</button>
+          </div>
+        </div>
+
+        <aside class="create-panel">
+          <p class="create-panel-title">Create your own partnership</p>
+          <p class="create-panel-sub" id="createPanelSub">Companies already aligned with your organization, the ones with a real reason to say yes, not on your list yet.</p>
+
+          <div class="design-results" id="designResults">
+            <div id="sponsorList"></div>
+            <div class="sponsor-detail" id="sponsorDetailWrap" hidden>
+              <div class="sponsor-detail-body" id="sponsorDetail"></div>
+            </div>
+          </div>
+
+          <details class="create-panel-refine">
+            <summary>Describe your own program for a sharper match</summary>
+            <div class="pill-group" id="sampleGroup"></div>
+            <div class="field-group" style="margin-top:14px; margin-bottom:10px;">
+              <textarea id="studyInput" rows="3" placeholder="e.g. A 400-patient trial testing HEPA purifiers in COPD patients' homes..."></textarea>
+            </div>
+            <button class="btn-primary" id="designBtn" disabled>Find who should fund this</button>
+            <p class="design-meta" id="designMeta"></p>
+          </details>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="build">
+    <div class="build-wrap">
+      <button class="back-link" id="buildBackLink">← Back to your list</button>
+      <div class="build-columns">
+        <aside class="build-summary">
+          <p class="eyebrow" id="buildEyebrow"></p>
+          <h2 class="build-name" id="buildName"></h2>
+          <p class="build-sub" id="buildSub"></p>
+          <div class="gain-callout">
+            <blockquote id="buildGainText"></blockquote>
+            <p class="works-with" id="buildGainSub"></p>
+          </div>
+          <p class="build-terms" id="buildTerms"></p>
+        </aside>
+
+        <div class="build-draft">
+          <p class="eyebrow">Design your partnership</p>
+          <p class="build-draft-sub">CHELCIE drafts each section below to start. Edit anything directly, or redraft one section at a time if it's not quite right.</p>
+
+          <div class="field-group">
+            <label>Your organization</label>
+            <input type="text" class="pitch-org" value="Your organization" />
+          </div>
+
+          <p class="drafting-state" id="buildLoading" hidden>CHELCIE is drafting this document…</p>
+
+          <div id="buildSections" hidden>
+            <div class="doc-section">
+              <div class="doc-section-head">
+                <label>What we are asking</label>
+                <button class="regen-link" data-field="ask">Redraft with CHELCIE</button>
+              </div>
+              <textarea class="pitch-ask" rows="3"></textarea>
+            </div>
+
+            <div class="doc-section">
+              <div class="doc-section-head">
+                <label>How the funds will be used</label>
+                <button class="regen-link" data-field="use">Redraft with CHELCIE</button>
+              </div>
+              <textarea class="pitch-use" rows="3"></textarea>
+            </div>
+
+            <div class="doc-section">
+              <div class="doc-section-head">
+                <label>Why this fits</label>
+                <button class="regen-link" data-field="fit">Redraft with CHELCIE</button>
+              </div>
+              <textarea class="pitch-fit" rows="3"></textarea>
+            </div>
+
+            <div class="doc-section">
+              <div class="doc-section-head">
+                <label>Terms under discussion</label>
+                <button class="regen-link" data-field="terms">Redraft with CHELCIE</button>
+              </div>
+              <textarea class="pitch-terms" rows="2"></textarea>
+            </div>
+
+            <div class="build-actions">
+              <p class="draft-status" id="draftStatus"></p>
+              <div class="draft-actions">
+                <button class="btn-secondary" id="exportDraftBtn">Export .txt</button>
+                <button class="btn-secondary" id="markSentBtn">Mark as sent</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="overlay" id="refineOverlay">
+  <header class="topbar">
+    <span class="wordmark">Refine</span>
+    <button class="pill-link" id="refineClose">Close</button>
+  </header>
+  <div class="refine-body">
+    <div class="refine-section">
+      <p class="label">Capital types you'll consider</p>
+      <div class="pill-group" id="typeGroup">
+        <button class="pill selected" data-value="loan">Loans</button>
+        <button class="pill selected" data-value="grant">Grants</button>
+        <button class="pill selected" data-value="corporate">Corporate partnerships</button>
+        <button class="pill selected" data-value="equity">Equity</button>
+      </div>
+    </div>
+    <div class="refine-section">
+      <p class="label">Funding range you're working with</p>
+      <div class="side-options" id="rangeGroup">
+        <button class="side-option selected" data-value="0">
+          <span class="side-option-label">Any amount</span>
+        </button>
+        <button class="side-option" data-value="250000">
+          <span class="side-option-label">At least $250K</span>
+        </button>
+        <button class="side-option" data-value="1000000">
+          <span class="side-option-label">At least $1M</span>
+        </button>
+      </div>
+    </div>
+    <div class="refine-section">
+      <p class="label">Fine-tune</p>
+      <div class="pill-group" id="extraGroup">
+        <button class="pill" data-value="hideDilutive">Hide dilutive capital</button>
+        <button class="pill" data-value="under500k">Only under $500K</button>
+        <button class="pill" data-value="rollingOnly">Only rolling deadlines</button>
+      </div>
+    </div>
+    <button class="btn-primary" id="applyRefine">Update my map</button>
+  </div>
+</div>
+
+<div class="overlay" id="trackerOverlay">
+  <header class="topbar">
+    <span class="wordmark">Your partnerships</span>
+    <button class="pill-link" id="trackerClose">Close</button>
+  </header>
+  <div class="tracker-body" id="trackerBody"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="partnership-lib.js"></script>
+<script>
+  const prefs = { types: new Set(["loan", "grant", "corporate", "equity"]), minRange: 0, hideDilutive: false, under500k: false, rollingOnly: false };
+  let filtered = [];
+  let visibleCount = 6;
+  let currentTrackedEntry = null;
+  const tracked = [];
+
+  const screens = Array.from(document.querySelectorAll(".screen"));
+
+  function slug(text) {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  }
+
+  function showScreen(id) {
+    screens.forEach((s) => s.classList.toggle("active", s.dataset.screen === id));
+    window.scrollTo(0, 0);
+    syncScrollLock();
+  }
+
+  function recompute() {
+    filtered = OPPORTUNITIES.filter((o) => {
+      if (!prefs.types.has(o.type)) return false;
+      if (prefs.minRange && o.max < prefs.minRange) return false;
+      if (prefs.hideDilutive && o.dilutive) return false;
+      if (prefs.under500k && o.max > 500000) return false;
+      if (prefs.rollingOnly && !isRolling(o)) return false;
+      return true;
+    }).sort((a, b) => b.fit - a.fit);
+    visibleCount = Math.min(6, filtered.length);
+    renderList();
+  }
+
+  function renderList() {
+    const shown = filtered.slice(0, visibleCount);
+    document.getElementById("listCount").textContent = `${shown.length} of ${filtered.length} shown`;
+    document.getElementById("oppList").innerHTML = shown.map((o, i) => `
+      <button class="row-item" data-idx="${i}">
+        <div class="row-main">
+          <p class="row-eyebrow">${TYPE_LABEL[o.type]}</p>
+          <p class="row-name">${o.name}</p>
+          <p class="row-sub">${amountRange(o)} · ${o.timeline}</p>
+        </div>
+        <div class="row-fit">
+          <span class="row-fit-num">${o.fit}</span>
+          <span class="row-fit-label">Fit</span>
+        </div>
+      </button>
+    `).join("");
+    document.querySelectorAll("#oppList .row-item").forEach((el, i) => {
+      el.addEventListener("click", () => openOpportunity(shown[i]));
+    });
+
+    const remaining = filtered.length - visibleCount;
+    const showMoreBtn = document.getElementById("showMoreBtn");
+    if (remaining > 0) {
+      showMoreBtn.style.display = "inline";
+      showMoreBtn.textContent = `Show ${remaining} more opportunit${remaining === 1 ? "y" : "ies"}`;
+    } else {
+      showMoreBtn.style.display = "none";
+    }
+  }
+
+  document.getElementById("showMoreBtn").addEventListener("click", () => {
+    visibleCount = filtered.length;
+    renderList();
+  });
+
+  /* ---------- generalized designable: an opportunity node OR a sponsor
+     target, normalized so the same build screen works for both. ---------- */
+
+  let currentDesignable = null;
+
+  function fromOpportunity(o) {
+    return {
+      kind: "onepager",
+      eyebrow: TYPE_LABEL[o.type] + " · Fit " + o.fit,
+      name: o.name,
+      sub: amountRange(o) + " · " + o.timeline,
+      gainQuote: o.gain,
+      gainSub: o.worksWith,
+      termsLine: o.terms.join(", ") + ".",
+      defaultAskText: defaultAsk(o),
+      defaultUseText: defaultUseOfFunds(o),
+      draftSubLine: () => "Partnership request to " + o.name,
+      filenameBase: (org) => slug(org) + "-" + slug(o.name) + "-one-pager",
+      trackerKind: "onepager",
+      trackerTitle: o.name,
+      trackerSubtitle: amountRange(o) + " · " + o.timeline,
+    };
+  }
+
+  function fromSponsor(t, design) {
+    return {
+      kind: "email",
+      eyebrow: "CORPORATE · " + t.business_unit,
+      name: t.company,
+      sub: t.check_size,
+      gainQuote: t.strategic_hook,
+      gainSub: t.why_them,
+      termsLine: `${t.entry_vehicle} Typical structure: ${t.check_size}.`,
+      defaultAskText: `A short call to explore ${t.entry_vehicle.split(".")[0].toLowerCase()}.`,
+      defaultUseText: `To advance: ${design.study_summary}`,
+      draftSubLine: () => `Outreach to ${t.company}, ${t.business_unit}`,
+      filenameBase: (org) => slug(org) + "-" + slug(t.company) + "-outreach",
+      trackerKind: "vpemail",
+      trackerTitle: t.company + " outreach",
+      trackerSubtitle: t.business_unit,
+    };
+  }
+
+  function openDetail(d) {
+    currentDesignable = d;
+    currentTrackedEntry = null;
+    showScreen("build");
+
+    document.getElementById("buildEyebrow").textContent = d.eyebrow;
+    document.getElementById("buildName").textContent = d.name;
+    document.getElementById("buildSub").textContent = d.sub;
+    document.getElementById("buildGainText").textContent = d.gainQuote;
+    document.getElementById("buildGainSub").textContent = d.gainSub;
+    document.getElementById("buildTerms").textContent = d.termsLine;
+    document.querySelector(".pitch-org").value = "Your organization";
+
+    document.getElementById("buildSections").hidden = true;
+    document.getElementById("buildLoading").hidden = false;
+
+    setTimeout(() => {
+      document.querySelector(".pitch-ask").value = d.defaultAskText;
+      document.querySelector(".pitch-use").value = d.defaultUseText;
+      document.querySelector(".pitch-fit").value = d.gainQuote;
+      document.querySelector(".pitch-terms").value = d.termsLine;
+
+      document.getElementById("buildLoading").hidden = true;
+      document.getElementById("buildSections").hidden = false;
+
+      const { text, org } = currentDocumentText();
+      currentTrackedEntry = addTracked({
+        kind: d.trackerKind,
+        title: d.trackerTitle,
+        subtitle: d.trackerSubtitle,
+        exportText: text,
+        filename: d.filenameBase(org) + ".txt",
+      });
+      renderDraftStatus();
+    }, 900);
+  }
+
+  function openOpportunity(o) {
+    openDetail(fromOpportunity(o));
+  }
+
+  function currentDocumentText() {
+    const d = currentDesignable;
+    const org = document.querySelector(".pitch-org").value.trim() || "Your organization";
+    const ask = document.querySelector(".pitch-ask").value.trim();
+    const use = document.querySelector(".pitch-use").value.trim();
+    const fit = document.querySelector(".pitch-fit").value.trim();
+    const terms = document.querySelector(".pitch-terms").value.trim();
+    const text = [
+      org,
+      d.draftSubLine(),
+      ``,
+      `WHAT WE ARE ASKING`,
+      ask,
+      ``,
+      `HOW THE FUNDS WILL BE USED`,
+      use,
+      ``,
+      `WHY THIS FITS`,
+      fit,
+      ``,
+      `TERMS UNDER DISCUSSION`,
+      terms,
+    ].join("\n");
+    return { org, text };
+  }
+
+  document.querySelectorAll(".regen-link").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const d = currentDesignable;
+      const field = btn.dataset.field;
+      if (field === "ask") document.querySelector(".pitch-ask").value = d.defaultAskText;
+      else if (field === "use") document.querySelector(".pitch-use").value = d.defaultUseText;
+      else if (field === "fit") document.querySelector(".pitch-fit").value = d.gainQuote;
+      else if (field === "terms") document.querySelector(".pitch-terms").value = d.termsLine;
+    });
+  });
+
+  document.getElementById("buildBackLink").addEventListener("click", () => showScreen("map"));
+
+  /* ---------- refine overlay ---------- */
+
+  const refineOverlay = document.getElementById("refineOverlay");
+  document.getElementById("refineBtn").addEventListener("click", () => refineOverlay.classList.add("active"));
+  document.getElementById("refineClose").addEventListener("click", () => refineOverlay.classList.remove("active"));
+
+  document.querySelectorAll("#typeGroup .pill").forEach((p) => {
+    p.addEventListener("click", () => {
+      const v = p.dataset.value;
+      if (prefs.types.has(v)) { prefs.types.delete(v); p.classList.remove("selected"); }
+      else { prefs.types.add(v); p.classList.add("selected"); }
+    });
+  });
+
+  document.querySelectorAll("#rangeGroup .side-option").forEach((b) => {
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#rangeGroup .side-option").forEach((o) => o.classList.remove("selected"));
+      b.classList.add("selected");
+      prefs.minRange = Number(b.dataset.value);
+    });
+  });
+
+  document.querySelectorAll("#extraGroup .pill").forEach((p) => {
+    p.addEventListener("click", () => {
+      const v = p.dataset.value;
+      prefs[v] = !prefs[v];
+      p.classList.toggle("selected", prefs[v]);
+    });
+  });
+
+  document.getElementById("applyRefine").addEventListener("click", () => {
+    recompute();
+    refineOverlay.classList.remove("active");
+  });
+
+  /* ---------- status + export tracker ---------- */
+
+  function addTracked(entry) {
+    const record = { id: Date.now() + Math.random(), status: "draft", createdAt: new Date(), ...entry };
+    tracked.unshift(record);
+    updateTrackerBadge();
+    return record;
+  }
+
+  function updateTrackerBadge() {
+    const badge = document.getElementById("trackerBadge");
+    badge.hidden = tracked.length === 0;
+    badge.textContent = tracked.length;
+  }
+
+  function exportEntry(entry) {
+    const blob = new Blob([entry.exportText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = entry.filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function renderDraftStatus() {
+    if (!currentTrackedEntry) return;
+    const s = document.getElementById("draftStatus");
+    const btn = document.getElementById("markSentBtn");
+    s.innerHTML = `<span class="status-dot ${currentTrackedEntry.status}"></span> ${currentTrackedEntry.status === "sent" ? "Marked as sent" : "Draft ready, not sent yet"}`;
+    btn.textContent = currentTrackedEntry.status === "sent" ? "Mark as not sent" : "Mark as sent";
+  }
+
+  document.getElementById("exportDraftBtn").addEventListener("click", () => {
+    if (!currentTrackedEntry) return;
+    const { org, text } = currentDocumentText();
+    currentTrackedEntry.exportText = text;
+    currentTrackedEntry.filename = currentDesignable.filenameBase(org) + ".txt";
+    exportEntry(currentTrackedEntry);
+  });
+
+  document.getElementById("markSentBtn").addEventListener("click", () => {
+    if (!currentTrackedEntry) return;
+    currentTrackedEntry.exportText = currentDocumentText().text;
+    currentTrackedEntry.status = currentTrackedEntry.status === "sent" ? "draft" : "sent";
+    renderDraftStatus();
+  });
+
+  const trackerOverlay = document.getElementById("trackerOverlay");
+  document.getElementById("trackerBtn").addEventListener("click", () => {
+    renderTracker();
+    trackerOverlay.classList.add("active");
+  });
+  document.getElementById("trackerClose").addEventListener("click", () => trackerOverlay.classList.remove("active"));
+
+  function renderTracker() {
+    const body = document.getElementById("trackerBody");
+    if (tracked.length === 0) {
+      body.innerHTML = `<p class="tracker-empty">Nothing drafted yet. Design a partnership from your list, or describe a program under "Create your own partnership", and it'll show up here with a status and an export.</p>`;
+      return;
+    }
+    body.innerHTML = tracked.map((t, i) => `
+      <div class="tracker-item">
+        <div>
+          <p class="tracker-kind">${t.kind === "onepager" ? "ONE-PAGER" : "OUTREACH EMAIL"}</p>
+          <p class="tracker-title">${t.title}</p>
+          <p class="tracker-sub">${t.subtitle}</p>
+        </div>
+        <div class="tracker-actions">
+          <span class="status-pill ${t.status}">${t.status === "sent" ? "Sent" : "Draft ready"}</span>
+          <button class="btn-secondary tracker-export" data-idx="${i}">Export</button>
+          <button class="back-link tracker-toggle" data-idx="${i}">${t.status === "sent" ? "Mark as not sent" : "Mark as sent"}</button>
+        </div>
+      </div>
+    `).join("");
+
+    body.querySelectorAll(".tracker-export").forEach((btn) => {
+      btn.addEventListener("click", () => exportEntry(tracked[Number(btn.dataset.idx)]));
+    });
+    body.querySelectorAll(".tracker-toggle").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const t = tracked[Number(btn.dataset.idx)];
+        t.status = t.status === "sent" ? "draft" : "sent";
+        renderTracker();
+      });
+    });
+  }
+
+  /* ---------- create-your-own-partnership panel ---------- */
+
+  const sampleGroup = document.getElementById("sampleGroup");
+  SAMPLE_STUDIES.forEach((s) => {
+    const btn = document.createElement("button");
+    btn.className = "pill";
+    btn.textContent = s.label;
+    btn.addEventListener("click", () => {
+      studyInput.value = s.text;
+      designBtn.disabled = false;
+      runDesign(s.text);
+    });
+    sampleGroup.appendChild(btn);
+  });
+
+  const studyInput = document.getElementById("studyInput");
+  const designBtn = document.getElementById("designBtn");
+  studyInput.addEventListener("input", () => {
+    designBtn.disabled = !studyInput.value.trim();
+  });
+  designBtn.addEventListener("click", () => runDesign(studyInput.value));
+
+  let currentDesign = null;
+  let selectedTargetIdx = 0;
+
+  function runDesign(text) {
+    const trimmed = (text || "").trim();
+    currentDesign = designPartnership(trimmed);
+    selectedTargetIdx = -1;
+    document.getElementById("sponsorDetailWrap").hidden = true;
+
+    if (trimmed) {
+      document.getElementById("createPanelSub").textContent = "Matched to what you described, not the grant desk.";
+      document.getElementById("designMeta").textContent =
+        `${currentDesign.targets.length} target${currentDesign.targets.length === 1 ? "" : "s"} · themes: ${currentDesign.themes.slice(0, 4).join(", ") || "—"}`;
+    } else {
+      document.getElementById("createPanelSub").textContent = "Companies already aligned with your organization, the ones with a real reason to say yes, not on your list yet.";
+      document.getElementById("designMeta").textContent = "";
+    }
+
+    renderSponsorList();
+  }
+
+  function renderSponsorList() {
+    const list = document.getElementById("sponsorList");
+    list.innerHTML = currentDesign.targets.map((t, i) => `
+      <button class="sponsor-row ${i === selectedTargetIdx ? "selected" : ""}" data-idx="${i}">
+        <span class="sponsor-company">${t.company}</span>
+        <span class="sponsor-unit">${t.business_unit}</span>
+        <span class="sponsor-check">${t.check_size.split(" ")[0]}</span>
+      </button>
+    `).join("");
+    list.querySelectorAll(".sponsor-row").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        selectedTargetIdx = Number(btn.dataset.idx);
+        renderSponsorList();
+        renderSponsorDetail();
+        document.getElementById("sponsorDetailWrap").hidden = false;
+      });
+    });
+  }
+
+  function renderSponsorDetail() {
+    const t = currentDesign.targets[selectedTargetIdx];
+    const design = currentDesign;
+    const detail = document.getElementById("sponsorDetail");
+    detail.innerHTML = `
+      <p class="eyebrow accent">ENTRY DESIGN · ${t.company}</p>
+      <div class="sponsor-field"><p class="sponsor-field-label">Strategic hook</p><p>${t.strategic_hook}</p></div>
+      <div class="sponsor-field"><p class="sponsor-field-label">Entry vehicle</p><p>${t.entry_vehicle}</p></div>
+      <div class="sponsor-field-row">
+        <div class="sponsor-field"><p class="sponsor-field-label">Check size</p><p class="mono">${t.check_size}</p></div>
+        <div class="sponsor-field"><p class="sponsor-field-label">Decision maker</p><p>${t.decision_maker.role}</p></div>
+      </div>
+      <div class="sponsor-field"><p class="sponsor-field-label">Why them</p><p>${t.why_them}</p></div>
+      <div class="sponsor-field"><p class="sponsor-field-label">How to find them</p><p class="muted-italic">${t.decision_maker.name_hint}</p></div>
+      ${t.sources && t.sources.length ? `<div class="sponsor-field"><p class="sponsor-field-label">Verify · public sources</p><ul class="source-list">${t.sources.map((s) => `<li><a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.label}</a></li>`).join("")}</ul></div>` : ""}
+      <button class="btn-primary" id="designThisBtn">Design this partnership →</button>
+    `;
+
+    document.getElementById("designThisBtn").addEventListener("click", () => {
+      openDetail(fromSponsor(t, design));
+    });
+  }
+
+  /* ---------- scroll lock: same pattern as Layout R ---------- */
+
+  function syncScrollLock() {
+    const active = document.querySelector(".screen.active");
+    const isMap = active && active.dataset.screen === "map";
+    const desktop = window.innerWidth >= 860;
+    document.body.classList.toggle("scroll-unlocked", !(isMap && desktop));
+  }
+
+  window.addEventListener("resize", syncScrollLock);
+
+  recompute();
+  runDesign("");
+  syncScrollLock();
+</script>
+</body>
+</html>

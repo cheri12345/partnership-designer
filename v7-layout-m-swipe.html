@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Layout M: Swipe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v2-shared.css" />
+<link rel="stylesheet" href="builder-shared.css" />
+<style>
+  .swipe-head {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 40px 24px 8px;
+    text-align: center;
+  }
+
+  .swipe-head h1 {
+    font-size: 2rem;
+    margin: 4px 0 10px;
+  }
+
+  .swipe-sub {
+    font-size: 0.9375rem;
+    color: hsl(var(--stone));
+    max-width: 42rem;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .swipe-stage {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 460px;
+    margin: 28px auto 0;
+  }
+
+  .swipe-card {
+    position: absolute;
+    inset: 0;
+    border: 1px solid hsl(var(--ink) / 0.14);
+    border-radius: 16px;
+    padding: 28px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-shadow: 0 14px 32px hsl(var(--ink) / 0.14);
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+  }
+
+  .swipe-card:active {
+    cursor: grabbing;
+  }
+
+  .swipe-card-kind {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 0.8125rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: hsl(var(--ink) / 0.55);
+    margin: 0 0 8px;
+  }
+
+  .swipe-card-fit {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #fff;
+    border: 1.5px solid hsl(var(--ink));
+    border-radius: 999px;
+    padding: 4px 11px;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 0.8125rem;
+  }
+
+  .swipe-card-name {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1.375rem;
+    line-height: 1.25;
+    margin: 0 0 8px;
+  }
+
+  .swipe-card-amount {
+    font-size: 0.9375rem;
+    color: hsl(var(--stone));
+    margin: 0 0 14px;
+  }
+
+  .swipe-card-blurb {
+    font-size: 0.875rem;
+    color: hsl(var(--ink) / 0.75);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .swipe-card-stamp {
+    position: absolute;
+    top: 28px;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 1.375rem;
+    letter-spacing: 0.05em;
+    border: 3px solid;
+    border-radius: 8px;
+    padding: 4px 12px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .swipe-card-stamp.like {
+    left: 28px;
+    color: #0f766e;
+    border-color: #0f766e;
+    transform: rotate(-12deg);
+  }
+
+  .swipe-card-stamp.pass {
+    right: 28px;
+    color: hsl(var(--destructive));
+    border-color: hsl(var(--destructive));
+    transform: rotate(12deg);
+  }
+
+  .swipe-actions {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    margin-top: 24px;
+  }
+
+  .swipe-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid hsl(var(--border));
+    background: #fff;
+    font-size: 1.25rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px hsl(var(--ink) / 0.1);
+  }
+
+  .swipe-btn.pass {
+    color: hsl(var(--destructive));
+  }
+
+  .swipe-btn.like {
+    color: #0f766e;
+  }
+
+  .swipe-count {
+    text-align: center;
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    margin: 14px 0 60px;
+  }
+
+  .swipe-empty {
+    text-align: center;
+    padding: 80px 24px;
+    color: hsl(var(--stone));
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="wordmark" href="index.html">CHELCIE</a>
+  <button class="pill-link" id="trackerBtn">Your partnerships<span class="badge" id="trackerBadge" hidden>0</span></button>
+</header>
+
+<main>
+
+  <section class="screen active" data-screen="browse">
+    <div class="swipe-head">
+      <h1>Build toward a more resilient future.</h1>
+      <p class="swipe-sub">One opportunity at a time. Swipe right (or tap the check) to start drafting it, left to pass.</p>
+    </div>
+    <div class="swipe-stage" id="swipeStage"></div>
+    <div class="swipe-actions">
+      <button class="swipe-btn pass" id="swipePassBtn" aria-label="Pass">&#10005;</button>
+      <button class="swipe-btn like" id="swipeLikeBtn" aria-label="Interested">&#10003;</button>
+    </div>
+    <p class="swipe-count" id="swipeCount"></p>
+  </section>
+
+  <section class="screen" data-screen="builder">
+    <div class="builder-shell">
+      <aside class="builder-nav">
+        <button class="back-link builder-back-link" id="builderBackToBrowse">← Back to the stack</button>
+        <ul class="section-list" id="sectionList"></ul>
+      </aside>
+      <div class="builder-main" id="builderMain"></div>
+    </div>
+    <div class="builder-footer">
+      <button class="back-link" id="builderBack">Back</button>
+      <p class="builder-progress" id="builderProgress"></p>
+      <button class="btn-primary" id="builderNext">Continue</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="overlay" id="trackerOverlay">
+  <header class="topbar">
+    <span class="wordmark">Your partnerships</span>
+    <button class="pill-link" id="trackerClose">Close</button>
+  </header>
+  <div class="tracker-body" id="trackerBody" style="max-width:560px; margin:0 auto; padding:48px 24px 100px; width:100%;"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="partnership-lib.js"></script>
+<script src="builder-shared.js"></script>
+<script>
+  /* ---------- swipe stack: one opportunity full-screen at a time,
+     drag right to start drafting, left to pass, same as any dating-app
+     card stack. ---------- */
+
+  let swipeItems = [];
+  let swipeIdx = 0;
+  let dragState = null;
+
+  function buildSwipeItems() {
+    const items = OPPORTUNITIES.slice().sort((a, b) => b.fit - a.fit).map((o) => ({
+      kind: TYPE_LABEL[o.type], badge: o.fit, name: o.name, amount: amountRange(o), blurb: o.gain, designable: fromOpportunity(o),
+    }));
+    const design = designPartnership("");
+    design.targets.forEach((t) => items.push({
+      kind: "Corporate · Discovered", badge: t.check_size.split(" ")[0], name: t.company, amount: t.business_unit, blurb: t.strategic_hook, designable: fromSponsor(t, design),
+    }));
+    return items;
+  }
+
+  function renderSwipeCard() {
+    const stage = document.getElementById("swipeStage");
+    document.getElementById("swipeCount").textContent = Math.min(swipeIdx + 1, swipeItems.length) + " / " + swipeItems.length;
+
+    if (swipeIdx >= swipeItems.length) {
+      stage.innerHTML = `<div class="swipe-empty"><p>That's everything for now.</p><button class="btn-secondary" id="swipeRestart">Start over</button></div>`;
+      document.getElementById("swipeRestart").addEventListener("click", () => { swipeIdx = 0; renderSwipeCard(); });
+      return;
+    }
+
+    stage.innerHTML = "";
+    [1, 0].forEach((offset) => {
+      const i = swipeIdx + offset;
+      if (i >= swipeItems.length) return;
+      const item = swipeItems[i];
+      const card = document.createElement("div");
+      card.className = "swipe-card";
+      card.style.zIndex = offset === 0 ? 2 : 1;
+      if (offset === 1) card.style.transform = "scale(0.94) translateY(10px)";
+      card.innerHTML = `
+        <span class="swipe-card-fit">${item.badge}</span>
+        <span class="swipe-card-stamp like">Interested</span>
+        <span class="swipe-card-stamp pass">Pass</span>
+        <p class="swipe-card-kind">${item.kind}</p>
+        <p class="swipe-card-name">${item.name}</p>
+        <p class="swipe-card-amount">${item.amount}</p>
+        <p class="swipe-card-blurb">${item.blurb}</p>
+      `;
+      if (offset === 0) {
+        card.addEventListener("pointerdown", (e) => {
+          dragState = { card, item, startX: e.clientX, dx: 0 };
+          card.style.transition = "none";
+        });
+      }
+      stage.appendChild(card);
+    });
+  }
+
+  window.addEventListener("pointermove", (e) => {
+    if (!dragState) return;
+    dragState.dx = e.clientX - dragState.startX;
+    const { card, dx } = dragState;
+    card.style.transform = `translateX(${dx}px) rotate(${dx / 20}deg)`;
+    card.querySelector(".like").style.opacity = Math.max(0, Math.min(1, dx / 80));
+    card.querySelector(".pass").style.opacity = Math.max(0, Math.min(1, -dx / 80));
+  });
+
+  window.addEventListener("pointerup", () => {
+    if (!dragState) return;
+    const { card, item, dx } = dragState;
+    card.style.transition = "transform 0.3s ease";
+    if (dx > 100) {
+      card.style.transform = "translateX(600px) rotate(20deg)";
+      setTimeout(() => openBuilder(item.designable), 180);
+    } else if (dx < -100) {
+      card.style.transform = "translateX(-600px) rotate(-20deg)";
+      setTimeout(() => { swipeIdx++; renderSwipeCard(); }, 180);
+    } else {
+      card.style.transform = "";
+      card.querySelector(".like").style.opacity = 0;
+      card.querySelector(".pass").style.opacity = 0;
+    }
+    dragState = null;
+  });
+
+  document.getElementById("swipeLikeBtn").addEventListener("click", () => {
+    if (swipeIdx < swipeItems.length) openBuilder(swipeItems[swipeIdx].designable);
+  });
+  document.getElementById("swipePassBtn").addEventListener("click", () => {
+    if (swipeIdx < swipeItems.length) { swipeIdx++; renderSwipeCard(); }
+  });
+
+  swipeItems = buildSwipeItems();
+  renderSwipeCard();
+</script>
+</body>
+</html>

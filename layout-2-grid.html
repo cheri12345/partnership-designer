@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Partnership Designer — Layout 2: Grid</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  .page-heading {
+    padding: 24px 28px 8px;
+  }
+
+  .page-heading h1 {
+    font-size: 20px;
+    margin: 0 0 4px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .page-heading p {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 28px 6px;
+  }
+
+  .chip {
+    border: 1px solid var(--line-strong);
+    background: #fff;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    transition: all 0.15s ease;
+  }
+
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .chip.active {
+    background: var(--fg);
+    border-color: var(--fg);
+    color: #fff;
+  }
+
+  .grid-wrap {
+    padding: 12px 28px 40px;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 16px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.15s ease, opacity 0.4s ease, filter 0.4s ease, transform 0.15s ease;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .card.dim {
+    opacity: 0.4;
+    filter: grayscale(0.6);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .fit-badge {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  .card-name {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    line-height: 1.3;
+  }
+
+  .card-terms {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin: 0 0 14px;
+    line-height: 1.4;
+  }
+
+  .fit-bar {
+    height: 3px;
+    background: var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .fit-bar-fill {
+    height: 100%;
+    background: var(--fg);
+  }
+
+  /* modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+  }
+
+  .modal-overlay[hidden] {
+    display: none;
+  }
+
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 10, 0.35);
+    border: none;
+  }
+
+  .modal-panel {
+    position: relative;
+    width: 100%;
+    max-width: 620px;
+    max-height: 88vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 6px;
+    padding: 24px 28px 36px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  }
+
+  .modal-panel .close-btn {
+    position: sticky;
+    top: 0;
+    float: right;
+    background: #fff;
+  }
+</style>
+</head>
+<body>
+
+<header class="top-bar">
+  <div class="wordmark">
+    <span class="wordmark-text">CHELCIE<span class="tagline">Capital, matched to what you're responsible for.</span></span>
+    <span class="wordmark-wl">Meridian Partners Portal<span class="tagline">Powered by CHELCIE</span></span>
+  </div>
+  <div class="top-bar-actions">
+    <button class="brand-toggle" id="brandToggle">View as white-label</button>
+    <button class="btn" id="prefsBtn">Preferences</button>
+  </div>
+</header>
+
+<div class="page-heading">
+  <h1>Your opportunities</h1>
+  <p id="gridCount">13 opportunities, ranked by fit to what you're responsible for.</p>
+</div>
+
+<div class="chip-row">
+  <button class="chip" id="fHideDilutive">Hide dilutive capital</button>
+  <button class="chip" id="fUnder500k">Under $500K only</button>
+  <button class="chip" id="fRolling">Rolling deadlines only</button>
+</div>
+
+<div class="grid-wrap">
+  <div class="card-grid" id="cardGrid"></div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" hidden>
+  <button class="modal-backdrop" id="modalBackdrop" aria-label="Close"></button>
+  <div class="modal-panel">
+    <button class="close-btn" id="modalClose">Close ✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<div class="prefs-overlay" id="prefsOverlay" hidden>
+  <div class="prefs-panel">
+    <button class="close-btn" id="prefsClose" style="float:right">Close ✕</button>
+    <h3>What are you responsible for?</h3>
+    <p class="prefs-intro">These reshape how opportunities are ranked and emphasized. They don't hide anything outright, that's what the filters above the grid are for.</p>
+
+    <div class="prefs-section">
+      <p class="label">Capital types you'll consider</p>
+      <label class="check-row"><input type="checkbox" class="prefType" value="loan" checked /> Loans</label>
+      <label class="check-row"><input type="checkbox" class="prefType" value="grant" checked /> Grants</label>
+      <label class="check-row"><input type="checkbox" class="prefType" value="corporate" checked /> Corporate partnerships</label>
+      <label class="check-row"><input type="checkbox" class="prefType" value="equity" checked /> Equity</label>
+    </div>
+
+    <div class="prefs-section">
+      <p class="label">Funding range you're working with</p>
+      <select id="prefRange">
+        <option value="0">Any amount</option>
+        <option value="250000">At least $250K</option>
+        <option value="1000000">At least $1M</option>
+      </select>
+    </div>
+
+    <div class="prefs-section">
+      <p class="label">Timeline</p>
+      <select id="prefTimeline">
+        <option>Need capital within 3 months</option>
+        <option>Flexible, 6 to 12 months</option>
+        <option>Long-term, opportunistic</option>
+      </select>
+    </div>
+
+    <button class="btn btn-primary prefs-save" id="prefsSave">Save preferences</button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+  const cardGrid = document.getElementById("cardGrid");
+  const sorted = [...OPPORTUNITIES].sort((a, b) => b.fit - a.fit);
+
+  sorted.forEach((o) => {
+    const card = document.createElement("div");
+    card.className = "card fade-target";
+    card.dataset.id = o.id;
+    card.innerHTML = `
+      <div class="card-top">
+        <span class="tag">${TYPE_LABEL[o.type]}</span>
+        <span class="fit-badge">${o.fit}</span>
+      </div>
+      <h3 class="card-name">${o.name}</h3>
+      <p class="card-terms">${amountRange(o)} &middot; ${o.timeline}</p>
+      <div class="fit-bar"><div class="fit-bar-fill" style="width:${o.fit}%"></div></div>
+    `;
+    card.addEventListener("click", () => openDetail(o));
+    cardGrid.appendChild(card);
+  });
+
+  const filters = { hideDilutive: false, under500k: false, rollingOnly: false };
+  const prefs = { wantTypes: ["loan", "grant", "corporate", "equity"], maxRange: 0 };
+
+  function updateVisibility() {
+    let visibleCount = 0;
+    OPPORTUNITIES.forEach((o) => {
+      const el = document.querySelector(`.card[data-id="${o.id}"]`);
+      const show = passesFilters(o, filters);
+      el.classList.toggle("hidden-fade", !show);
+      if (show) visibleCount++;
+      const match = matchesPreferences(o, prefs);
+      el.classList.toggle("dim", show && !match);
+    });
+    document.getElementById("gridCount").textContent =
+      visibleCount + " of " + OPPORTUNITIES.length + " opportunities, ranked by fit to what you're responsible for.";
+  }
+
+  function bindChip(id, key) {
+    const el = document.getElementById(id);
+    el.addEventListener("click", () => {
+      filters[key] = !filters[key];
+      el.classList.toggle("active", filters[key]);
+      updateVisibility();
+    });
+  }
+  bindChip("fHideDilutive", "hideDilutive");
+  bindChip("fUnder500k", "under500k");
+  bindChip("fRolling", "rollingOnly");
+
+  const prefsOverlay = document.getElementById("prefsOverlay");
+  document.getElementById("prefsBtn").addEventListener("click", () => (prefsOverlay.hidden = false));
+  document.getElementById("prefsClose").addEventListener("click", () => (prefsOverlay.hidden = true));
+  document.getElementById("prefsSave").addEventListener("click", () => {
+    prefs.wantTypes = Array.from(document.querySelectorAll(".prefType:checked")).map((c) => c.value);
+    prefs.maxRange = Number(document.getElementById("prefRange").value);
+    prefsOverlay.hidden = true;
+    updateVisibility();
+  });
+
+  const modalOverlay = document.getElementById("modalOverlay");
+  const modalContent = document.getElementById("modalContent");
+
+  function openDetail(o) {
+    modalContent.innerHTML = renderDetailContent(o);
+    wireDetail(modalContent, o);
+    modalOverlay.hidden = false;
+  }
+
+  function closeDetail() {
+    modalOverlay.hidden = true;
+  }
+
+  document.getElementById("modalClose").addEventListener("click", closeDetail);
+  document.getElementById("modalBackdrop").addEventListener("click", closeDetail);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeDetail();
+      prefsOverlay.hidden = true;
+    }
+  });
+
+  document.getElementById("brandToggle").addEventListener("click", () => {
+    document.body.classList.toggle("white-label");
+  });
+
+  updateVisibility();
+</script>
+</body>
+</html>

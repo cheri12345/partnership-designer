@@ -1,0 +1,1128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Layout L: Capital Stack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v2-shared.css" />
+<style>
+  /* ---------- capital stack (browse): vertical layers with real meaning.
+     This is a real finance concept, not a decorative metaphor: capital
+     stacks are drawn bottom-to-top by seniority/commitment. Grants are
+     foundational (non-dilutive, no repayment) at the base; loans are
+     structured debt above that; corporate partnerships are relationship-
+     bound strategic capital above that; equity, the highest-commitment,
+     highest-dilution layer, sits at the top. Scrolling down the page
+     moves you down the stack, exactly like reading a real stack diagram. ---------- */
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  body.scroll-unlocked {
+    height: auto;
+    min-height: 100%;
+    display: block;
+    overflow: visible;
+  }
+
+  .topbar {
+    flex-shrink: 0;
+  }
+
+  main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .screen[data-screen="stack"] {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .stack-head {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 4px 24px 0;
+    flex-shrink: 0;
+  }
+
+  .stack-head h1 {
+    font-size: 1.5rem;
+    margin: 4px 0 6px;
+  }
+
+  .stack-sub {
+    font-size: 0.875rem;
+    color: hsl(var(--stone));
+    max-width: 46rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* static key, not a jump-nav: everything is already on screen at once,
+     so there's nothing to scroll to. Color is what tells the pins apart
+     now that the map itself is plain black-and-white. */
+
+  .stack-key {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 10px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    flex-shrink: 0;
+  }
+
+  .stack-key-item {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 0.75rem;
+  }
+
+  .stack-key-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+    top: 1px;
+  }
+
+  .stack-key-label {
+    font-weight: 700;
+    color: hsl(var(--ink));
+  }
+
+  .stack-key-role {
+    color: hsl(var(--ink) / 0.5);
+  }
+
+  /* one continuous map: every opportunity, every kind of capital, coexists
+     in the same space, all visible at once, no scroll. Vertical position
+     is what carries the meaning (a real capital stack is drawn as bands
+     by seniority/risk, equity at the top down to grants at the base), but
+     the map itself stays plain paper/ink; the pins carry the category
+     color, the way a real map color-codes pins rather than painting the
+     whole terrain by category. */
+
+  .capital-map-wrap {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 6px 24px 16px;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .capital-map {
+    position: relative;
+    width: 100%;
+    flex: 1;
+    min-height: 420px;
+    border: 1px solid hsl(var(--ink) / 0.14);
+    border-radius: 16px;
+    overflow: hidden;
+    background:
+      linear-gradient(hsl(var(--ink) / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--ink) / 0.05) 1px, transparent 1px),
+      #fff;
+    background-size: 34px 34px;
+  }
+
+  .map-band {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 0;
+  }
+
+  .map-band:not(:first-child) {
+    border-top: 1px dashed hsl(var(--ink) / 0.15);
+  }
+
+  .map-band-title {
+    position: absolute;
+    left: 16px;
+    top: 10px;
+    z-index: 1;
+    pointer-events: none;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: hsl(var(--ink) / 0.38);
+  }
+
+  .stack-pin {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .stack-pin-bubble {
+    display: inline-block;
+    background: #fff;
+    border: 2px solid var(--pin-color, hsl(var(--ink)));
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 0.75rem;
+    color: var(--pin-color, hsl(var(--ink)));
+    white-space: nowrap;
+    box-shadow: 0 2px 6px hsl(var(--ink) / 0.1);
+    transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+  }
+
+  .stack-pin:hover .stack-pin-bubble {
+    transform: scale(1.1);
+  }
+
+  .stack-pin.active .stack-pin-bubble {
+    background: var(--pin-color, hsl(var(--ink)));
+    color: #fff;
+  }
+
+  .stack-popup {
+    position: absolute;
+    z-index: 6;
+    width: 240px;
+    background: #fff;
+    border: 1px solid hsl(var(--border));
+    border-radius: 12px;
+    box-shadow: 0 14px 32px hsl(var(--ink) / 0.18);
+    padding: 16px;
+    transform: translate(-50%, calc(-100% - 16px));
+  }
+
+  .stack-popup.below {
+    transform: translate(-50%, 16px);
+  }
+
+  .stack-popup-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 0.75rem;
+    color: hsl(var(--stone));
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .stack-popup-fit {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: hsl(var(--stone));
+    margin: 0 0 4px;
+  }
+
+  .stack-popup-name {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    margin: 0 0 6px;
+    padding-right: 18px;
+  }
+
+  .stack-popup-amount {
+    font-size: 0.75rem;
+    color: hsl(var(--stone));
+    margin: 0 0 10px;
+  }
+
+  .stack-popup-blurb {
+    font-size: 0.8125rem;
+    color: hsl(var(--ink) / 0.75);
+    line-height: 1.5;
+    margin: 0 0 14px;
+  }
+
+  .stack-popup-cta {
+    width: 100%;
+    font-size: 0.8125rem;
+    padding: 9px 14px;
+  }
+
+  /* ---------- builder: section outline (left) + focused editor (right) ---------- */
+
+  .builder-shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    padding-bottom: 84px;
+  }
+
+  @media (min-width: 860px) {
+    .builder-shell {
+      grid-template-columns: 300px 1fr;
+    }
+  }
+
+  .builder-nav {
+    padding: 28px 24px;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  @media (min-width: 860px) {
+    .builder-nav {
+      border-bottom: none;
+      border-right: 1px solid hsl(var(--border));
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: calc(100vh - 73px);
+      overflow-y: auto;
+    }
+  }
+
+  .builder-back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+
+  .section-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .section-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    border: 1px solid hsl(var(--border));
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .section-item.current {
+    border-color: hsl(var(--ink));
+  }
+
+  .section-mark {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid hsl(var(--border));
+    position: relative;
+  }
+
+  .section-mark.done {
+    border-color: #0f766e;
+    background: #0f766e;
+  }
+
+  .section-mark.done::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid #fff;
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
+  }
+
+  .section-item-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .builder-main {
+    padding: 40px 24px 60px;
+    max-width: 640px;
+    width: 100%;
+  }
+
+  @media (min-width: 860px) {
+    .builder-main {
+      padding: 48px 56px 60px;
+    }
+  }
+
+  .builder-eyebrow {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: hsl(var(--stone));
+    margin: 0 0 8px;
+  }
+
+  .builder-title {
+    font-size: 1.625rem;
+    margin-bottom: 12px;
+  }
+
+  .builder-helper {
+    font-size: 0.875rem;
+    color: hsl(var(--stone));
+    line-height: 1.6;
+    margin: 0 0 24px;
+    max-width: 46ch;
+  }
+
+  .builder-redraft {
+    margin: -14px 0 20px;
+  }
+
+  .builder-footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: hsl(var(--paper) / 0.96);
+    backdrop-filter: blur(6px);
+    border-top: 1px solid hsl(var(--border));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    z-index: 10;
+  }
+
+  @media (min-width: 860px) {
+    .builder-footer {
+      padding: 16px 56px;
+    }
+  }
+
+  .builder-progress {
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    margin: 0;
+  }
+
+  /* ---------- header badge + status/export + tracker (not in v2-shared.css) ---------- */
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 5px;
+    margin-left: 6px;
+    border-radius: 999px;
+    background: hsl(var(--teal));
+    color: hsl(var(--ink));
+    font-size: 0.6875rem;
+    font-weight: 700;
+  }
+
+  .draft-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    color: hsl(var(--stone));
+    margin: 0 0 20px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: hsl(38 92% 55%);
+    flex-shrink: 0;
+  }
+
+  .status-dot.sent {
+    background: #0f766e;
+  }
+
+  .draft-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .tracker-empty {
+    font-size: 0.9375rem;
+    color: hsl(var(--stone));
+    line-height: 1.6;
+  }
+
+  .tracker-item {
+    border-top: 1px solid hsl(var(--border));
+    padding: 22px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .tracker-item:last-child {
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .tracker-kind {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: hsl(var(--stone));
+    margin: 0 0 6px;
+  }
+
+  .tracker-title {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1.0625rem;
+    margin: 0 0 4px;
+  }
+
+  .tracker-sub {
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    margin: 0;
+  }
+
+  .tracker-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .status-pill {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: hsl(38 92% 55% / 0.18);
+    color: hsl(30 70% 32%);
+  }
+
+  .status-pill.sent {
+    background: hsl(var(--teal) / 0.2);
+    color: #0f766e;
+  }
+
+  .tracker-export {
+    padding: 8px 16px;
+    font-size: 0.8125rem;
+  }
+
+  .regen-link {
+    display: inline-block;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #0f766e;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .regen-link:hover {
+    opacity: 0.75;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="wordmark" href="index.html">CHELCIE</a>
+  <button class="pill-link" id="trackerBtn">Your partnerships<span class="badge" id="trackerBadge" hidden>0</span></button>
+</header>
+
+<main>
+
+  <section class="screen active" data-screen="stack">
+    <div class="stack-head">
+      <h1>Build toward a more resilient future.</h1>
+      <p class="stack-sub">Structured like a real capital stack, equity at the top down to grants at the base. A resilient organization has more than one layer filled, not just one.</p>
+    </div>
+
+    <div class="stack-key" id="stackKey"></div>
+
+    <div class="capital-map-wrap">
+      <div class="capital-map" id="capitalMap"></div>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="builder">
+    <div class="builder-shell">
+      <aside class="builder-nav">
+        <button class="back-link builder-back-link" id="builderBackToStack">← Back to the stack</button>
+        <ul class="section-list" id="sectionList"></ul>
+      </aside>
+      <div class="builder-main" id="builderMain"></div>
+    </div>
+    <div class="builder-footer">
+      <button class="back-link" id="builderBack">Back</button>
+      <p class="builder-progress" id="builderProgress"></p>
+      <button class="btn-primary" id="builderNext">Continue</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="overlay" id="trackerOverlay">
+  <header class="topbar">
+    <span class="wordmark">Your partnerships</span>
+    <button class="pill-link" id="trackerClose">Close</button>
+  </header>
+  <div class="tracker-body" id="trackerBody" style="max-width:560px; margin:0 auto; padding:48px 24px 100px; width:100%;"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="partnership-lib.js"></script>
+<script>
+  function slug(text) {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  }
+
+  /* ---------- capital stack: four layers, ordered top-to-bottom exactly
+     like a real capital-stack diagram (equity at the top, grants at the
+     base), each with a one-line explanation of what that layer actually
+     costs an organization. ---------- */
+
+  // the map stays plain black-and-white; color lives on the pins only,
+  // so a muted, distinct hue per kind of capital is what tells them apart
+  // at a glance, the way a real map color-codes pin categories
+  const LAYER_TINT = {
+    equity: "hsl(35 55% 48%)",
+    corporate: "hsl(159 50% 34%)",
+    loan: "hsl(212 48% 48%)",
+    grant: "hsl(142 38% 38%)",
+  };
+
+  const STACK_LAYERS = [
+    { type: "equity", title: "Equity", role: "Ownership, highest commitment", frac: [0, 0.25] },
+    { type: "corporate", title: "Corporate partnerships", role: "Strategic, relationship-bound", frac: [0.25, 0.5] },
+    { type: "loan", title: "Loans", role: "Structured, repaid with interest", frac: [0.5, 0.75] },
+    { type: "grant", title: "Grants", role: "Foundational, non-dilutive", frac: [0.75, 1] },
+  ];
+
+  // deterministic pseudo-random in [0,1) from a string, so pins land in
+  // the same spot on every render instead of reshuffling
+  function seeded(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+    return (h % 10000) / 10000;
+  }
+
+  let activeStackPin = null;
+
+  function closeStackPopup() {
+    const existing = document.querySelector(".stack-popup");
+    if (existing) existing.remove();
+    if (activeStackPin) activeStackPin.classList.remove("active");
+    activeStackPin = null;
+  }
+
+  function openStackPopup(item, pinEl, canvas) {
+    closeStackPopup();
+    activeStackPin = pinEl;
+    pinEl.classList.add("active");
+
+    const popup = document.createElement("div");
+    popup.className = "stack-popup";
+    popup.style.left = pinEl.style.left;
+    popup.style.top = pinEl.style.top;
+    popup.innerHTML = `
+      <button class="stack-popup-close">Close</button>
+      <p class="stack-popup-fit" style="color:${LAYER_TINT[item.layer.type]}">${item.layer.title} · ${item.badgeIsFit ? "Fit " + item.badge : "Ask " + item.badge}</p>
+      <p class="stack-popup-name">${item.name}</p>
+      <p class="stack-popup-amount">${item.amount}</p>
+      <p class="stack-popup-blurb">${item.blurb}</p>
+      <button class="btn-primary stack-popup-cta">Design this partnership</button>
+    `;
+    canvas.appendChild(popup);
+    popup.querySelector(".stack-popup-close").addEventListener("click", (e) => { e.stopPropagation(); closeStackPopup(); });
+    popup.querySelector(".stack-popup-cta").addEventListener("click", () => openBuilder(item.designable));
+
+    // keep the card inside the canvas: flip below if it would clip the
+    // top edge, nudge sideways if it would clip a side
+    const canvasRect = canvas.getBoundingClientRect();
+    let popRect = popup.getBoundingClientRect();
+    if (popRect.top < canvasRect.top + 6) {
+      popup.classList.add("below");
+      popRect = popup.getBoundingClientRect();
+    }
+    let shiftX = 0;
+    if (popRect.left < canvasRect.left + 6) shiftX = canvasRect.left + 6 - popRect.left;
+    if (popRect.right > canvasRect.right - 6) shiftX = canvasRect.right - 6 - popRect.right;
+    if (shiftX) popup.style.marginLeft = shiftX + "px";
+  }
+
+  // pins scatter in a gutter to the right of each band's title, in a
+  // sub-grid by index so same-band pins can't land on top of each other,
+  // with a small seeded jitter inside each cell so it still reads as
+  // scattered rather than a grid. The title's box is a fixed character
+  // width, not a fixed fraction of the map, so the gutter is measured off
+  // the actual rendered label rather than guessed as a percentage.
+  function measureRegionStart(map) {
+    const mapRect = map.getBoundingClientRect();
+    const label = map.querySelector(".map-band-title");
+    if (!label) return 0.22;
+    const labelRect = label.getBoundingClientRect();
+    return Math.min(0.5, (labelRect.right - mapRect.left) / mapRect.width + 0.03);
+  }
+
+  function placePins(map, allItemsByType, regionStart) {
+    const regionEnd = 0.97;
+    Object.values(allItemsByType).forEach((items) => {
+      const layer = items[0].layer;
+      const [f0, f1] = layer.frac;
+      const bandH = f1 - f0;
+      const cols = Math.min(items.length, 4);
+      const rows = Math.ceil(items.length / cols);
+      const regionW = regionEnd - regionStart;
+
+      items.forEach((item, i) => {
+        const cellW = regionW / cols;
+        const cellH = bandH / rows;
+        const cellX = regionStart + (i % cols) * cellW;
+        const cellY = f0 + Math.floor(i / cols) * cellH;
+        const x = (cellX + (0.14 + seeded(item.seedKey + "-x") * 0.72) * cellW) * 100;
+        const y = (cellY + (0.18 + seeded(item.seedKey + "-y") * 0.64) * cellH) * 100;
+
+        const pin = document.createElement("button");
+        pin.className = "stack-pin";
+        pin.style.left = x + "%";
+        pin.style.top = y + "%";
+        pin.style.setProperty("--pin-color", LAYER_TINT[layer.type]);
+        pin.innerHTML = `<span class="stack-pin-bubble">${item.badge}</span>`;
+        pin.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openStackPopup(item, pin, map);
+        });
+        map.appendChild(pin);
+      });
+    });
+  }
+
+  function gatherItemsByType() {
+    const byType = {};
+    STACK_LAYERS.forEach((layer) => {
+      if (layer.type === "corporate") {
+        const corpOpps = OPPORTUNITIES.filter((o) => o.type === "corporate").sort((a, b) => b.fit - a.fit);
+        const design = designPartnership("");
+        byType.corporate = [
+          ...corpOpps.map((o) => ({
+            layer, seedKey: o.id, badge: o.fit, badgeIsFit: true,
+            name: o.name, amount: amountRange(o), blurb: o.gain, designable: fromOpportunity(o),
+          })),
+          ...design.targets.map((t) => ({
+            layer, seedKey: slug(t.company), badge: t.check_size.split(" ")[0], badgeIsFit: false,
+            name: t.company, amount: t.business_unit, blurb: t.strategic_hook, designable: fromSponsor(t, design),
+          })),
+        ];
+        return;
+      }
+      const opps = OPPORTUNITIES.filter((o) => o.type === layer.type).sort((a, b) => b.fit - a.fit);
+      byType[layer.type] = opps.map((o) => ({
+        layer, seedKey: o.id, badge: o.fit, badgeIsFit: true,
+        name: o.name, amount: amountRange(o), blurb: o.gain, designable: fromOpportunity(o),
+      }));
+    });
+    return byType;
+  }
+
+  function buildStack() {
+    const map = document.getElementById("capitalMap");
+    closeStackPopup();
+    map.innerHTML = "";
+
+    STACK_LAYERS.forEach((layer) => {
+      const band = document.createElement("div");
+      band.className = "map-band";
+      band.style.top = (layer.frac[0] * 100) + "%";
+      band.style.height = ((layer.frac[1] - layer.frac[0]) * 100) + "%";
+      band.innerHTML = `<span class="map-band-title" style="color:${LAYER_TINT[layer.type]}">${layer.title}</span>`;
+      map.appendChild(band);
+    });
+
+    map.addEventListener("click", closeStackPopup);
+
+    const regionStart = measureRegionStart(map);
+    placePins(map, gatherItemsByType(), regionStart);
+  }
+  buildStack();
+
+  // the map is sized live off the actual viewport (flex:1 in CSS) so it
+  // holds to "everything visible, no scroll" at any window size; rebuild
+  // on resize, and once more after the Archivo/Inter webfonts swap in
+  // since that changes how much room the compact header leaves for it
+  window.addEventListener("resize", buildStack);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(buildStack);
+  window.addEventListener("load", buildStack);
+
+  function buildKey() {
+    const key = document.getElementById("stackKey");
+    key.innerHTML = STACK_LAYERS.map((l) => `
+      <span class="stack-key-item">
+        <span class="stack-key-dot" style="background:${LAYER_TINT[l.type]}"></span>
+        <span class="stack-key-label">${l.title}</span>
+        <span class="stack-key-role">${l.role}</span>
+      </span>
+    `).join("");
+  }
+  buildKey();
+
+  function updateLegendFromScroll() {
+    const map = document.getElementById("capitalMap");
+    const mapRect = map.getBoundingClientRect();
+    const frac = (window.innerHeight / 2 - mapRect.top) / mapRect.height;
+    const clamped = Math.max(0, Math.min(0.999, frac));
+    const current = STACK_LAYERS.find((l) => clamped >= l.frac[0] && clamped < l.frac[1]);
+    if (!current) return;
+    document.querySelectorAll(".stack-legend-item").forEach((b) => {
+      b.classList.toggle("active", b.dataset.target === current.type);
+    });
+  }
+  window.addEventListener("scroll", updateLegendFromScroll, { passive: true });
+  updateLegendFromScroll();
+
+  /* ---------- generalized designable ---------- */
+
+  function fromOpportunity(o) {
+    return {
+      kind: "onepager",
+      eyebrow: TYPE_LABEL[o.type] + " · Fit " + o.fit,
+      name: o.name,
+      sub: amountRange(o) + " · " + o.timeline,
+      gainQuote: o.gain,
+      gainSub: o.worksWith,
+      termsLine: o.terms.join(", ") + ".",
+      defaultAskText: defaultAsk(o),
+      defaultUseText: defaultUseOfFunds(o),
+      draftSubLine: () => "Partnership request to " + o.name,
+      filenameBase: (org) => slug(org) + "-" + slug(o.name) + "-one-pager",
+      trackerKind: "onepager",
+      trackerTitle: o.name,
+      trackerSubtitle: amountRange(o) + " · " + o.timeline,
+    };
+  }
+
+  function fromSponsor(t, design) {
+    return {
+      kind: "email",
+      eyebrow: "CORPORATE · " + t.business_unit,
+      name: t.company,
+      sub: t.check_size,
+      gainQuote: t.strategic_hook,
+      gainSub: t.why_them,
+      termsLine: `${t.entry_vehicle} Typical structure: ${t.check_size}.`,
+      defaultAskText: `A short call to explore ${t.entry_vehicle.split(".")[0].toLowerCase()}.`,
+      defaultUseText: `To advance: ${design.study_summary}`,
+      draftSubLine: () => `Outreach to ${t.company}, ${t.business_unit}`,
+      filenameBase: (org) => slug(org) + "-" + slug(t.company) + "-outreach",
+      trackerKind: "vpemail",
+      trackerTitle: t.company + " outreach",
+      trackerSubtitle: t.business_unit,
+    };
+  }
+
+  /* ---------- builder: outline-nav + focused editor ---------- */
+
+  const SECTIONS = [
+    { id: "opportunity", label: "The opportunity", kind: "summary" },
+    { id: "ask", label: "What we're asking", kind: "field", helper: "One or two sentences. CHELCIE drafted a start, edit it into your own words." },
+    { id: "use", label: "How funds are used", kind: "field", helper: "Be specific, this is what gets checked against later." },
+    { id: "fit", label: "Why this fits", kind: "field", helper: "Their reasoning, in your voice." },
+    { id: "terms", label: "Terms under discussion", kind: "field", helper: "What's on the table so far. Nothing here is final." },
+    { id: "review", label: "Review & send", kind: "review" },
+  ];
+
+  let currentDesignable = null;
+  let fieldValues = {};
+  let sectionIdx = 0;
+  let currentTrackedEntry = null;
+
+  const screens = Array.from(document.querySelectorAll(".screen"));
+  function showScreen(id) {
+    screens.forEach((s) => s.classList.toggle("active", s.dataset.screen === id));
+    window.scrollTo(0, 0);
+    syncScrollLock();
+  }
+
+  // the stack screen locks the page to exactly one viewport (no scroll,
+  // everything visible at once); the builder and tracker need normal page
+  // scroll for their longer content, so unlock html/body whenever either
+  // of those is showing
+  function syncScrollLock() {
+    const stackActive = document.querySelector(".screen.active")?.dataset.screen === "stack"
+      && !document.getElementById("trackerOverlay").classList.contains("active");
+    document.body.classList.toggle("scroll-unlocked", !stackActive);
+  }
+
+  function openBuilder(d) {
+    currentDesignable = d;
+    currentTrackedEntry = null;
+    fieldValues = {
+      org: "Your organization",
+      ask: d.defaultAskText,
+      use: d.defaultUseText,
+      fit: d.gainQuote,
+      terms: d.termsLine,
+    };
+    sectionIdx = 0;
+    showScreen("builder");
+    renderSectionList();
+    renderBuilderMain();
+  }
+
+  document.getElementById("builderBackToStack").addEventListener("click", () => showScreen("stack"));
+
+  function renderSectionList() {
+    const list = document.getElementById("sectionList");
+    list.innerHTML = SECTIONS.map((s, i) => `
+      <li>
+        <button class="section-item ${i === sectionIdx ? "current" : ""}" data-idx="${i}">
+          <span class="section-mark ${s.kind !== "field" || fieldValues[s.id] ? "done" : ""}"></span>
+          <span class="section-item-label">${s.label}</span>
+        </button>
+      </li>
+    `).join("");
+    list.querySelectorAll(".section-item").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        sectionIdx = Number(btn.dataset.idx);
+        renderSectionList();
+        renderBuilderMain();
+      });
+    });
+  }
+
+  function currentDocumentText() {
+    const d = currentDesignable;
+    const org = fieldValues.org.trim() || "Your organization";
+    const text = [
+      org,
+      d.draftSubLine(),
+      ``,
+      `WHAT WE ARE ASKING`,
+      fieldValues.ask,
+      ``,
+      `HOW THE FUNDS WILL BE USED`,
+      fieldValues.use,
+      ``,
+      `WHY THIS FITS`,
+      fieldValues.fit,
+      ``,
+      `TERMS UNDER DISCUSSION`,
+      fieldValues.terms,
+    ].join("\n");
+    return { org, text };
+  }
+
+  function renderBuilderMain() {
+    const d = currentDesignable;
+    const s = SECTIONS[sectionIdx];
+    const main = document.getElementById("builderMain");
+
+    if (s.kind === "summary") {
+      main.innerHTML = `
+        <p class="builder-eyebrow">${d.eyebrow}</p>
+        <h2 class="builder-title">${d.name}</h2>
+        <p class="builder-helper">${d.sub}</p>
+        <div class="gain-callout">
+          <blockquote>${d.gainQuote}</blockquote>
+          <p class="works-with">${d.gainSub}</p>
+        </div>
+        <div class="field-group">
+          <label>Your organization</label>
+          <input type="text" id="orgInput" value="${fieldValues.org}" />
+        </div>
+      `;
+      document.getElementById("orgInput").addEventListener("input", (e) => { fieldValues.org = e.target.value; });
+    } else if (s.kind === "field") {
+      main.innerHTML = `
+        <p class="builder-eyebrow">Section ${sectionIdx} of ${SECTIONS.length - 1}</p>
+        <h2 class="builder-title">${s.label}</h2>
+        <p class="builder-helper">${s.helper}</p>
+        <button class="regen-link builder-redraft" id="redraftBtn">Redraft with CHELCIE</button>
+        <div class="field-group">
+          <textarea id="sectionField" rows="6">${fieldValues[s.id]}</textarea>
+        </div>
+      `;
+      document.getElementById("sectionField").addEventListener("input", (e) => {
+        fieldValues[s.id] = e.target.value;
+        renderSectionList();
+      });
+      document.getElementById("redraftBtn").addEventListener("click", () => {
+        const defaults = { ask: d.defaultAskText, use: d.defaultUseText, fit: d.gainQuote, terms: d.termsLine };
+        fieldValues[s.id] = defaults[s.id];
+        renderBuilderMain();
+        renderSectionList();
+      });
+    } else if (s.kind === "review") {
+      const { text } = currentDocumentText();
+      if (!currentTrackedEntry) {
+        currentTrackedEntry = addTracked({
+          kind: d.trackerKind,
+          title: d.trackerTitle,
+          subtitle: d.trackerSubtitle,
+          exportText: text,
+          filename: d.filenameBase(fieldValues.org) + ".txt",
+        });
+      } else {
+        currentTrackedEntry.exportText = text;
+      }
+      main.innerHTML = `
+        <p class="builder-eyebrow">Last step</p>
+        <h2 class="builder-title">Review &amp; send</h2>
+        <p class="builder-helper">Everything below is editable from its own section on the left. Export when it's ready, or mark it sent once it's out the door.</p>
+        <p class="draft-status" id="draftStatus"></p>
+        <div class="draft-actions">
+          <button class="btn-secondary" id="exportDraftBtn">Export .txt</button>
+          <button class="btn-secondary" id="markSentBtn">Mark as sent</button>
+        </div>
+        <div class="draft-output"><pre style="white-space:pre-wrap; font-family:inherit; margin:0; font-size:0.875rem; line-height:1.6;">${text}</pre></div>
+      `;
+      renderDraftStatus();
+      document.getElementById("exportDraftBtn").addEventListener("click", () => {
+        currentTrackedEntry.exportText = currentDocumentText().text;
+        exportEntry(currentTrackedEntry);
+      });
+      document.getElementById("markSentBtn").addEventListener("click", () => {
+        currentTrackedEntry.status = currentTrackedEntry.status === "sent" ? "draft" : "sent";
+        renderDraftStatus();
+      });
+    }
+
+    document.getElementById("builderProgress").textContent = `${s.label} · ${sectionIdx + 1} of ${SECTIONS.length}`;
+    document.getElementById("builderBack").style.visibility = sectionIdx === 0 ? "hidden" : "visible";
+    document.getElementById("builderNext").style.visibility = sectionIdx === SECTIONS.length - 1 ? "hidden" : "visible";
+  }
+
+  document.getElementById("builderBack").addEventListener("click", () => {
+    if (sectionIdx > 0) {
+      sectionIdx--;
+      renderSectionList();
+      renderBuilderMain();
+    }
+  });
+  document.getElementById("builderNext").addEventListener("click", () => {
+    if (sectionIdx < SECTIONS.length - 1) {
+      sectionIdx++;
+      renderSectionList();
+      renderBuilderMain();
+    }
+  });
+
+  function renderDraftStatus() {
+    if (!currentTrackedEntry) return;
+    const st = document.getElementById("draftStatus");
+    const btn = document.getElementById("markSentBtn");
+    st.innerHTML = `<span class="status-dot ${currentTrackedEntry.status}"></span> ${currentTrackedEntry.status === "sent" ? "Marked as sent" : "Draft ready, not sent yet"}`;
+    btn.textContent = currentTrackedEntry.status === "sent" ? "Mark as not sent" : "Mark as sent";
+  }
+
+  /* ---------- status + export tracker ---------- */
+
+  const tracked = [];
+
+  function addTracked(entry) {
+    const record = { id: Date.now() + Math.random(), status: "draft", createdAt: new Date(), ...entry };
+    tracked.unshift(record);
+    updateTrackerBadge();
+    return record;
+  }
+
+  function updateTrackerBadge() {
+    const badge = document.getElementById("trackerBadge");
+    badge.hidden = tracked.length === 0;
+    badge.textContent = tracked.length;
+  }
+
+  function exportEntry(entry) {
+    const blob = new Blob([entry.exportText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = entry.filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  const trackerOverlay = document.getElementById("trackerOverlay");
+  document.getElementById("trackerBtn").addEventListener("click", () => {
+    renderTracker();
+    trackerOverlay.classList.add("active");
+    syncScrollLock();
+  });
+  document.getElementById("trackerClose").addEventListener("click", () => {
+    trackerOverlay.classList.remove("active");
+    syncScrollLock();
+  });
+
+  function renderTracker() {
+    const body = document.getElementById("trackerBody");
+    if (tracked.length === 0) {
+      body.innerHTML = `<p class="tracker-empty">Nothing drafted yet. Open any opportunity or discovered company and start designing.</p>`;
+      return;
+    }
+    body.innerHTML = tracked.map((t, i) => `
+      <div class="tracker-item">
+        <div>
+          <p class="tracker-kind">${t.kind === "onepager" ? "ONE-PAGER" : "OUTREACH EMAIL"}</p>
+          <p class="tracker-title">${t.title}</p>
+          <p class="tracker-sub">${t.subtitle}</p>
+        </div>
+        <div class="tracker-actions">
+          <span class="status-pill ${t.status}">${t.status === "sent" ? "Sent" : "Draft ready"}</span>
+          <button class="btn-secondary tracker-export" data-idx="${i}">Export</button>
+          <button class="back-link tracker-toggle" data-idx="${i}">${t.status === "sent" ? "Mark as not sent" : "Mark as sent"}</button>
+        </div>
+      </div>
+    `).join("");
+    body.querySelectorAll(".tracker-export").forEach((btn) => {
+      btn.addEventListener("click", () => exportEntry(tracked[Number(btn.dataset.idx)]));
+    });
+    body.querySelectorAll(".tracker-toggle").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const t = tracked[Number(btn.dataset.idx)];
+        t.status = t.status === "sent" ? "draft" : "sent";
+        renderTracker();
+      });
+    });
+  }
+</script>
+</body>
+</html>

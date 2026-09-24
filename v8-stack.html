@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Round 8 C: The stack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v2-shared.css" />
+<link rel="stylesheet" href="builder-shared.css" />
+<link rel="stylesheet" href="v8-shared.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <a class="wordmark" href="index.html">CHELCIE</a>
+  <button class="pill-link" id="trackerBtn">Your partnerships<span class="badge" id="trackerBadge" hidden>0</span></button>
+</header>
+
+<main>
+
+  <section class="screen active" data-screen="browse">
+    <div class="v8-page">
+      <section id="fitMount"></section>
+      <section class="v8-section ruled" id="toldMount"></section>
+
+      <section class="v8-section ruled">
+        <div class="view-row">
+          <div class="view-toggle" id="viewToggle">
+            <button data-view="list" class="on">The list</button>
+            <button data-view="stack">The stack</button>
+          </div>
+        </div>
+        <div id="listMount"></div>
+      </section>
+
+      <section class="v8-section ruled" id="tellMount"></section>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="builder">
+    <div class="builder-shell">
+      <aside class="builder-nav">
+        <button class="back-link builder-back-link" id="builderBackToBrowse">← Back to the list</button>
+        <ul class="section-list" id="sectionList"></ul>
+      </aside>
+      <div class="builder-main" id="builderMain"></div>
+    </div>
+    <div class="builder-footer">
+      <button class="back-link" id="builderBack">Back</button>
+      <p class="builder-progress" id="builderProgress"></p>
+      <button class="btn-primary" id="builderNext">Continue</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="overlay" id="trackerOverlay">
+  <header class="topbar">
+    <span class="wordmark">Your partnerships</span>
+    <button class="pill-link" id="trackerClose">Close</button>
+  </header>
+  <div class="tracker-body" id="trackerBody" style="max-width:560px; margin:0 auto; padding:48px 24px 100px; width:100%;"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="partnership-lib.js"></script>
+<script src="builder-shared.js"></script>
+<script src="v8-shared.js"></script>
+<script>
+  /* Layout C — the same arrival page, with a second way of looking at the
+     same money.
+
+     Not the star map: nothing about a funding opportunity is actually
+     spatial, so the clusters were decorative — a customer could not do
+     anything with them, the same problem round 4's map had. This is a
+     capital stack instead, sorted by what each kind of money costs you,
+     which is how finance people already sort it. Tap a band and the list
+     filters to it, so the second view is a way in rather than a dead end. */
+
+  applyDescribe(intakeQuery());
+
+  renderFit();
+  renderTold();
+  renderList();
+  renderTell();
+
+  document.querySelectorAll("[data-view]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      v8.view = btn.dataset.view;
+      syncViewToggle();
+      renderList();
+    });
+  });
+</script>
+</body>
+</html>

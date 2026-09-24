@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Partnership Designer — Layout 1: Constellation</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  .layout-shell {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    height: calc(100vh - 57px);
+  }
+
+  .filter-rail {
+    border-right: 1px solid var(--line);
+    padding: 20px 18px;
+    overflow-y: auto;
+  }
+
+  .rail-heading {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 0 0 14px;
+  }
+
+  .constellation-wrap {
+    position: relative;
+    overflow: hidden;
+    background:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-position: -1px -1px;
+    background-color: #fff;
+  }
+
+  .canvas-heading {
+    position: absolute;
+    top: 22px;
+    left: 28px;
+    z-index: 5;
+  }
+
+  .canvas-heading h1 {
+    font-size: 20px;
+    margin: 0 0 4px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .canvas-heading p {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0;
+    max-width: 340px;
+  }
+
+  .constellation {
+    position: absolute;
+    inset: 0;
+  }
+
+  .lines-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .lines-svg line {
+    stroke: var(--line-strong);
+    stroke-width: 0.25;
+  }
+
+  .node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 128px;
+    text-align: center;
+  }
+
+  .node-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    border-radius: 50%;
+    border: 1.5px solid var(--fg);
+    background: #fff;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 12.5px;
+    color: var(--fg);
+    transition: border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, opacity 0.4s ease, filter 0.4s ease;
+  }
+
+  .node-circle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 0 5px rgba(36, 81, 224, 0.08);
+  }
+
+  .node-name {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .node-type {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+
+  .node.dim .node-circle,
+  .node.dim .node-name,
+  .node.dim .node-type {
+    opacity: 0.32;
+    filter: grayscale(1);
+  }
+
+  .node.dim .node-circle {
+    box-shadow: none;
+  }
+
+  /* slide-over */
+  .slideover-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .slideover-overlay[hidden] {
+    display: none;
+  }
+
+  .slideover-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 10, 0.3);
+    border: none;
+  }
+
+  .slideover-panel {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    height: 100%;
+    background: #fff;
+    border-left: 1px solid var(--line);
+    padding: 22px 28px 40px;
+    overflow-y: auto;
+  }
+
+  .slideover-panel .close-btn {
+    position: sticky;
+    top: 0;
+    float: right;
+    background: #fff;
+  }
+</style>
+</head>
+<body>
+
+<header class="top-bar">
+  <div class="wordmark">
+    <span class="wordmark-text">CHELCIE<span class="tagline">Capital, matched to what you're responsible for.</span></span>
+    <span class="wordmark-wl">Meridian Partners Portal<span class="tagline">Powered by CHELCIE</span></span>
+  </div>
+  <div class="top-bar-actions">
+    <button class="brand-toggle" id="brandToggle">View as white-label</button>
+    <button class="btn" id="prefsBtn">Preferences</button>
+  </div>
+</header>
+
+<div class="layout-shell">
+  <aside class="filter-rail">
+    <p class="rail-heading">Filters</p>
+    <div class="filter-panel">
+      <div class="toggle-row">
+        <span>Hide dilutive capital</span>
+        <label class="switch">
+          <input type="checkbox" id="fHideDilutive" />
+          <span class="switch-track"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <span>Show only under $500K</span>
+        <label class="switch">
+          <input type="checkbox" id="fUnder500k" />
+          <span class="switch-track"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <span>Rolling deadlines only</span>
+        <label class="switch">
+          <input type="checkbox" id="fRolling" />
+          <span class="switch-track"></span>
+        </label>
+      </div>
+    </div>
+  </aside>
+
+  <main class="constellation-wrap">
+    <div class="canvas-heading">
+      <h1>Your constellation</h1>
+      <p id="canvasCount">13 opportunities, matched to what you're responsible for right now.</p>
+    </div>
+    <div class="constellation" id="constellation">
+      <svg class="lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none" id="linesSvg"></svg>
+      <!-- nodes injected by script -->
+    </div>
+  </main>
+</div>
+
+<div class="slideover-overlay" id="slideoverOverlay" hidden>
+  <button class="slideover-backdrop" id="slideoverBackdrop" aria-label="Close"></button>
+  <aside class="slideover-panel">
+    <button class="close-btn" id="slideoverClose">Close ✕</button>
+    <div id="slideoverContent"></div>
+  </aside>
+</div>
+
+<div class="prefs-overlay" id="prefsOverlay" hidden>
+  <div class="prefs-panel">
+    <button class="close-btn" id="prefsClose" style="float:right">Close ✕</button>
+    <h3>What are you responsible for?</h3>
+    <p class="prefs-intro">These reshape which opportunities get emphasis on your constellation. They don't hide anything outright, that's what filters are for.</p>
+
+    <div class="prefs-section">
+      <p class="label">Capital types you'll consider</p>
+      <label class="check-row"><input type="checkbox" class="prefType" value="loan" checked /> Loans</label>
+      <label class="check-row"><input type="checkbox" class="prefType" value="grant" checked /> Grants</label>
+      <label class="check-row"><input type="checkbox" class="prefType" value="corporate" checked /> Corporate partnerships</label>
+      <label class="check-row"><input type="checkbox" class="prefType" value="equity" checked /> Equity</label>
+    </div>
+
+    <div class="prefs-section">
+      <p class="label">Funding range you're working with</p>
+      <select id="prefRange">
+        <option value="0">Any amount</option>
+        <option value="250000">At least $250K</option>
+        <option value="1000000">At least $1M</option>
+      </select>
+    </div>
+
+    <div class="prefs-section">
+      <p class="label">Timeline</p>
+      <select id="prefTimeline">
+        <option>Need capital within 3 months</option>
+        <option>Flexible, 6 to 12 months</option>
+        <option>Long-term, opportunistic</option>
+      </select>
+    </div>
+
+    <button class="btn btn-primary prefs-save" id="prefsSave">Save preferences</button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+  const POS = {
+    meridian: { x: 14, y: 18 },
+    northstar: { x: 30, y: 30 },
+    harborview: { x: 20, y: 40 },
+    hartwell: { x: 66, y: 16 },
+    cascade: { x: 84, y: 22 },
+    willowmere: { x: 88, y: 42 },
+    unionsquare: { x: 72, y: 36 },
+    alderfitch: { x: 14, y: 64 },
+    fielding: { x: 30, y: 76 },
+    granitestate: { x: 20, y: 86 },
+    beacon: { x: 66, y: 62 },
+    thornwood: { x: 84, y: 70 },
+    kestrelvine: { x: 74, y: 84 },
+  };
+
+  const CLUSTER_PATHS = [
+    ["meridian", "northstar", "harborview"],
+    ["hartwell", "cascade", "willowmere", "unionsquare"],
+    ["alderfitch", "fielding", "granitestate"],
+    ["beacon", "thornwood", "kestrelvine"],
+  ];
+
+  const constellation = document.getElementById("constellation");
+  const linesSvg = document.getElementById("linesSvg");
+
+  CLUSTER_PATHS.forEach((path) => {
+    for (let i = 0; i < path.length - 1; i++) {
+      const a = POS[path[i]];
+      const b = POS[path[i + 1]];
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", a.x);
+      line.setAttribute("y1", a.y);
+      line.setAttribute("x2", b.x);
+      line.setAttribute("y2", b.y);
+      linesSvg.appendChild(line);
+    }
+  });
+
+  OPPORTUNITIES.forEach((o) => {
+    const p = POS[o.id];
+    const diameter = Math.round(20 + o.fit * 0.32) * 2;
+    const node = document.createElement("div");
+    node.className = "node fade-target";
+    node.dataset.id = o.id;
+    node.style.left = p.x + "%";
+    node.style.top = p.y + "%";
+    node.innerHTML = `
+      <button class="node-circle" style="width:${diameter}px;height:${diameter}px">${o.fit}</button>
+      <span class="node-name">${o.name}</span>
+      <span class="node-type">${TYPE_LABEL[o.type]}</span>
+    `;
+    node.querySelector(".node-circle").addEventListener("click", () => openDetail(o));
+    constellation.appendChild(node);
+  });
+
+  const filters = { hideDilutive: false, under500k: false, rollingOnly: false };
+  const prefs = { wantTypes: ["loan", "grant", "corporate", "equity"], maxRange: 0 };
+
+  function updateVisibility() {
+    let visibleCount = 0;
+    OPPORTUNITIES.forEach((o) => {
+      const el = document.querySelector(`.node[data-id="${o.id}"]`);
+      const show = passesFilters(o, filters);
+      el.classList.toggle("hidden-fade", !show);
+      if (show) visibleCount++;
+      const match = matchesPreferences(o, prefs);
+      el.classList.toggle("dim", show && !match);
+    });
+    document.getElementById("canvasCount").textContent =
+      visibleCount + " of " + OPPORTUNITIES.length + " opportunities, matched to what you're responsible for right now.";
+  }
+
+  document.getElementById("fHideDilutive").addEventListener("change", (e) => {
+    filters.hideDilutive = e.target.checked;
+    updateVisibility();
+  });
+  document.getElementById("fUnder500k").addEventListener("change", (e) => {
+    filters.under500k = e.target.checked;
+    updateVisibility();
+  });
+  document.getElementById("fRolling").addEventListener("change", (e) => {
+    filters.rollingOnly = e.target.checked;
+    updateVisibility();
+  });
+
+  const prefsOverlay = document.getElementById("prefsOverlay");
+  document.getElementById("prefsBtn").addEventListener("click", () => (prefsOverlay.hidden = false));
+  document.getElementById("prefsClose").addEventListener("click", () => (prefsOverlay.hidden = true));
+  document.getElementById("prefsSave").addEventListener("click", () => {
+    prefs.wantTypes = Array.from(document.querySelectorAll(".prefType:checked")).map((c) => c.value);
+    prefs.maxRange = Number(document.getElementById("prefRange").value);
+    prefsOverlay.hidden = true;
+    updateVisibility();
+  });
+
+  const slideoverOverlay = document.getElementById("slideoverOverlay");
+  const slideoverContent = document.getElementById("slideoverContent");
+
+  function openDetail(o) {
+    slideoverContent.innerHTML = renderDetailContent(o);
+    wireDetail(slideoverContent, o);
+    slideoverOverlay.hidden = false;
+  }
+
+  function closeDetail() {
+    slideoverOverlay.hidden = true;
+  }
+
+  document.getElementById("slideoverClose").addEventListener("click", closeDetail);
+  document.getElementById("slideoverBackdrop").addEventListener("click", closeDetail);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeDetail();
+      prefsOverlay.hidden = true;
+    }
+  });
+
+  document.getElementById("brandToggle").addEventListener("click", () => {
+    document.body.classList.toggle("white-label");
+  });
+
+  updateVisibility();
+</script>
+</body>
+</html>

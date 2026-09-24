@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Layout D: Split, persistent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v3-shared.css" />
+<style>
+  .work-max {
+    max-width: 560px;
+  }
+
+  .hero-num-label {
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    margin: 0 0 2px;
+  }
+
+  .hero-num {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    line-height: 1;
+    margin: 0 0 30px;
+  }
+</style>
+</head>
+<body>
+
+<div class="split">
+  <aside class="panel-brand">
+    <div>
+      <a class="wordmark" href="index.html">CHELCIE</a>
+      <p class="overline">Partnership Designer</p>
+      <h1 class="brand-headline">There's more than grants in here.</h1>
+      <p class="brand-lede">CHELCIE treats capital as one connected universe, not four separate hunts. This panel doesn't go anywhere while you work.</p>
+
+      <div class="capital-list">
+        <div class="capital-item">
+          <div class="capital-mark"><svg viewBox="0 0 24 24"><path d="M2 10l10-6 10 6"/><path d="M4 10v10M9 10v10M15 10v10M20 10v10"/><path d="M2 21h20"/></svg></div>
+          <div><p class="capital-title">Loans</p><p class="capital-sub">Capital you repay, on your terms.</p></div>
+        </div>
+        <div class="capital-item">
+          <div class="capital-mark"><svg viewBox="0 0 24 24"><path d="M12 3c-1.5 2-4 2.5-4 5a4 4 0 0 0 8 0c0-2.5-2.5-3-4-5Z"/><path d="M5 10h14v11H5z"/><path d="M5 15h14"/></svg></div>
+          <div><p class="capital-title">Grants</p><p class="capital-sub">No repayment, the door everyone already knows.</p></div>
+        </div>
+        <div class="capital-item">
+          <div class="capital-mark"><svg viewBox="0 0 24 24"><path d="M3 8l4-4h10l4 4"/><path d="M3 8v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8"/><path d="M9 12a3 3 0 0 0 6 0"/></svg></div>
+          <div><p class="capital-title">Corporate partnerships</p><p class="capital-sub">Capital from business units with their own reasons to say yes.</p></div>
+        </div>
+        <div class="capital-item">
+          <div class="capital-mark"><svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M12 2a10 10 0 0 1 8 16"/></svg></div>
+          <div><p class="capital-title">Equity</p><p class="capital-sub">A stake, for the moments that call for it.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="brand-footline" id="brandFootline">13 open opportunities across 4 kinds of capital, right now.</p>
+  </aside>
+
+  <div class="panel-work">
+    <div class="work-inner">
+
+      <section class="screen active" data-screen="types">
+        <div class="work-max">
+          <p class="work-eyebrow">Step 1 of 3</p>
+          <div class="work-rule"></div>
+          <h2 class="work-title">What kind of capital will you consider?</h2>
+          <p class="work-sub" style="margin-bottom:26px;">Pick as many as apply. Most people limit themselves to one before they even look.</p>
+          <div class="pill-group" id="typeGroup">
+            <button class="pill selected" data-value="loan">Loans</button>
+            <button class="pill selected" data-value="grant">Grants</button>
+            <button class="pill selected" data-value="corporate">Corporate partnerships</button>
+            <button class="pill selected" data-value="equity">Equity</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="range">
+        <div class="work-max">
+          <p class="work-eyebrow">Step 2 of 3</p>
+          <div class="work-rule"></div>
+          <h2 class="work-title">What funding range are you working with?</h2>
+          <div class="side-options" id="rangeGroup" style="margin-top:26px;">
+            <button class="side-option selected" data-value="0"><span class="side-option-label">Any amount</span></button>
+            <button class="side-option" data-value="250000"><span class="side-option-label">At least $250K</span></button>
+            <button class="side-option" data-value="1000000"><span class="side-option-label">At least $1M</span></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="matches">
+        <div class="work-max" style="max-width:640px;">
+          <p class="work-eyebrow">Step 3 of 3</p>
+          <div class="work-rule"></div>
+          <h2 class="work-title">Your matches.</h2>
+          <p class="hero-num-label" id="heroMatchLabel">Ranked by fit</p>
+          <p class="hero-num" id="heroMatchCount">0</p>
+          <div class="row-list" id="matchList" style="margin-top:14px;"></div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="gain">
+        <div class="work-max">
+          <p class="work-eyebrow" id="gainEyebrow"></p>
+          <div class="gain-callout">
+            <blockquote id="gainText"></blockquote>
+            <p class="works-with" id="gainWorksWith"></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="pitch">
+        <div class="work-max">
+          <p class="work-eyebrow">Design your partnership</p>
+          <h2 class="work-title" id="pitchHeadline" style="font-size:1.375rem; margin-bottom:24px;"></h2>
+          <div class="field-group">
+            <label>Your organization</label>
+            <input type="text" class="pitch-org" value="Your organization" />
+          </div>
+          <div class="field-group">
+            <label>What you are asking for</label>
+            <textarea class="pitch-ask" rows="3"></textarea>
+          </div>
+          <div class="field-group">
+            <label>How the funds will be used</label>
+            <textarea class="pitch-use" rows="3"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="draft">
+        <div class="work-max">
+          <p class="work-eyebrow">Ready to send</p>
+          <h2 class="work-title" style="font-size:1.375rem; margin-bottom:14px;">Here's your one-pager.</h2>
+          <p class="draft-status" id="draftStatus"></p>
+          <div class="draft-actions">
+            <button class="btn-secondary" id="exportDraftBtn">Export .txt</button>
+            <button class="btn-secondary" id="markSentBtn">Mark as sent</button>
+          </div>
+          <div class="draft-output" id="draftOutput"></div>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="footer-nav" id="footerNav">
+      <div class="footer-nav-inner">
+        <button class="back-link" id="backBtn">Back</button>
+        <button class="btn-primary" id="nextBtn">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+  const prefs = { types: new Set(["loan", "grant", "corporate", "equity"]), minRange: 0 };
+  let matches = [];
+  let currentOpp = null;
+  let currentTrackedEntry = null;
+
+  const screens = Array.from(document.querySelectorAll(".screen"));
+  const backBtn = document.getElementById("backBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  const NEXT_LABEL = { types: "Continue", range: "Show my matches", matches: "Continue", gain: "Continue", pitch: "Draft with CHELCIE", draft: "Choose another opportunity" };
+  const BACK_MAP = { range: "types", matches: "range", gain: "matches", pitch: "gain", draft: "pitch" };
+
+  function slug(text) {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  }
+
+  function showScreen(id) {
+    screens.forEach((s) => s.classList.toggle("active", s.dataset.screen === id));
+    window.scrollTo(0, 0);
+    backBtn.style.visibility = id === "types" ? "hidden" : "visible";
+    nextBtn.textContent = NEXT_LABEL[id];
+    nextBtn.disabled = id === "matches" ? !currentOpp : false;
+  }
+
+  document.querySelectorAll("#typeGroup .pill").forEach((p) => {
+    p.addEventListener("click", () => {
+      const v = p.dataset.value;
+      if (prefs.types.has(v)) { prefs.types.delete(v); p.classList.remove("selected"); }
+      else { prefs.types.add(v); p.classList.add("selected"); }
+    });
+  });
+
+  document.querySelectorAll("#rangeGroup .side-option").forEach((b) => {
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#rangeGroup .side-option").forEach((o) => o.classList.remove("selected"));
+      b.classList.add("selected");
+      prefs.minRange = Number(b.dataset.value);
+    });
+  });
+
+  function buildMatches() {
+    matches = OPPORTUNITIES.filter((o) => {
+      if (!prefs.types.has(o.type)) return false;
+      if (prefs.minRange && o.max < prefs.minRange) return false;
+      return true;
+    }).sort((a, b) => b.fit - a.fit).slice(0, 6);
+
+    currentOpp = null;
+    document.getElementById("heroMatchCount").textContent = matches.length;
+    document.getElementById("heroMatchLabel").textContent = `Ranked by fit, out of ${OPPORTUNITIES.length} total`;
+
+    const list = document.getElementById("matchList");
+    list.innerHTML = "";
+    matches.forEach((o) => {
+      const row = document.createElement("button");
+      row.className = "row-item";
+      row.innerHTML = `
+        <div>
+          <p class="row-eyebrow">${TYPE_LABEL[o.type]}</p>
+          <p class="row-name">${o.name}</p>
+          <p class="row-sub">${amountRange(o)} &middot; ${o.timeline}</p>
+        </div>
+        <div class="row-fit"><span class="row-fit-num">${o.fit}</span><span class="row-fit-label">Fit</span></div>
+      `;
+      row.addEventListener("click", () => {
+        currentOpp = o;
+        showScreen("gain");
+        document.getElementById("gainEyebrow").textContent = "What " + o.name + " gains from you";
+        document.getElementById("gainText").textContent = o.gain;
+        document.getElementById("gainWorksWith").textContent = o.worksWith;
+      });
+      list.appendChild(row);
+    });
+  }
+
+  function renderPitch() {
+    const o = currentOpp;
+    document.getElementById("pitchHeadline").textContent = "A one-pager for " + o.name;
+    document.querySelector(".pitch-org").value = "Your organization";
+    document.querySelector(".pitch-ask").value = defaultAsk(o);
+    document.querySelector(".pitch-use").value = defaultUseOfFunds(o);
+  }
+
+  function renderDraftStatus() {
+    if (!currentTrackedEntry) return;
+    const s = document.getElementById("draftStatus");
+    const btn = document.getElementById("markSentBtn");
+    s.innerHTML = `<span class="status-dot ${currentTrackedEntry.status}"></span> ${currentTrackedEntry.status === "sent" ? "Marked as sent" : "Draft ready, not sent yet"}`;
+    btn.textContent = currentTrackedEntry.status === "sent" ? "Mark as not sent" : "Mark as sent";
+  }
+
+  function exportEntry(entry) {
+    const blob = new Blob([entry.exportText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = entry.filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById("exportDraftBtn").addEventListener("click", () => {
+    if (currentTrackedEntry) exportEntry(currentTrackedEntry);
+  });
+  document.getElementById("markSentBtn").addEventListener("click", () => {
+    if (!currentTrackedEntry) return;
+    currentTrackedEntry.status = currentTrackedEntry.status === "sent" ? "draft" : "sent";
+    renderDraftStatus();
+  });
+
+  function runDraft() {
+    const o = currentOpp;
+    const org = document.querySelector(".pitch-org").value.trim() || "Your organization";
+    const ask = document.querySelector(".pitch-ask").value.trim();
+    const use = document.querySelector(".pitch-use").value.trim();
+
+    nextBtn.disabled = true;
+    nextBtn.textContent = "Drafting…";
+
+    setTimeout(() => {
+      document.getElementById("draftOutput").innerHTML = `
+        <p class="draft-label">One-pager · draft</p>
+        <p class="draft-doc-title">${org}</p>
+        <p class="draft-doc-sub">Partnership request to ${o.name}</p>
+        <p class="draft-doc-h">What we are asking</p>
+        <p>${ask}</p>
+        <p class="draft-doc-h">How the funds will be used</p>
+        <p>${use}</p>
+        <p class="draft-doc-h">Why this fits</p>
+        <p>${o.gain}</p>
+        <p class="draft-doc-h">Terms under discussion</p>
+        <p>${o.terms.join(", ")}.</p>
+      `;
+      const exportText = [org, `Partnership request to ${o.name}`, ``, `WHAT WE ARE ASKING`, ask, ``, `HOW THE FUNDS WILL BE USED`, use, ``, `WHY THIS FITS`, o.gain, ``, `TERMS UNDER DISCUSSION`, o.terms.join(", ") + "."].join("\n");
+      currentTrackedEntry = { status: "draft", exportText, filename: slug(org) + "-" + slug(o.name) + "-one-pager.txt" };
+      renderDraftStatus();
+      nextBtn.disabled = false;
+      showScreen("draft");
+    }, 1100);
+  }
+
+  backBtn.addEventListener("click", () => {
+    const current = screens.find((s) => s.classList.contains("active")).dataset.screen;
+    if (BACK_MAP[current]) showScreen(BACK_MAP[current]);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    const current = screens.find((s) => s.classList.contains("active")).dataset.screen;
+    if (current === "types") showScreen("range");
+    else if (current === "range") { buildMatches(); showScreen("matches"); }
+    else if (current === "matches") { if (currentOpp) showScreen("gain"); }
+    else if (current === "gain") { showScreen("pitch"); renderPitch(); }
+    else if (current === "pitch") runDraft();
+    else if (current === "draft") showScreen("matches");
+  });
+
+  showScreen("types");
+</script>
+</body>
+</html>

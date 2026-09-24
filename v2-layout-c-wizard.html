@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Layout C: Step-by-step</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v2-shared.css" />
+<style>
+  .intro-body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 48px;
+    padding: 40px 40px 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  @media (min-width: 860px) {
+    .intro-body {
+      grid-template-columns: 1fr 1fr;
+      padding-top: 90px;
+    }
+  }
+
+  .intro-greeting {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+
+  .intro-headline {
+    font-size: 1.75rem;
+    line-height: 1.15;
+  }
+
+  @media (min-width: 860px) {
+    .intro-headline {
+      font-size: 2.25rem;
+    }
+  }
+
+  .intro-time {
+    font-size: 0.9375rem;
+    font-weight: 400;
+    color: hsl(var(--stone));
+    margin: 12px 0 0;
+  }
+
+  .phase-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .phase-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 22px 0;
+    border-top: 1px solid hsl(var(--border));
+  }
+
+  .phase-item:first-child {
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .phase-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    background: hsl(var(--teal) / 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .phase-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: #0f766e;
+  }
+
+  .phase-text h3 {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    font-family: "Inter", sans-serif;
+    letter-spacing: normal;
+  }
+
+  .phase-text p {
+    font-size: 0.9375rem;
+    color: hsl(var(--stone));
+    margin: 0;
+    max-width: 42ch;
+  }
+
+  .data-body {
+    flex: 1;
+    max-width: 640px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 56px 40px 130px;
+  }
+
+  .data-eyebrow {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: hsl(var(--stone));
+    margin: 0 0 8px;
+  }
+
+  .data-title {
+    font-size: 1.75rem;
+    margin-bottom: 30px;
+  }
+
+  .row-item.selected {
+    background: hsl(var(--teal) / 0.08);
+  }
+
+  .row-item.selected .row-name {
+    color: #0f766e;
+  }
+
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="wordmark" href="index.html">CHELCIE</a>
+  <span class="pill-link" style="cursor:default;">Step by step</span>
+</header>
+
+<main>
+
+  <section class="screen active" data-screen="intro">
+    <div class="intro-body">
+      <div>
+        <p class="intro-greeting">Welcome back.</p>
+        <h1 class="intro-headline">Let's design your first partnership.</h1>
+        <p class="intro-time">About 3 minutes. Three short steps, one question at a time.</p>
+      </div>
+      <div class="phase-list">
+        <div class="phase-item">
+          <div class="phase-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4l3 3"></path></svg></div>
+          <div class="phase-text"><h3>What you need</h3><p>Capital types, funding range, and timeline, one question per screen.</p></div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><circle cx="19" cy="6" r="2"></circle><circle cx="5" cy="18" r="2"></circle><path d="M14 10l3-2M10 14l-3 2"></path></svg></div>
+          <div class="phase-text"><h3>Your matches</h3><p>A short, ranked list, not all thirteen opportunities at once.</p></div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg></div>
+          <div class="phase-text"><h3>Design &amp; send</h3><p>See what they gain from you, then build a one-pager for that one opportunity.</p></div>
+        </div>
+        <button class="btn-primary" style="margin-top:32px; align-self:flex-start;" id="startBtn">Get started</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="d-types">
+    <div class="data-body">
+      <p class="data-eyebrow">What you need</p>
+      <h2 class="data-title">What kind of capital will you consider?</h2>
+      <div class="pill-group" id="typeGroup">
+        <button class="pill selected" data-value="loan">Loans</button>
+        <button class="pill selected" data-value="grant">Grants</button>
+        <button class="pill selected" data-value="corporate">Corporate partnerships</button>
+        <button class="pill selected" data-value="equity">Equity</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="d-range">
+    <div class="data-body">
+      <p class="data-eyebrow">What you need</p>
+      <h2 class="data-title">What funding range are you working with?</h2>
+      <div class="side-options" id="rangeGroup">
+        <button class="side-option selected" data-value="0"><span class="side-option-label">Any amount</span></button>
+        <button class="side-option" data-value="250000"><span class="side-option-label">At least $250K</span></button>
+        <button class="side-option" data-value="1000000"><span class="side-option-label">At least $1M</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="d-timeline">
+    <div class="data-body">
+      <p class="data-eyebrow">What you need</p>
+      <h2 class="data-title">What's your timeline?</h2>
+      <div class="side-options" id="timelineGroup">
+        <button class="side-option selected" data-value="urgent"><span class="side-option-label">Need it within 3 months</span></button>
+        <button class="side-option" data-value="flexible"><span class="side-option-label">Flexible, 6 to 12 months</span></button>
+        <button class="side-option" data-value="longterm"><span class="side-option-label">Long-term, opportunistic</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="d-matches">
+    <div class="data-body">
+      <p class="data-eyebrow">Your matches</p>
+      <h2 class="data-title">Here are your closest matches.</h2>
+      <div class="row-list" id="matchList"></div>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="d-gain">
+    <div class="data-body">
+      <p class="data-eyebrow" id="gainEyebrow"></p>
+      <div class="gain-callout">
+        <blockquote id="gainText"></blockquote>
+        <p class="works-with" id="gainWorksWith"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="d-pitch">
+    <div class="data-body">
+      <p class="data-eyebrow">Design &amp; send</p>
+      <h2 class="data-title" id="pitchHeadline" style="font-size:1.5rem;"></h2>
+
+      <div class="field-group">
+        <label>Your organization</label>
+        <input type="text" class="pitch-org" value="Your organization" />
+      </div>
+      <div class="field-group">
+        <label>What you are asking for</label>
+        <textarea class="pitch-ask" rows="3"></textarea>
+      </div>
+      <div class="field-group">
+        <label>How the funds will be used</label>
+        <textarea class="pitch-use" rows="3"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="success">
+    <div class="success-wrap">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <h1 style="font-size:1.75rem;">Your one-pager is ready.</h1>
+      <p style="font-size:0.9375rem; color:hsl(var(--stone)); margin:10px 0 28px;">CHELCIE drafted this from what you told it. You're the one who sends it, whenever you're ready.</p>
+      <div class="draft-output" id="draftOutput" style="text-align:left;"></div>
+      <button class="btn-primary" style="margin-top:28px;" id="restartBtn">Design another partnership</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="footer-nav" id="footerNav">
+  <div class="progress-track" id="progressTrack" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="progress-seg-wrap"><p class="progress-label" id="pLabel0">What you need</p><div class="progress-seg"><div class="progress-seg-fill" id="pSeg0"></div></div></div>
+    <div class="progress-seg-wrap"><p class="progress-label" id="pLabel1">Your matches</p><div class="progress-seg"><div class="progress-seg-fill" id="pSeg1"></div></div></div>
+    <div class="progress-seg-wrap"><p class="progress-label" id="pLabel2">Design &amp; send</p><div class="progress-seg"><div class="progress-seg-fill" id="pSeg2"></div></div></div>
+  </div>
+  <div class="footer-nav-inner">
+    <button class="back-link" id="backBtn">Back</button>
+    <button class="btn-primary" id="nextBtn" disabled>Continue</button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+  const prefs = { types: new Set(["loan", "grant", "corporate", "equity"]), minRange: 0, timeline: "urgent", hideDilutive: false, under500k: false, rollingOnly: false };
+  let matches = [];
+  let currentOpp = null;
+
+  const screens = Array.from(document.querySelectorAll(".screen"));
+  const footerNav = document.getElementById("footerNav");
+  const progressTrack = document.getElementById("progressTrack");
+  const backBtn = document.getElementById("backBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  const STEP_ORDER = ["d-types", "d-range", "d-timeline", "d-matches", "d-gain", "d-pitch"];
+  const SEGMENT_OF = { "d-types": 0, "d-range": 0, "d-timeline": 0, "d-matches": 1, "d-gain": 2, "d-pitch": 2 };
+  const SEGMENT_STEPS = { 0: 3, 1: 1, 2: 2 };
+  const SEGMENT_STEP_INDEX = { "d-types": 1, "d-range": 2, "d-timeline": 3, "d-matches": 1, "d-gain": 1, "d-pitch": 2 };
+  const NEXT_LABEL = {
+    "d-types": "Continue",
+    "d-range": "Continue",
+    "d-timeline": "Show my matches",
+    "d-matches": "Design this partnership",
+    "d-gain": "Continue",
+    "d-pitch": "Draft with CHELCIE",
+  };
+  const BACK_MAP = { "d-range": "d-types", "d-timeline": "d-range", "d-matches": "d-timeline", "d-gain": "d-matches", "d-pitch": "d-gain" };
+
+  function showScreen(id) {
+    screens.forEach((s) => s.classList.toggle("active", s.dataset.screen === id));
+    window.scrollTo(0, 0);
+    configureChrome(id);
+  }
+
+  function configureChrome(id) {
+    if (id === "intro" || id === "success") {
+      footerNav.style.display = "none";
+      return;
+    }
+    footerNav.style.display = "block";
+
+    const seg = SEGMENT_OF[id];
+    [0, 1, 2].forEach((n) => {
+      const label = document.getElementById("pLabel" + n);
+      const fill = document.getElementById("pSeg" + n);
+      label.classList.remove("is-current", "is-done");
+      if (n < seg) { label.classList.add("is-done"); fill.style.width = "100%"; }
+      else if (n === seg) {
+        label.classList.add("is-current");
+        fill.style.width = Math.round((SEGMENT_STEP_INDEX[id] / SEGMENT_STEPS[n]) * 100) + "%";
+      } else {
+        fill.style.width = "0%";
+      }
+    });
+
+    backBtn.style.visibility = id === "d-types" ? "hidden" : "visible";
+    nextBtn.textContent = NEXT_LABEL[id];
+    nextBtn.disabled = id === "d-matches" ? !currentOpp : false;
+  }
+
+  document.getElementById("startBtn").addEventListener("click", () => showScreen("d-types"));
+
+  document.querySelectorAll("#typeGroup .pill").forEach((p) => {
+    p.addEventListener("click", () => {
+      const v = p.dataset.value;
+      if (prefs.types.has(v)) { prefs.types.delete(v); p.classList.remove("selected"); }
+      else { prefs.types.add(v); p.classList.add("selected"); }
+    });
+  });
+
+  document.querySelectorAll("#rangeGroup .side-option").forEach((b) => {
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#rangeGroup .side-option").forEach((o) => o.classList.remove("selected"));
+      b.classList.add("selected");
+      prefs.minRange = Number(b.dataset.value);
+    });
+  });
+
+  document.querySelectorAll("#timelineGroup .side-option").forEach((b) => {
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#timelineGroup .side-option").forEach((o) => o.classList.remove("selected"));
+      b.classList.add("selected");
+      prefs.timeline = b.dataset.value;
+    });
+  });
+
+  function buildMatches() {
+    matches = OPPORTUNITIES.filter((o) => {
+      if (!prefs.types.has(o.type)) return false;
+      if (prefs.minRange && o.max < prefs.minRange) return false;
+      return true;
+    }).sort((a, b) => b.fit - a.fit).slice(0, 5);
+
+    currentOpp = null;
+    const list = document.getElementById("matchList");
+    list.innerHTML = "";
+    matches.forEach((o) => {
+      const row = document.createElement("button");
+      row.className = "row-item";
+      row.innerHTML = `
+        <div class="row-main">
+          <p class="row-eyebrow">${TYPE_LABEL[o.type]}</p>
+          <p class="row-name">${o.name}</p>
+          <p class="row-sub">${amountRange(o)} &middot; ${o.timeline}</p>
+        </div>
+        <div class="row-fit"><span class="row-fit-num">${o.fit}</span><span class="row-fit-label">Fit</span></div>
+      `;
+      row.addEventListener("click", () => {
+        document.querySelectorAll("#matchList .row-item").forEach((r) => r.classList.remove("selected"));
+        row.classList.add("selected");
+        currentOpp = o;
+        nextBtn.disabled = false;
+      });
+      list.appendChild(row);
+    });
+  }
+
+  function renderGain() {
+    document.getElementById("gainEyebrow").textContent = "What " + currentOpp.name + " gains from you";
+    document.getElementById("gainText").textContent = currentOpp.gain;
+    document.getElementById("gainWorksWith").textContent = currentOpp.worksWith;
+  }
+
+  function renderPitch() {
+    document.getElementById("pitchHeadline").textContent = "A one-pager for " + currentOpp.name;
+    document.querySelector(".pitch-org").value = "Your organization";
+    document.querySelector(".pitch-ask").value = defaultAsk(currentOpp);
+    document.querySelector(".pitch-use").value = defaultUseOfFunds(currentOpp);
+  }
+
+  function runDraft() {
+    const o = currentOpp;
+    const org = document.querySelector(".pitch-org").value.trim() || "Your organization";
+    const ask = document.querySelector(".pitch-ask").value.trim();
+    const use = document.querySelector(".pitch-use").value.trim();
+
+    nextBtn.disabled = true;
+    nextBtn.textContent = "Drafting…";
+
+    setTimeout(() => {
+      document.getElementById("draftOutput").innerHTML = `
+        <p class="draft-label">One-pager · draft</p>
+        <p class="draft-doc-title">${org}</p>
+        <p class="draft-doc-sub">Partnership request to ${o.name}</p>
+        <p class="draft-doc-h">What we are asking</p>
+        <p>${ask}</p>
+        <p class="draft-doc-h">How the funds will be used</p>
+        <p>${use}</p>
+        <p class="draft-doc-h">Why this fits</p>
+        <p>${o.gain}</p>
+        <p class="draft-doc-h">Terms under discussion</p>
+        <p>${o.terms.join(", ")}.</p>
+      `;
+      showScreen("success");
+    }, 1100);
+  }
+
+  backBtn.addEventListener("click", () => {
+    const current = screens.find((s) => s.classList.contains("active")).dataset.screen;
+    if (BACK_MAP[current]) showScreen(BACK_MAP[current]);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    const current = screens.find((s) => s.classList.contains("active")).dataset.screen;
+    if (current === "d-types") {
+      if (prefs.types.size === 0) return;
+      showScreen("d-range");
+    } else if (current === "d-range") {
+      showScreen("d-timeline");
+    } else if (current === "d-timeline") {
+      buildMatches();
+      showScreen("d-matches");
+    } else if (current === "d-matches") {
+      if (!currentOpp) return;
+      renderGain();
+      showScreen("d-gain");
+    } else if (current === "d-gain") {
+      renderPitch();
+      showScreen("d-pitch");
+    } else if (current === "d-pitch") {
+      runDraft();
+    }
+  });
+
+  document.getElementById("restartBtn").addEventListener("click", () => showScreen("intro"));
+
+  configureChrome("intro");
+</script>
+</body>
+</html>

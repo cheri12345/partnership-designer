@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Layout E: Split, then hand off</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v3-shared.css" />
+<style>
+  .landing-work {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    padding: 48px 24px;
+  }
+
+  @media (min-width: 860px) {
+    .landing-work {
+      padding: 56px;
+    }
+  }
+
+  .landing-work-inner {
+    max-width: 26rem;
+  }
+
+  .rotating-stat {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: hsl(var(--ink-foreground));
+    border-top: 1px solid hsl(var(--ink-border));
+    padding-top: 16px;
+    margin-top: 36px;
+    transition: opacity 0.3s ease;
+  }
+
+  /* ---------- top bar for the full-bleed tool ---------- */
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  @media (min-width: 860px) {
+    .topbar {
+      padding: 20px 56px;
+    }
+  }
+
+  .topbar .wordmark {
+    color: hsl(var(--ink));
+    font-size: 1.1rem;
+  }
+
+  .pill-link {
+    border: 1px solid hsl(var(--border));
+    border-radius: 999px;
+    padding: 9px 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: hsl(var(--ink));
+    background: hsl(var(--paper));
+    cursor: pointer;
+  }
+
+  .pill-link:hover {
+    border-color: hsl(var(--ink) / 0.5);
+  }
+
+  .tool-center {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 56px 24px 140px;
+    width: 100%;
+  }
+
+  .review-eyebrow-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .review-name {
+    font-size: 1.875rem;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+
+  @media (min-width: 640px) {
+    .review-name {
+      font-size: 2.25rem;
+    }
+  }
+
+  .review-sub {
+    font-size: 1rem;
+    color: hsl(var(--stone));
+    margin: 0 0 30px;
+  }
+
+  .review-choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 34px;
+  }
+
+  .choice-skip,
+  .choice-yes {
+    padding: 18px;
+    border-radius: 4px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .choice-skip {
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--paper));
+    color: hsl(var(--ink));
+  }
+
+  .choice-skip:hover {
+    border-color: hsl(var(--ink) / 0.6);
+  }
+
+  .choice-yes {
+    border: 1px solid hsl(var(--ink));
+    background: hsl(var(--ink));
+    color: hsl(var(--paper));
+  }
+
+  .choice-yes:hover {
+    opacity: 0.85;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: hsl(var(--paper));
+    z-index: 50;
+    display: none;
+    flex-direction: column;
+  }
+
+  .overlay.active {
+    display: flex;
+  }
+
+  .refine-body {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 48px 24px 100px;
+    width: 100%;
+  }
+
+  .refine-section {
+    margin-bottom: 32px;
+  }
+
+  .refine-section .label {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+</style>
+</head>
+<body>
+
+<div class="split" id="landingSplit">
+  <aside class="panel-brand">
+    <div>
+      <a class="wordmark" href="index.html">CHELCIE</a>
+      <p class="overline">Partnership Designer</p>
+      <h1 class="brand-headline">There's more than grants in here.</h1>
+      <p class="brand-lede">A versatile way to find money: loans, corporate partnerships, equity, and grants, all treated as one universe of capital instead of four separate hunts.</p>
+      <p class="rotating-stat" id="rotatingStat">13 LOANS, GRANTS &amp; MORE, OPEN NOW</p>
+    </div>
+    <p class="brand-footline">You'll see all of it before anything gets filtered out.</p>
+  </aside>
+
+  <div class="panel-work">
+    <div class="landing-work">
+      <div class="landing-work-inner">
+        <p class="work-eyebrow">Ready when you are</p>
+        <div class="work-rule"></div>
+        <h2 class="work-title">See what's actually out there.</h2>
+        <p class="work-sub" style="margin-bottom:30px;">No intake form first. You'll go straight through every kind of capital, one at a time, and narrow it down as you go.</p>
+        <button class="btn-primary" id="startBtn">Start your first match</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toolRoot" style="display:none;">
+  <header class="topbar">
+    <span class="wordmark">CHELCIE</span>
+    <button class="pill-link" id="refineBtn">Refine</button>
+  </header>
+
+  <main>
+    <section class="screen active" data-screen="review">
+      <div class="tool-center">
+        <div class="review-eyebrow-row">
+          <p class="work-eyebrow" id="reviewCount" style="margin:0;">Opportunity 1 of 13</p>
+          <p class="work-eyebrow" id="reviewType" style="margin:0;">LOAN</p>
+        </div>
+        <h1 class="review-name" id="reviewName"></h1>
+        <p class="review-sub" id="reviewSub"></p>
+        <ul class="terms-list" id="reviewTerms"></ul>
+        <div class="review-choices">
+          <button class="choice-skip" id="skipBtn">Not for us</button>
+          <button class="choice-yes" id="designBtn">Design a partnership</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="gain">
+      <div class="tool-center">
+        <p class="work-eyebrow" id="gainEyebrow"></p>
+        <div class="gain-callout">
+          <blockquote id="gainText"></blockquote>
+          <p class="works-with" id="gainWorksWith"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="pitch">
+      <div class="tool-center">
+        <p class="work-eyebrow">Design your partnership</p>
+        <h2 class="work-title" id="pitchHeadline" style="font-size:1.5rem;"></h2>
+        <div class="field-group">
+          <label>Your organization</label>
+          <input type="text" class="pitch-org" value="Your organization" />
+        </div>
+        <div class="field-group">
+          <label>What you are asking for</label>
+          <textarea class="pitch-ask" rows="3"></textarea>
+        </div>
+        <div class="field-group">
+          <label>How the funds will be used</label>
+          <textarea class="pitch-use" rows="3"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="draft">
+      <div class="tool-center">
+        <p class="work-eyebrow">Ready to send</p>
+        <h2 class="work-title" style="font-size:1.5rem;">Here's your one-pager.</h2>
+        <p class="draft-status" id="draftStatus"></p>
+        <div class="draft-actions">
+          <button class="btn-secondary" id="exportDraftBtn">Export .txt</button>
+          <button class="btn-secondary" id="markSentBtn">Mark as sent</button>
+        </div>
+        <div class="draft-output" id="draftOutput"></div>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="done">
+      <div class="tool-center" style="text-align:center;">
+        <h1 class="review-name">You've seen all of it.</h1>
+        <p class="work-sub" id="doneSummary" style="margin:0 auto 28px;"></p>
+        <button class="btn-primary" id="restartBtn">Start over</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="overlay" id="refineOverlay">
+    <header class="topbar">
+      <span class="wordmark">Refine</span>
+      <button class="pill-link" id="refineClose">Close</button>
+    </header>
+    <div class="refine-body">
+      <div class="refine-section">
+        <p class="label">Capital types you'll consider</p>
+        <div class="pill-group" id="typeGroup">
+          <button class="pill selected" data-value="loan">Loans</button>
+          <button class="pill selected" data-value="grant">Grants</button>
+          <button class="pill selected" data-value="corporate">Corporate partnerships</button>
+          <button class="pill selected" data-value="equity">Equity</button>
+        </div>
+      </div>
+      <div class="refine-section">
+        <p class="label">Funding range you're working with</p>
+        <div class="side-options" id="rangeGroup">
+          <button class="side-option selected" data-value="0"><span class="side-option-label">Any amount</span></button>
+          <button class="side-option" data-value="250000"><span class="side-option-label">At least $250K</span></button>
+          <button class="side-option" data-value="1000000"><span class="side-option-label">At least $1M</span></button>
+        </div>
+      </div>
+      <button class="btn-primary" id="applyRefine">Update the queue</button>
+    </div>
+  </div>
+
+  <div class="footer-nav" id="footerNav" style="display:none; position:fixed; left:0; right:0; bottom:0;">
+    <div class="footer-nav-inner">
+      <button class="back-link" id="backBtn">Back</button>
+      <button class="btn-primary" id="nextBtn">Continue</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+  /* ---------- landing: rotating stat + handoff ---------- */
+
+  const ROTATING = [
+    "13 LOANS, GRANTS & MORE, OPEN NOW",
+    "3 LOANS OPEN RIGHT NOW",
+    "4 GRANTS OPEN RIGHT NOW",
+    "3 CORPORATE PARTNERSHIPS OPEN",
+    "3 EQUITY OFFERS OPEN RIGHT NOW",
+  ];
+  let rotIdx = 0;
+  const rotatingStat = document.getElementById("rotatingStat");
+  setInterval(() => {
+    rotIdx = (rotIdx + 1) % ROTATING.length;
+    rotatingStat.style.opacity = 0;
+    setTimeout(() => {
+      rotatingStat.textContent = ROTATING[rotIdx];
+      rotatingStat.style.opacity = 1;
+    }, 300);
+  }, 2600);
+
+  document.getElementById("startBtn").addEventListener("click", () => {
+    document.getElementById("landingSplit").style.display = "none";
+    document.getElementById("toolRoot").style.display = "block";
+    initTool();
+  });
+
+  /* ---------- full-bleed tool ---------- */
+
+  function slug(text) {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  }
+
+  const prefs = { types: new Set(["loan", "grant", "corporate", "equity"]), minRange: 0 };
+  let queue = [];
+  let idx = 0;
+  let chosen = [];
+  let currentOpp = null;
+  let currentTrackedEntry = null;
+  let started = false;
+
+  const screens = Array.from(document.querySelectorAll(".screen"));
+  const footerNav = document.getElementById("footerNav");
+  const backBtn = document.getElementById("backBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  function initTool() {
+    if (started) return;
+    started = true;
+    buildQueue();
+  }
+
+  function showScreen(id) {
+    screens.forEach((s) => s.classList.toggle("active", s.dataset.screen === id));
+    window.scrollTo(0, 0);
+    configureFooter(id);
+  }
+
+  function configureFooter(id) {
+    if (id === "review" || id === "done") {
+      footerNav.style.display = "none";
+      return;
+    }
+    footerNav.style.display = "block";
+    if (id === "gain") { backBtn.style.visibility = "visible"; backBtn.textContent = "Back"; nextBtn.textContent = "Continue"; }
+    else if (id === "pitch") { backBtn.style.visibility = "visible"; backBtn.textContent = "Back"; nextBtn.textContent = "Draft with CHELCIE"; }
+    else if (id === "draft") { backBtn.style.visibility = "hidden"; nextBtn.textContent = "Review next opportunity"; }
+  }
+
+  function buildQueue() {
+    queue = OPPORTUNITIES.filter((o) => {
+      if (!prefs.types.has(o.type)) return false;
+      if (prefs.minRange && o.max < prefs.minRange) return false;
+      return true;
+    }).sort((a, b) => b.fit - a.fit);
+    idx = 0;
+    chosen = [];
+    showScreen("review");
+    renderReview();
+  }
+
+  function renderReview() {
+    if (idx >= queue.length) {
+      showScreen("done");
+      document.getElementById("doneSummary").textContent =
+        chosen.length > 0
+          ? `You chose to design a partnership with ${chosen.length} of ${queue.length}, across more than one kind of capital.`
+          : `None of the ${queue.length} felt right this time. Refine and try again.`;
+      return;
+    }
+    const o = queue[idx];
+    document.getElementById("reviewCount").textContent = `Opportunity ${idx + 1} of ${queue.length}`;
+    document.getElementById("reviewType").textContent = TYPE_LABEL[o.type].toUpperCase();
+    document.getElementById("reviewName").textContent = o.name;
+    document.getElementById("reviewSub").textContent = `${amountRange(o)} · ${o.timeline}`;
+    document.getElementById("reviewTerms").innerHTML = o.terms.map((t) => `<li>${t}</li>`).join("");
+  }
+
+  document.getElementById("skipBtn").addEventListener("click", () => { idx++; renderReview(); });
+
+  document.getElementById("designBtn").addEventListener("click", () => {
+    currentOpp = queue[idx];
+    if (!chosen.includes(currentOpp.id)) chosen.push(currentOpp.id);
+    showScreen("gain");
+    document.getElementById("gainEyebrow").textContent = "What " + currentOpp.name + " gains from you";
+    document.getElementById("gainText").textContent = currentOpp.gain;
+    document.getElementById("gainWorksWith").textContent = currentOpp.worksWith;
+  });
+
+  function renderPitch() {
+    const o = currentOpp;
+    document.getElementById("pitchHeadline").textContent = "A one-pager for " + o.name;
+    document.querySelector(".pitch-org").value = "Your organization";
+    document.querySelector(".pitch-ask").value = defaultAsk(o);
+    document.querySelector(".pitch-use").value = defaultUseOfFunds(o);
+  }
+
+  function renderDraftStatus() {
+    if (!currentTrackedEntry) return;
+    const s = document.getElementById("draftStatus");
+    const btn = document.getElementById("markSentBtn");
+    s.innerHTML = `<span class="status-dot ${currentTrackedEntry.status}"></span> ${currentTrackedEntry.status === "sent" ? "Marked as sent" : "Draft ready, not sent yet"}`;
+    btn.textContent = currentTrackedEntry.status === "sent" ? "Mark as not sent" : "Mark as sent";
+  }
+
+  function exportEntry(entry) {
+    const blob = new Blob([entry.exportText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = entry.filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById("exportDraftBtn").addEventListener("click", () => { if (currentTrackedEntry) exportEntry(currentTrackedEntry); });
+  document.getElementById("markSentBtn").addEventListener("click", () => {
+    if (!currentTrackedEntry) return;
+    currentTrackedEntry.status = currentTrackedEntry.status === "sent" ? "draft" : "sent";
+    renderDraftStatus();
+  });
+
+  function runDraft() {
+    const o = currentOpp;
+    const org = document.querySelector(".pitch-org").value.trim() || "Your organization";
+    const ask = document.querySelector(".pitch-ask").value.trim();
+    const use = document.querySelector(".pitch-use").value.trim();
+
+    nextBtn.disabled = true;
+    nextBtn.textContent = "Drafting…";
+
+    setTimeout(() => {
+      document.getElementById("draftOutput").innerHTML = `
+        <p class="draft-label">One-pager · draft</p>
+        <p class="draft-doc-title">${org}</p>
+        <p class="draft-doc-sub">Partnership request to ${o.name}</p>
+        <p class="draft-doc-h">What we are asking</p>
+        <p>${ask}</p>
+        <p class="draft-doc-h">How the funds will be used</p>
+        <p>${use}</p>
+        <p class="draft-doc-h">Why this fits</p>
+        <p>${o.gain}</p>
+        <p class="draft-doc-h">Terms under discussion</p>
+        <p>${o.terms.join(", ")}.</p>
+      `;
+      const exportText = [org, `Partnership request to ${o.name}`, ``, `WHAT WE ARE ASKING`, ask, ``, `HOW THE FUNDS WILL BE USED`, use, ``, `WHY THIS FITS`, o.gain, ``, `TERMS UNDER DISCUSSION`, o.terms.join(", ") + "."].join("\n");
+      currentTrackedEntry = { status: "draft", exportText, filename: slug(org) + "-" + slug(o.name) + "-one-pager.txt" };
+      renderDraftStatus();
+      nextBtn.disabled = false;
+      showScreen("draft");
+    }, 1100);
+  }
+
+  backBtn.addEventListener("click", () => {
+    const current = screens.find((s) => s.classList.contains("active")).dataset.screen;
+    if (current === "gain") showScreen("review");
+    else if (current === "pitch") showScreen("gain");
+  });
+
+  nextBtn.addEventListener("click", () => {
+    const current = screens.find((s) => s.classList.contains("active")).dataset.screen;
+    if (current === "gain") { showScreen("pitch"); renderPitch(); }
+    else if (current === "pitch") runDraft();
+    else if (current === "draft") { idx++; showScreen("review"); renderReview(); }
+  });
+
+  document.getElementById("restartBtn").addEventListener("click", buildQueue);
+
+  /* ---------- refine overlay ---------- */
+
+  const refineOverlay = document.getElementById("refineOverlay");
+  document.getElementById("refineBtn").addEventListener("click", () => refineOverlay.classList.add("active"));
+  document.getElementById("refineClose").addEventListener("click", () => refineOverlay.classList.remove("active"));
+
+  document.querySelectorAll("#typeGroup .pill").forEach((p) => {
+    p.addEventListener("click", () => {
+      const v = p.dataset.value;
+      if (prefs.types.has(v)) { prefs.types.delete(v); p.classList.remove("selected"); }
+      else { prefs.types.add(v); p.classList.add("selected"); }
+    });
+  });
+
+  document.querySelectorAll("#rangeGroup .side-option").forEach((b) => {
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#rangeGroup .side-option").forEach((o) => o.classList.remove("selected"));
+      b.classList.add("selected");
+      prefs.minRange = Number(b.dataset.value);
+    });
+  });
+
+  document.getElementById("applyRefine").addEventListener("click", () => {
+    buildQueue();
+    refineOverlay.classList.remove("active");
+  });
+</script>
+</body>
+</html>

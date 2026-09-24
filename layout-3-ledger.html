@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Partnership Designer — Layout 3: Ledger</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  .page-heading {
+    padding: 22px 28px 6px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .page-heading h1 {
+    font-size: 18px;
+    margin: 0 0 4px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .page-heading p {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .control-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 22px;
+    padding: 12px 28px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: var(--card);
+  }
+
+  .control-bar label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.02em;
+    color: var(--fg);
+  }
+
+  .control-bar input[type="checkbox"] {
+    width: 13px;
+    height: 13px;
+    accent-color: var(--accent);
+  }
+
+  .ledger-wrap {
+    padding: 0 28px 48px;
+  }
+
+  table.ledger {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+
+  .ledger thead th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .ledger thead th.num-col {
+    width: 34px;
+  }
+
+  .ledger thead th.right {
+    text-align: right;
+  }
+
+  .ledger-row {
+    cursor: pointer;
+    transition: opacity 0.4s ease, filter 0.4s ease, background 0.1s ease;
+  }
+
+  .ledger-row:hover {
+    background: var(--card);
+  }
+
+  .ledger-row.dim {
+    opacity: 0.4;
+    filter: grayscale(0.6);
+  }
+
+  .ledger-row td {
+    padding: 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+
+  .ledger-row .num {
+    font-family: var(--font-mono);
+    color: var(--faint);
+    font-size: 11.5px;
+  }
+
+  .ledger-row .name {
+    font-weight: 600;
+  }
+
+  .ledger-row .fit {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .ledger-row .mono {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+  }
+
+  .ledger-row .muted {
+    color: var(--muted);
+  }
+
+  .ledger-row .chev {
+    text-align: right;
+    color: var(--muted);
+    font-size: 13px;
+    transition: transform 0.15s ease;
+  }
+
+  .ledger-row.open .chev {
+    transform: rotate(90deg);
+    color: var(--accent);
+  }
+
+  .detail-row td {
+    padding: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .detail-row.collapsed {
+    display: none;
+  }
+
+  .detail-wrap {
+    padding: 22px 24px 30px;
+    background: #fdfdfd;
+    max-width: 640px;
+  }
+</style>
+</head>
+<body>
+
+<header class="top-bar">
+  <div class="wordmark">
+    <span class="wordmark-text">CHELCIE<span class="tagline">Capital, matched to what you're responsible for.</span></span>
+    <span class="wordmark-wl">Meridian Partners Portal<span class="tagline">Powered by CHELCIE</span></span>
+  </div>
+  <div class="top-bar-actions">
+    <button class="brand-toggle" id="brandToggle">View as white-label</button>
+    <button class="btn" id="prefsBtn">Preferences</button>
+  </div>
+</header>
+
+<div class="page-heading">
+  <div>
+    <h1>Your opportunities</h1>
+    <p id="ledgerCount">13 opportunities, ranked by fit.</p>
+  </div>
+</div>
+
+<div class="control-bar">
+  <label><input type="checkbox" id="fHideDilutive" /> Hide dilutive capital</label>
+  <label><input type="checkbox" id="fUnder500k" /> Show only under $500K</label>
+  <label><input type="checkbox" id="fRolling" /> Rolling deadlines only</label>
+</div>
+
+<div class="ledger-wrap">
+  <table class="ledger">
+    <thead>
+      <tr>
+        <th class="num-col">#</th>
+        <th>Opportunity</th>
+        <th>Type</th>
+        <th class="right">Fit</th>
+        <th>Range</th>
+        <th>Timeline</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="ledgerBody"></tbody>
+  </table>
+</div>
+
+<div class="prefs-overlay" id="prefsOverlay" hidden>
+  <div class="prefs-panel">
+    <button class="close-btn" id="prefsClose" style="float:right">Close ✕</button>
+    <h3>What are you responsible for?</h3>
+    <p class="prefs-intro">These reshape how rows are emphasized. They don't hide anything outright, that's what the checkboxes above the table are for.</p>
+
+    <div class="prefs-section">
+      <p class="label">Capital types you'll consider</p>
+      <label class="check-row"><input type="checkbox" class="prefType" value="loan" checked /> Loans</label>
+      <label class="check-row"><input type="checkbox" class="prefType" value="grant" checked /> Grants</label>
+      <label class="check-row"><input type="checkbox" class="prefType" value="corporate" checked /> Corporate partnerships</label>
+      <label class="check-row"><input type="checkbox" class="prefType" value="equity" checked /> Equity</label>
+    </div>
+
+    <div class="prefs-section">
+      <p class="label">Funding range you're working with</p>
+      <select id="prefRange">
+        <option value="0">Any amount</option>
+        <option value="250000">At least $250K</option>
+        <option value="1000000">At least $1M</option>
+      </select>
+    </div>
+
+    <div class="prefs-section">
+      <p class="label">Timeline</p>
+      <select id="prefTimeline">
+        <option>Need capital within 3 months</option>
+        <option>Flexible, 6 to 12 months</option>
+        <option>Long-term, opportunistic</option>
+      </select>
+    </div>
+
+    <button class="btn btn-primary prefs-save" id="prefsSave">Save preferences</button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+  const ledgerBody = document.getElementById("ledgerBody");
+  const sorted = [...OPPORTUNITIES].sort((a, b) => b.fit - a.fit);
+
+  sorted.forEach((o, i) => {
+    const row = document.createElement("tr");
+    row.className = "ledger-row fade-target";
+    row.dataset.id = o.id;
+    row.innerHTML = `
+      <td class="num">${String(i + 1).padStart(2, "0")}</td>
+      <td class="name">${o.name}</td>
+      <td><span class="tag">${TYPE_LABEL[o.type]}</span></td>
+      <td class="fit">${o.fit}</td>
+      <td class="mono">${amountRange(o)}</td>
+      <td class="mono muted">${o.timeline}</td>
+      <td class="chev">&rsaquo;</td>
+    `;
+
+    const detailRow = document.createElement("tr");
+    detailRow.className = "detail-row collapsed";
+    const detailCell = document.createElement("td");
+    detailCell.colSpan = 7;
+    const detailWrap = document.createElement("div");
+    detailWrap.className = "detail-wrap";
+    detailCell.appendChild(detailWrap);
+    detailRow.appendChild(detailCell);
+
+    let built = false;
+    row.addEventListener("click", () => {
+      const isOpen = row.classList.toggle("open");
+      detailRow.classList.toggle("collapsed", !isOpen);
+      if (isOpen && !built) {
+        detailWrap.innerHTML = renderDetailContent(o);
+        wireDetail(detailWrap, o);
+        built = true;
+      }
+    });
+
+    ledgerBody.appendChild(row);
+    ledgerBody.appendChild(detailRow);
+  });
+
+  const filters = { hideDilutive: false, under500k: false, rollingOnly: false };
+  const prefs = { wantTypes: ["loan", "grant", "corporate", "equity"], maxRange: 0 };
+
+  function updateVisibility() {
+    let visibleCount = 0;
+    OPPORTUNITIES.forEach((o) => {
+      const el = document.querySelector(`.ledger-row[data-id="${o.id}"]`);
+      const show = passesFilters(o, filters);
+      el.classList.toggle("hidden-fade", !show);
+      if (show) visibleCount++;
+      const match = matchesPreferences(o, prefs);
+      el.classList.toggle("dim", show && !match);
+    });
+    document.getElementById("ledgerCount").textContent =
+      visibleCount + " of " + OPPORTUNITIES.length + " opportunities, ranked by fit.";
+  }
+
+  document.getElementById("fHideDilutive").addEventListener("change", (e) => {
+    filters.hideDilutive = e.target.checked;
+    updateVisibility();
+  });
+  document.getElementById("fUnder500k").addEventListener("change", (e) => {
+    filters.under500k = e.target.checked;
+    updateVisibility();
+  });
+  document.getElementById("fRolling").addEventListener("change", (e) => {
+    filters.rollingOnly = e.target.checked;
+    updateVisibility();
+  });
+
+  const prefsOverlay = document.getElementById("prefsOverlay");
+  document.getElementById("prefsBtn").addEventListener("click", () => (prefsOverlay.hidden = false));
+  document.getElementById("prefsClose").addEventListener("click", () => (prefsOverlay.hidden = true));
+  document.getElementById("prefsSave").addEventListener("click", () => {
+    prefs.wantTypes = Array.from(document.querySelectorAll(".prefType:checked")).map((c) => c.value);
+    prefs.maxRange = Number(document.getElementById("prefRange").value);
+    prefsOverlay.hidden = true;
+    updateVisibility();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") prefsOverlay.hidden = true;
+  });
+
+  document.getElementById("brandToggle").addEventListener("click", () => {
+    document.body.classList.toggle("white-label");
+  });
+
+  updateVisibility();
+</script>
+</body>
+</html>

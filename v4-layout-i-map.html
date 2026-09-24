@@ -1,0 +1,1105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Layout I: Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v2-shared.css" />
+<style>
+  /* ---------- map (browse) ---------- */
+
+  .map-wrap {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 40px 24px 100px;
+  }
+
+  .map-head h1 {
+    font-size: 2rem;
+    margin: 4px 0 10px;
+  }
+
+  .map-sub {
+    font-size: 0.9375rem;
+    color: hsl(var(--stone));
+    max-width: 42rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .discover-strip {
+    margin: 32px 0 40px;
+  }
+
+  .discover-strip-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .discover-strip-head h2 {
+    font-size: 1.125rem;
+    margin: 0;
+  }
+
+  .cap-row-sub {
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+  }
+
+  .cap-row-scroll {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+
+  .row-card {
+    flex: 0 0 auto;
+    width: 220px;
+    border: 1px solid hsl(var(--border));
+    border-radius: 10px;
+    padding: 16px;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .row-card:hover {
+    border-color: hsl(var(--ink) / 0.5);
+    transform: translateY(-1px);
+  }
+
+  .row-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .row-card-fit {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 1.0625rem;
+  }
+
+  .row-card-name {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    line-height: 1.3;
+    margin: 0 0 8px;
+  }
+
+  .row-card-meta {
+    font-size: 0.75rem;
+    color: hsl(var(--stone));
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  /* map canvas: opportunities plotted like pins on a territory, loosely
+     clustered into four labeled districts (one per kind of capital) so
+     browsing feels like wandering a map, not filling out a form. Click a
+     pin, a card floats up with the details, same pattern as any map app. */
+
+  .map-canvas-wrap {
+    position: relative;
+    height: 640px;
+    border: 1px solid hsl(var(--border));
+    border-radius: 16px;
+    overflow: hidden;
+    background:
+      linear-gradient(hsl(var(--border) / 0.55) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.55) 1px, transparent 1px),
+      hsl(var(--paper));
+    background-size: 40px 40px;
+  }
+
+  .map-content {
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 50%;
+    transition: transform 0.2s ease;
+  }
+
+  .map-region-label {
+    position: absolute;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: hsl(var(--ink) / 0.16);
+    pointer-events: none;
+  }
+
+  .map-pin {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .map-pin-bubble {
+    display: inline-block;
+    background: #fff;
+    border: 1.5px solid hsl(var(--ink));
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: hsl(var(--ink));
+    white-space: nowrap;
+    box-shadow: 0 2px 6px hsl(var(--ink) / 0.08);
+    transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+  }
+
+  .map-pin:hover .map-pin-bubble {
+    transform: scale(1.08);
+  }
+
+  .map-pin.active .map-pin-bubble {
+    background: hsl(var(--ink));
+    color: #fff;
+    transform: scale(1.1);
+  }
+
+  .map-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 16px;
+  }
+
+  .map-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 7px 14px;
+    border: 1px solid hsl(var(--border));
+    border-radius: 999px;
+    background: #fff;
+    transition: border-color 0.15s ease;
+  }
+
+  .map-filter-chip:hover {
+    border-color: hsl(var(--ink) / 0.45);
+  }
+
+  .map-filter-chip input {
+    accent-color: hsl(var(--ink));
+  }
+
+  .map-zoom {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid hsl(var(--border));
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px hsl(var(--ink) / 0.08);
+  }
+
+  .map-zoom button {
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: hsl(var(--ink));
+    font-family: "Archivo", system-ui, sans-serif;
+  }
+
+  .map-zoom button:first-child {
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .map-zoom button:hover {
+    background: hsl(var(--paper));
+  }
+
+  .map-popup {
+    position: absolute;
+    z-index: 6;
+    width: 250px;
+    background: #fff;
+    border: 1px solid hsl(var(--border));
+    border-radius: 12px;
+    box-shadow: 0 14px 34px hsl(var(--ink) / 0.16);
+    padding: 18px;
+    transform: translate(-50%, calc(-100% - 18px));
+  }
+
+  .map-popup.below {
+    transform: translate(-50%, 18px);
+  }
+
+  .map-popup-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 0.875rem;
+    color: hsl(var(--stone));
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .map-popup-kind {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: hsl(var(--stone));
+    margin: 0 0 4px;
+  }
+
+  .map-popup-name {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 0 0 6px;
+    padding-right: 20px;
+  }
+
+  .map-popup-meta {
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    line-height: 1.5;
+    margin: 0 0 14px;
+  }
+
+  .map-popup-cta {
+    width: 100%;
+    font-size: 0.8125rem;
+    padding: 10px 14px;
+  }
+
+  /* ---------- builder: section outline (left) + focused editor (right) ---------- */
+
+  .builder-shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    padding-bottom: 84px;
+  }
+
+  @media (min-width: 860px) {
+    .builder-shell {
+      grid-template-columns: 300px 1fr;
+    }
+  }
+
+  .builder-nav {
+    padding: 28px 24px;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  @media (min-width: 860px) {
+    .builder-nav {
+      border-bottom: none;
+      border-right: 1px solid hsl(var(--border));
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: calc(100vh - 73px);
+      overflow-y: auto;
+    }
+  }
+
+  .builder-back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+
+  .section-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .section-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    border: 1px solid hsl(var(--border));
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .section-item.current {
+    border-color: hsl(var(--ink));
+  }
+
+  .section-mark {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid hsl(var(--border));
+    position: relative;
+  }
+
+  .section-mark.done {
+    border-color: #0f766e;
+    background: #0f766e;
+  }
+
+  .section-mark.done::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid #fff;
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
+  }
+
+  .section-item-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .builder-main {
+    padding: 40px 24px 60px;
+    max-width: 640px;
+    width: 100%;
+  }
+
+  @media (min-width: 860px) {
+    .builder-main {
+      padding: 48px 56px 60px;
+    }
+  }
+
+  .builder-eyebrow {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: hsl(var(--stone));
+    margin: 0 0 8px;
+  }
+
+  .builder-title {
+    font-size: 1.625rem;
+    margin-bottom: 12px;
+  }
+
+  .builder-helper {
+    font-size: 0.875rem;
+    color: hsl(var(--stone));
+    line-height: 1.6;
+    margin: 0 0 24px;
+    max-width: 46ch;
+  }
+
+  .builder-redraft {
+    margin: -14px 0 20px;
+  }
+
+  .builder-footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: hsl(var(--paper) / 0.96);
+    backdrop-filter: blur(6px);
+    border-top: 1px solid hsl(var(--border));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    z-index: 10;
+  }
+
+  @media (min-width: 860px) {
+    .builder-footer {
+      padding: 16px 56px;
+    }
+  }
+
+  .builder-progress {
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    margin: 0;
+  }
+
+  /* ---------- header badge + status/export + tracker (not in v2-shared.css) ---------- */
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 5px;
+    margin-left: 6px;
+    border-radius: 999px;
+    background: hsl(var(--teal));
+    color: hsl(var(--ink));
+    font-size: 0.6875rem;
+    font-weight: 700;
+  }
+
+  .draft-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    color: hsl(var(--stone));
+    margin: 0 0 20px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: hsl(38 92% 55%);
+    flex-shrink: 0;
+  }
+
+  .status-dot.sent {
+    background: #0f766e;
+  }
+
+  .draft-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .tracker-empty {
+    font-size: 0.9375rem;
+    color: hsl(var(--stone));
+    line-height: 1.6;
+  }
+
+  .tracker-item {
+    border-top: 1px solid hsl(var(--border));
+    padding: 22px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .tracker-item:last-child {
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .tracker-kind {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: hsl(var(--stone));
+    margin: 0 0 6px;
+  }
+
+  .tracker-title {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1.0625rem;
+    margin: 0 0 4px;
+  }
+
+  .tracker-sub {
+    font-size: 0.8125rem;
+    color: hsl(var(--stone));
+    margin: 0;
+  }
+
+  .tracker-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .status-pill {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: hsl(38 92% 55% / 0.18);
+    color: hsl(30 70% 32%);
+  }
+
+  .status-pill.sent {
+    background: hsl(var(--teal) / 0.2);
+    color: #0f766e;
+  }
+
+  .tracker-export {
+    padding: 8px 16px;
+    font-size: 0.8125rem;
+  }
+
+  .regen-link {
+    display: inline-block;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #0f766e;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .regen-link:hover {
+    opacity: 0.75;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="wordmark" href="index.html">CHELCIE</a>
+  <button class="pill-link" id="trackerBtn">Your partnerships<span class="badge" id="trackerBadge" hidden>0</span></button>
+</header>
+
+<main>
+
+  <section class="screen active" data-screen="map">
+    <div class="map-wrap">
+      <div class="map-head">
+        <h1>Build toward a more resilient future.</h1>
+        <p class="map-sub">Loans, grants, corporate partnerships, and equity, so you're never leaning on one source of funding. Matched to the value you bring, not just what you're asking for.</p>
+      </div>
+
+      <div class="discover-strip">
+        <div class="discover-strip-head">
+          <h2>Realise your financial potential</h2>
+          <span class="cap-row-sub">Companies CHELCIE found, not already on your map</span>
+        </div>
+        <div class="cap-row-scroll" id="discoverScroll"></div>
+      </div>
+
+      <div class="map-filter-row" id="mapFilters"></div>
+
+      <div class="map-canvas-wrap" id="mapCanvas">
+        <div class="map-zoom">
+          <button id="mapZoomIn" aria-label="Zoom in">+</button>
+          <button id="mapZoomOut" aria-label="Zoom out">&minus;</button>
+        </div>
+        <div class="map-content" id="mapContent"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="builder">
+    <div class="builder-shell">
+      <aside class="builder-nav">
+        <button class="back-link builder-back-link" id="builderBackToMap">← Back to the map</button>
+        <ul class="section-list" id="sectionList"></ul>
+      </aside>
+      <div class="builder-main" id="builderMain"></div>
+    </div>
+    <div class="builder-footer">
+      <button class="back-link" id="builderBack">Back</button>
+      <p class="builder-progress" id="builderProgress"></p>
+      <button class="btn-primary" id="builderNext">Continue</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="overlay" id="trackerOverlay">
+  <header class="topbar">
+    <span class="wordmark">Your partnerships</span>
+    <button class="pill-link" id="trackerClose">Close</button>
+  </header>
+  <div class="tracker-body" id="trackerBody" style="max-width:560px; margin:0 auto; padding:48px 24px 100px; width:100%;"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="partnership-lib.js"></script>
+<script>
+  function slug(text) {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  }
+
+  /* ---------- discover strip ---------- */
+
+  function renderDiscoverCards() {
+    const design = designPartnership("");
+    const row = document.getElementById("discoverScroll");
+    row.innerHTML = "";
+    design.targets.forEach((t) => {
+      const card = document.createElement("button");
+      card.className = "row-card";
+      card.innerHTML = `
+        <div class="row-card-top">
+          <span class="row-card-fit" style="font-size:0.9375rem;">${t.check_size.split(" ")[0]}</span>
+        </div>
+        <p class="row-card-name">${t.company}</p>
+        <p class="row-card-meta">${t.business_unit}</p>
+      `;
+      card.addEventListener("click", () => openBuilder(fromSponsor(t, design)));
+      row.appendChild(card);
+    });
+  }
+  renderDiscoverCards();
+
+  /* ---------- map: opportunities scattered into four labeled districts,
+     one per kind of capital. Click a pin, a card floats up with details,
+     same pattern as any real map app (Airbnb, Zillow, Tripadvisor). ---------- */
+
+  const MAP_DISTRICTS = [
+    { type: "loan", label: "Loans", qx: [0.05, 0.46], qy: [0.08, 0.46] },
+    { type: "grant", label: "Grants", qx: [0.55, 0.95], qy: [0.08, 0.46] },
+    { type: "corporate", label: "Corporate", qx: [0.05, 0.46], qy: [0.56, 0.92] },
+    { type: "equity", label: "Equity", qx: [0.55, 0.95], qy: [0.56, 0.92] },
+  ];
+
+  // deterministic pseudo-random in [0,1) from a string, so pins land in
+  // the same spot on every render instead of reshuffling
+  function seeded(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+    return (h % 10000) / 10000;
+  }
+
+  let mapZoomLevel = 1;
+  let activePinEl = null;
+
+  function renderMapFilters() {
+    const wrap = document.getElementById("mapFilters");
+    wrap.innerHTML = MAP_DISTRICTS.map(({ type, label }) => `
+      <label class="map-filter-chip">
+        <input type="checkbox" id="filter-${type}" checked />
+        ${label}
+      </label>
+    `).join("");
+    wrap.querySelectorAll("input").forEach((input) => input.addEventListener("change", renderMap));
+  }
+
+  function closeMapPopup() {
+    const existing = document.getElementById("mapPopup");
+    if (existing) existing.remove();
+    if (activePinEl) activePinEl.classList.remove("active");
+    activePinEl = null;
+  }
+
+  function openMapPopup(o, pinEl) {
+    closeMapPopup();
+    activePinEl = pinEl;
+    pinEl.classList.add("active");
+
+    const popup = document.createElement("div");
+    popup.className = "map-popup";
+    popup.id = "mapPopup";
+    popup.style.left = pinEl.style.left;
+    popup.style.top = pinEl.style.top;
+    popup.innerHTML = `
+      <button class="map-popup-close" id="mapPopupClose">Close</button>
+      <p class="map-popup-kind">${TYPE_LABEL[o.type]} · Fit ${o.fit}</p>
+      <p class="map-popup-name">${o.name}</p>
+      <p class="map-popup-meta">${amountRange(o)} · ${o.timeline}</p>
+      <button class="btn-primary map-popup-cta" id="mapPopupCta">Design this partnership</button>
+    `;
+    document.getElementById("mapContent").appendChild(popup);
+    document.getElementById("mapPopupClose").addEventListener("click", (e) => { e.stopPropagation(); closeMapPopup(); });
+    document.getElementById("mapPopupCta").addEventListener("click", () => openBuilder(fromOpportunity(o)));
+
+    // keep the card inside the canvas: flip below the pin if it would
+    // clip the top edge, nudge sideways if it would clip a side
+    const canvasRect = document.getElementById("mapCanvas").getBoundingClientRect();
+    let popRect = popup.getBoundingClientRect();
+    if (popRect.top < canvasRect.top + 8) {
+      popup.classList.add("below");
+      popRect = popup.getBoundingClientRect();
+    }
+    let shiftX = 0;
+    if (popRect.left < canvasRect.left + 8) shiftX = canvasRect.left + 8 - popRect.left;
+    if (popRect.right > canvasRect.right - 8) shiftX = canvasRect.right - 8 - popRect.right;
+    if (shiftX) popup.style.marginLeft = shiftX + "px";
+  }
+
+  function renderMap() {
+    const content = document.getElementById("mapContent");
+    content.innerHTML = "";
+    activePinEl = null;
+
+    MAP_DISTRICTS.forEach(({ type, label, qx, qy }) => {
+      const checkbox = document.getElementById("filter-" + type);
+      if (checkbox && !checkbox.checked) return;
+
+      const wm = document.createElement("span");
+      wm.className = "map-region-label";
+      wm.textContent = label;
+      wm.style.left = (qx[0] * 100) + "%";
+      wm.style.top = (qy[0] * 100 - 4) + "%";
+      content.appendChild(wm);
+
+      // place each type's pins in a 2x2 sub-grid of the district with
+      // jitter inside each cell, so same-type pins can land close but
+      // never stack on top of each other
+      const opps = OPPORTUNITIES.filter((o) => o.type === type);
+      const cellW = (qx[1] - qx[0]) / 2;
+      const cellH = (qy[1] - qy[0]) / 2;
+      opps.forEach((o, i) => {
+        const cellX = qx[0] + (i % 2) * cellW;
+        const cellY = qy[0] + Math.floor(i / 2) * cellH;
+        const x = cellX + (0.18 + seeded(o.id + "-x") * 0.64) * cellW;
+        const y = cellY + (0.18 + seeded(o.id + "-y") * 0.64) * cellH;
+        const pin = document.createElement("button");
+        pin.className = "map-pin";
+        pin.style.left = (x * 100) + "%";
+        pin.style.top = (y * 100) + "%";
+        pin.innerHTML = `<span class="map-pin-bubble">${fmtMoney(o.max)}</span>`;
+        pin.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openMapPopup(o, pin);
+        });
+        content.appendChild(pin);
+      });
+    });
+  }
+
+  renderMapFilters();
+  renderMap();
+  document.getElementById("mapCanvas").addEventListener("click", closeMapPopup);
+
+  document.getElementById("mapZoomIn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    mapZoomLevel = Math.min(1.6, mapZoomLevel + 0.2);
+    document.getElementById("mapContent").style.transform = `scale(${mapZoomLevel})`;
+  });
+  document.getElementById("mapZoomOut").addEventListener("click", (e) => {
+    e.stopPropagation();
+    mapZoomLevel = Math.max(0.8, mapZoomLevel - 0.2);
+    document.getElementById("mapContent").style.transform = `scale(${mapZoomLevel})`;
+  });
+
+  /* ---------- generalized designable ---------- */
+
+  function fromOpportunity(o) {
+    return {
+      kind: "onepager",
+      eyebrow: TYPE_LABEL[o.type] + " · Fit " + o.fit,
+      name: o.name,
+      sub: amountRange(o) + " · " + o.timeline,
+      gainQuote: o.gain,
+      gainSub: o.worksWith,
+      termsLine: o.terms.join(", ") + ".",
+      defaultAskText: defaultAsk(o),
+      defaultUseText: defaultUseOfFunds(o),
+      draftSubLine: () => "Partnership request to " + o.name,
+      filenameBase: (org) => slug(org) + "-" + slug(o.name) + "-one-pager",
+      trackerKind: "onepager",
+      trackerTitle: o.name,
+      trackerSubtitle: amountRange(o) + " · " + o.timeline,
+    };
+  }
+
+  function fromSponsor(t, design) {
+    return {
+      kind: "email",
+      eyebrow: "CORPORATE · " + t.business_unit,
+      name: t.company,
+      sub: t.check_size,
+      gainQuote: t.strategic_hook,
+      gainSub: t.why_them,
+      termsLine: `${t.entry_vehicle} Typical structure: ${t.check_size}.`,
+      defaultAskText: `A short call to explore ${t.entry_vehicle.split(".")[0].toLowerCase()}.`,
+      defaultUseText: `To advance: ${design.study_summary}`,
+      draftSubLine: () => `Outreach to ${t.company}, ${t.business_unit}`,
+      filenameBase: (org) => slug(org) + "-" + slug(t.company) + "-outreach",
+      trackerKind: "vpemail",
+      trackerTitle: t.company + " outreach",
+      trackerSubtitle: t.business_unit,
+    };
+  }
+
+  /* ---------- builder: outline-nav + focused editor ---------- */
+
+  const SECTIONS = [
+    { id: "opportunity", label: "The opportunity", kind: "summary" },
+    { id: "ask", label: "What we're asking", kind: "field", helper: "One or two sentences. CHELCIE drafted a start, edit it into your own words." },
+    { id: "use", label: "How funds are used", kind: "field", helper: "Be specific, this is what gets checked against later." },
+    { id: "fit", label: "Why this fits", kind: "field", helper: "Their reasoning, in your voice." },
+    { id: "terms", label: "Terms under discussion", kind: "field", helper: "What's on the table so far. Nothing here is final." },
+    { id: "review", label: "Review & send", kind: "review" },
+  ];
+
+  let currentDesignable = null;
+  let fieldValues = {};
+  let sectionIdx = 0;
+  let currentTrackedEntry = null;
+
+  const screens = Array.from(document.querySelectorAll(".screen"));
+  function showScreen(id) {
+    screens.forEach((s) => s.classList.toggle("active", s.dataset.screen === id));
+    window.scrollTo(0, 0);
+  }
+
+  function openBuilder(d) {
+    currentDesignable = d;
+    currentTrackedEntry = null;
+    fieldValues = {
+      org: "Your organization",
+      ask: d.defaultAskText,
+      use: d.defaultUseText,
+      fit: d.gainQuote,
+      terms: d.termsLine,
+    };
+    sectionIdx = 0;
+    showScreen("builder");
+    renderSectionList();
+    renderBuilderMain();
+  }
+
+  document.getElementById("builderBackToMap").addEventListener("click", () => showScreen("map"));
+
+  function renderSectionList() {
+    const list = document.getElementById("sectionList");
+    list.innerHTML = SECTIONS.map((s, i) => `
+      <li>
+        <button class="section-item ${i === sectionIdx ? "current" : ""}" data-idx="${i}">
+          <span class="section-mark ${s.kind !== "field" || fieldValues[s.id] ? "done" : ""}"></span>
+          <span class="section-item-label">${s.label}</span>
+        </button>
+      </li>
+    `).join("");
+    list.querySelectorAll(".section-item").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        sectionIdx = Number(btn.dataset.idx);
+        renderSectionList();
+        renderBuilderMain();
+      });
+    });
+  }
+
+  function currentDocumentText() {
+    const d = currentDesignable;
+    const org = fieldValues.org.trim() || "Your organization";
+    const text = [
+      org,
+      d.draftSubLine(),
+      ``,
+      `WHAT WE ARE ASKING`,
+      fieldValues.ask,
+      ``,
+      `HOW THE FUNDS WILL BE USED`,
+      fieldValues.use,
+      ``,
+      `WHY THIS FITS`,
+      fieldValues.fit,
+      ``,
+      `TERMS UNDER DISCUSSION`,
+      fieldValues.terms,
+    ].join("\n");
+    return { org, text };
+  }
+
+  function renderBuilderMain() {
+    const d = currentDesignable;
+    const s = SECTIONS[sectionIdx];
+    const main = document.getElementById("builderMain");
+
+    if (s.kind === "summary") {
+      main.innerHTML = `
+        <p class="builder-eyebrow">${d.eyebrow}</p>
+        <h2 class="builder-title">${d.name}</h2>
+        <p class="builder-helper">${d.sub}</p>
+        <div class="gain-callout">
+          <blockquote>${d.gainQuote}</blockquote>
+          <p class="works-with">${d.gainSub}</p>
+        </div>
+        <div class="field-group">
+          <label>Your organization</label>
+          <input type="text" id="orgInput" value="${fieldValues.org}" />
+        </div>
+      `;
+      document.getElementById("orgInput").addEventListener("input", (e) => { fieldValues.org = e.target.value; });
+    } else if (s.kind === "field") {
+      main.innerHTML = `
+        <p class="builder-eyebrow">Section ${sectionIdx} of ${SECTIONS.length - 1}</p>
+        <h2 class="builder-title">${s.label}</h2>
+        <p class="builder-helper">${s.helper}</p>
+        <button class="regen-link builder-redraft" id="redraftBtn">Redraft with CHELCIE</button>
+        <div class="field-group">
+          <textarea id="sectionField" rows="6">${fieldValues[s.id]}</textarea>
+        </div>
+      `;
+      document.getElementById("sectionField").addEventListener("input", (e) => {
+        fieldValues[s.id] = e.target.value;
+        renderSectionList();
+      });
+      document.getElementById("redraftBtn").addEventListener("click", () => {
+        const defaults = { ask: d.defaultAskText, use: d.defaultUseText, fit: d.gainQuote, terms: d.termsLine };
+        fieldValues[s.id] = defaults[s.id];
+        renderBuilderMain();
+        renderSectionList();
+      });
+    } else if (s.kind === "review") {
+      const { text } = currentDocumentText();
+      if (!currentTrackedEntry) {
+        currentTrackedEntry = addTracked({
+          kind: d.trackerKind,
+          title: d.trackerTitle,
+          subtitle: d.trackerSubtitle,
+          exportText: text,
+          filename: d.filenameBase(fieldValues.org) + ".txt",
+        });
+      } else {
+        currentTrackedEntry.exportText = text;
+      }
+      main.innerHTML = `
+        <p class="builder-eyebrow">Last step</p>
+        <h2 class="builder-title">Review &amp; send</h2>
+        <p class="builder-helper">Everything below is editable from its own section on the left. Export when it's ready, or mark it sent once it's out the door.</p>
+        <p class="draft-status" id="draftStatus"></p>
+        <div class="draft-actions">
+          <button class="btn-secondary" id="exportDraftBtn">Export .txt</button>
+          <button class="btn-secondary" id="markSentBtn">Mark as sent</button>
+        </div>
+        <div class="draft-output"><pre style="white-space:pre-wrap; font-family:inherit; margin:0; font-size:0.875rem; line-height:1.6;">${text}</pre></div>
+      `;
+      renderDraftStatus();
+      document.getElementById("exportDraftBtn").addEventListener("click", () => {
+        currentTrackedEntry.exportText = currentDocumentText().text;
+        exportEntry(currentTrackedEntry);
+      });
+      document.getElementById("markSentBtn").addEventListener("click", () => {
+        currentTrackedEntry.status = currentTrackedEntry.status === "sent" ? "draft" : "sent";
+        renderDraftStatus();
+      });
+    }
+
+    document.getElementById("builderProgress").textContent = `${s.label} · ${sectionIdx + 1} of ${SECTIONS.length}`;
+    document.getElementById("builderBack").style.visibility = sectionIdx === 0 ? "hidden" : "visible";
+    document.getElementById("builderNext").style.visibility = sectionIdx === SECTIONS.length - 1 ? "hidden" : "visible";
+  }
+
+  document.getElementById("builderBack").addEventListener("click", () => {
+    if (sectionIdx > 0) {
+      sectionIdx--;
+      renderSectionList();
+      renderBuilderMain();
+    }
+  });
+  document.getElementById("builderNext").addEventListener("click", () => {
+    if (sectionIdx < SECTIONS.length - 1) {
+      sectionIdx++;
+      renderSectionList();
+      renderBuilderMain();
+    }
+  });
+
+  function renderDraftStatus() {
+    if (!currentTrackedEntry) return;
+    const st = document.getElementById("draftStatus");
+    const btn = document.getElementById("markSentBtn");
+    st.innerHTML = `<span class="status-dot ${currentTrackedEntry.status}"></span> ${currentTrackedEntry.status === "sent" ? "Marked as sent" : "Draft ready, not sent yet"}`;
+    btn.textContent = currentTrackedEntry.status === "sent" ? "Mark as not sent" : "Mark as sent";
+  }
+
+  /* ---------- status + export tracker ---------- */
+
+  const tracked = [];
+
+  function addTracked(entry) {
+    const record = { id: Date.now() + Math.random(), status: "draft", createdAt: new Date(), ...entry };
+    tracked.unshift(record);
+    updateTrackerBadge();
+    return record;
+  }
+
+  function updateTrackerBadge() {
+    const badge = document.getElementById("trackerBadge");
+    badge.hidden = tracked.length === 0;
+    badge.textContent = tracked.length;
+  }
+
+  function exportEntry(entry) {
+    const blob = new Blob([entry.exportText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = entry.filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  const trackerOverlay = document.getElementById("trackerOverlay");
+  document.getElementById("trackerBtn").addEventListener("click", () => {
+    renderTracker();
+    trackerOverlay.classList.add("active");
+  });
+  document.getElementById("trackerClose").addEventListener("click", () => trackerOverlay.classList.remove("active"));
+
+  function renderTracker() {
+    const body = document.getElementById("trackerBody");
+    if (tracked.length === 0) {
+      body.innerHTML = `<p class="tracker-empty">Nothing drafted yet. Open any opportunity or discovered company and start designing.</p>`;
+      return;
+    }
+    body.innerHTML = tracked.map((t, i) => `
+      <div class="tracker-item">
+        <div>
+          <p class="tracker-kind">${t.kind === "onepager" ? "ONE-PAGER" : "OUTREACH EMAIL"}</p>
+          <p class="tracker-title">${t.title}</p>
+          <p class="tracker-sub">${t.subtitle}</p>
+        </div>
+        <div class="tracker-actions">
+          <span class="status-pill ${t.status}">${t.status === "sent" ? "Sent" : "Draft ready"}</span>
+          <button class="btn-secondary tracker-export" data-idx="${i}">Export</button>
+          <button class="back-link tracker-toggle" data-idx="${i}">${t.status === "sent" ? "Mark as not sent" : "Mark as sent"}</button>
+        </div>
+      </div>
+    `).join("");
+    body.querySelectorAll(".tracker-export").forEach((btn) => {
+      btn.addEventListener("click", () => exportEntry(tracked[Number(btn.dataset.idx)]));
+    });
+    body.querySelectorAll(".tracker-toggle").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const t = tracked[Number(btn.dataset.idx)];
+        t.status = t.status === "sent" ? "draft" : "sent";
+        renderTracker();
+      });
+    });
+  }
+</script>
+</body>
+</html>

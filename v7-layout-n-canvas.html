@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partnership Designer — Layout N: Canvas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="v2-shared.css" />
+<link rel="stylesheet" href="builder-shared.css" />
+<style>
+  .canvas-head {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 40px 24px 8px;
+  }
+
+  .canvas-head h1 {
+    font-size: 2rem;
+    margin: 4px 0 10px;
+  }
+
+  .canvas-sub {
+    font-size: 0.9375rem;
+    color: hsl(var(--stone));
+    max-width: 46rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .canvas-wrap {
+    width: 100%;
+    max-width: 1180px;
+    margin: 16px auto 60px;
+    padding: 0 24px;
+  }
+
+  .canvas-viewport {
+    position: relative;
+    height: 640px;
+    border: 1px solid hsl(var(--ink) / 0.14);
+    border-radius: 16px;
+    overflow: hidden;
+    background:
+      linear-gradient(hsl(var(--ink) / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--ink) / 0.05) 1px, transparent 1px),
+      #fff;
+    background-size: 30px 30px;
+    cursor: grab;
+  }
+
+  .canvas-viewport.panning {
+    cursor: grabbing;
+  }
+
+  .canvas-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3000px;
+    height: 2000px;
+    transform-origin: 0 0;
+  }
+
+  .canvas-node {
+    position: absolute;
+    width: 190px;
+    border: 1.5px solid hsl(var(--ink));
+    border-radius: 10px;
+    padding: 14px;
+    background: #fff;
+    cursor: grab;
+    box-shadow: 0 4px 14px hsl(var(--ink) / 0.1);
+    user-select: none;
+    touch-action: none;
+  }
+
+  .canvas-node:active {
+    cursor: grabbing;
+  }
+
+  .canvas-node-fit {
+    display: inline-block;
+    border: 1.5px solid hsl(var(--ink));
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 0.75rem;
+    margin-bottom: 8px;
+  }
+
+  .canvas-node-name {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    line-height: 1.3;
+    margin: 0 0 4px;
+  }
+
+  .canvas-node-amount {
+    font-size: 0.75rem;
+    color: hsl(var(--stone));
+    margin: 0;
+  }
+
+  .canvas-controls {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid hsl(var(--border));
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px hsl(var(--ink) / 0.08);
+  }
+
+  .canvas-controls button {
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: "Archivo", system-ui, sans-serif;
+  }
+
+  .canvas-controls button:first-child {
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .canvas-hint {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    font-size: 0.75rem;
+    color: hsl(var(--stone));
+    background: #fff;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid hsl(var(--border));
+    z-index: 5;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="wordmark" href="index.html">CHELCIE</a>
+  <button class="pill-link" id="trackerBtn">Your partnerships<span class="badge" id="trackerBadge" hidden>0</span></button>
+</header>
+
+<main>
+
+  <section class="screen active" data-screen="browse">
+    <div class="canvas-head">
+      <h1>Build toward a more resilient future.</h1>
+      <p class="canvas-sub">Every opportunity on one board. Drag to arrange them your own way, pan and zoom to explore, click one (without dragging) to start designing.</p>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas-viewport" id="canvasViewport">
+        <div class="canvas-inner" id="canvasInner"></div>
+        <div class="canvas-controls">
+          <button id="canvasZoomIn" aria-label="Zoom in">+</button>
+          <button id="canvasZoomOut" aria-label="Zoom out">&minus;</button>
+        </div>
+        <span class="canvas-hint">Drag the board to pan · drag a card to move it · click to open</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="builder">
+    <div class="builder-shell">
+      <aside class="builder-nav">
+        <button class="back-link builder-back-link" id="builderBackToBrowse">← Back to the board</button>
+        <ul class="section-list" id="sectionList"></ul>
+      </aside>
+      <div class="builder-main" id="builderMain"></div>
+    </div>
+    <div class="builder-footer">
+      <button class="back-link" id="builderBack">Back</button>
+      <p class="builder-progress" id="builderProgress"></p>
+      <button class="btn-primary" id="builderNext">Continue</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="overlay" id="trackerOverlay">
+  <header class="topbar">
+    <span class="wordmark">Your partnerships</span>
+    <button class="pill-link" id="trackerClose">Close</button>
+  </header>
+  <div class="tracker-body" id="trackerBody" style="max-width:560px; margin:0 auto; padding:48px 24px 100px; width:100%;"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="partnership-lib.js"></script>
+<script src="builder-shared.js"></script>
+<script>
+  /* ---------- infinite canvas: opportunities as freely draggable nodes
+     on a pannable/zoomable board, Figma/Miro-style. The user arranges
+     their own layout instead of us presetting positions. ---------- */
+
+  function seeded(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+    return (h % 10000) / 10000;
+  }
+
+  let canvasScale = 1;
+  let panX = -100;
+  let panY = -100;
+  let panState = null;
+  let dragNode = null;
+
+  function buildCanvasItems() {
+    const items = OPPORTUNITIES.map((o) => ({
+      fit: o.fit, name: o.name, amount: amountRange(o), designable: fromOpportunity(o), key: o.id,
+    }));
+    const design = designPartnership("");
+    design.targets.forEach((t) => items.push({
+      fit: t.check_size.split(" ")[0], name: t.company, amount: t.business_unit, designable: fromSponsor(t, design), key: slug(t.company),
+    }));
+    return items;
+  }
+
+  function applyTransform() {
+    document.getElementById("canvasInner").style.transform = `translate(${panX}px, ${panY}px) scale(${canvasScale})`;
+  }
+
+  function wireNodeDrag(el, item) {
+    el.addEventListener("pointerdown", (e) => {
+      e.stopPropagation();
+      dragNode = { el, item, startX: e.clientX, startY: e.clientY, origX: parseFloat(el.style.left), origY: parseFloat(el.style.top), moved: false };
+    });
+  }
+
+  function renderCanvas() {
+    const inner = document.getElementById("canvasInner");
+    inner.innerHTML = "";
+    buildCanvasItems().forEach((item) => {
+      const x = 100 + seeded(item.key + "x") * 2700;
+      const y = 100 + seeded(item.key + "y") * 1700;
+      const node = document.createElement("div");
+      node.className = "canvas-node";
+      node.style.left = x + "px";
+      node.style.top = y + "px";
+      node.innerHTML = `
+        <span class="canvas-node-fit">${item.fit}</span>
+        <p class="canvas-node-name">${item.name}</p>
+        <p class="canvas-node-amount">${item.amount}</p>
+      `;
+      wireNodeDrag(node, item);
+      inner.appendChild(node);
+    });
+    applyTransform();
+  }
+  renderCanvas();
+
+  const viewport = document.getElementById("canvasViewport");
+  viewport.addEventListener("pointerdown", (e) => {
+    if (e.target.closest(".canvas-node")) return;
+    panState = { startX: e.clientX, startY: e.clientY, origX: panX, origY: panY };
+    viewport.classList.add("panning");
+  });
+
+  window.addEventListener("pointermove", (e) => {
+    if (panState) {
+      panX = panState.origX + (e.clientX - panState.startX);
+      panY = panState.origY + (e.clientY - panState.startY);
+      applyTransform();
+    }
+    if (dragNode) {
+      const dx = (e.clientX - dragNode.startX) / canvasScale;
+      const dy = (e.clientY - dragNode.startY) / canvasScale;
+      dragNode.el.style.left = (dragNode.origX + dx) + "px";
+      dragNode.el.style.top = (dragNode.origY + dy) + "px";
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) dragNode.moved = true;
+    }
+  });
+
+  window.addEventListener("pointerup", () => {
+    panState = null;
+    viewport.classList.remove("panning");
+    if (dragNode) {
+      if (!dragNode.moved) openBuilder(dragNode.item.designable);
+      dragNode = null;
+    }
+  });
+
+  document.getElementById("canvasZoomIn").addEventListener("click", () => { canvasScale = Math.min(1.6, canvasScale + 0.15); applyTransform(); });
+  document.getElementById("canvasZoomOut").addEventListener("click", () => { canvasScale = Math.max(0.5, canvasScale - 0.15); applyTransform(); });
+</script>
+</body>
+</html>

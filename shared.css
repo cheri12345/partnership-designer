@@ -1,0 +1,498 @@
+/* Shared base styles for all three Partnership Designer layout concepts.
+   Monochrome, typography-led, one functional accent color for interactive
+   states only. Each layout adds its own <style> block on top of this for
+   structure that's specific to that layout. */
+
+:root {
+  --bg: #ffffff;
+  --fg: #0a0a0a;
+  --muted: #6b6b6b;
+  --faint: #9a9a9a;
+  --line: #dcdcdc;
+  --line-strong: #b8b8b8;
+  --card: #fafafa;
+  --accent: #2451e0;
+  --accent-fg: #ffffff;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--fg);
+}
+
+a {
+  color: inherit;
+}
+
+/* ---------- top bar, shared across all three ---------- */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.wordmark {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.wordmark .tagline {
+  display: block;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0;
+  margin-top: 2px;
+}
+
+.top-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  border: 1px solid var(--line-strong);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 3px;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-primary {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btn-plain {
+  border: none;
+  background: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 4px 0;
+}
+
+.btn-plain:hover {
+  color: var(--accent);
+}
+
+/* ---------- labels / eyebrows / mono ---------- */
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 6px;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 8px;
+}
+
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--line-strong);
+  border-radius: 2px;
+  padding: 2px 6px;
+}
+
+/* ---------- filter panel, reused shape across layouts ---------- */
+
+.filter-panel {
+  font-size: 12px;
+}
+
+.filter-panel .label {
+  margin-top: 18px;
+}
+
+.filter-panel .label:first-child {
+  margin-top: 0;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.toggle-row span {
+  font-size: 12.5px;
+}
+
+.switch {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-track {
+  position: absolute;
+  inset: 0;
+  background: var(--line-strong);
+  border-radius: 999px;
+  transition: background 0.15s ease;
+}
+
+.switch-track::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.15s ease;
+}
+
+.switch input:checked + .switch-track {
+  background: var(--accent);
+}
+
+.switch input:checked + .switch-track::after {
+  transform: translateX(14px);
+}
+
+/* ---------- detail content, shared by slide-over / modal / accordion ---------- */
+
+.detail-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+
+.detail-sub {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  margin: 0 0 24px;
+}
+
+.detail-block {
+  border-top: 1px solid var(--line);
+  padding: 20px 0;
+}
+
+.terms-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.gain-block {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+  padding: 18px;
+  border-radius: 3px;
+  margin: 20px 0;
+}
+
+.gain-text {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 10px;
+}
+
+.works-with {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.field-caption {
+  font-size: 12px;
+  color: var(--muted);
+  margin: -4px 0 16px;
+  line-height: 1.5;
+}
+
+.field {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.field span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
+  padding: 8px 10px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.draft-btn {
+  margin-top: 4px;
+}
+
+.draft-output {
+  margin-top: 18px;
+}
+
+.draft-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 8px;
+}
+
+.draft-doc {
+  border: 1px solid var(--fg);
+  border-radius: 3px;
+  padding: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.draft-doc-title {
+  font-weight: 700;
+  font-size: 15px;
+  margin: 0 0 2px;
+}
+
+.draft-doc-sub {
+  color: var(--muted);
+  margin: 0 0 16px;
+  font-size: 12.5px;
+}
+
+.draft-doc-h {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 14px 0 4px;
+}
+
+.draft-doc p + .draft-doc-h {
+  margin-top: 14px;
+}
+
+/* ---------- close control, shared ---------- */
+
+.close-btn {
+  border: none;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 4px;
+}
+
+.close-btn:hover {
+  color: var(--accent);
+}
+
+/* ---------- preferences drawer, shared ---------- */
+
+.prefs-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.25);
+  z-index: 60;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.prefs-overlay[hidden] {
+  display: none;
+}
+
+.prefs-panel {
+  width: 100%;
+  max-width: 380px;
+  height: 100%;
+  background: #fff;
+  border-left: 1px solid var(--line);
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.prefs-panel h3 {
+  font-size: 18px;
+  margin: 4px 0 2px;
+}
+
+.prefs-panel .prefs-intro {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 0 0 22px;
+  line-height: 1.5;
+}
+
+.prefs-section {
+  border-top: 1px solid var(--line);
+  padding: 16px 0;
+}
+
+.prefs-section .label {
+  margin: 0 0 10px;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 13px;
+}
+
+.prefs-panel select {
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
+  padding: 8px 10px;
+  background: #fff;
+}
+
+.prefs-save {
+  margin-top: 20px;
+  width: 100%;
+}
+
+/* ---------- branding toggle ---------- */
+
+.brand-toggle {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+  border: 1px dashed var(--line-strong);
+  border-radius: 3px;
+  padding: 5px 9px;
+  background: none;
+}
+
+.brand-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+body.white-label .wordmark-text {
+  display: none;
+}
+
+body.white-label .wordmark-wl {
+  display: block !important;
+}
+
+.wordmark-wl {
+  display: none;
+}
+
+/* ---------- misc ---------- */
+
+.hidden-fade {
+  opacity: 0.08 !important;
+  pointer-events: none !important;
+}
+
+.fade-target {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}

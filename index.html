@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Partnership Designer — layout review</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  .intro h1 {
+    font-size: 26px;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .intro p {
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 620px;
+    line-height: 1.6;
+    margin: 0 0 8px;
+  }
+
+  .round-heading {
+    margin: 48px 0 16px;
+  }
+
+  .round-heading:first-of-type {
+    margin-top: 32px;
+  }
+
+  .round-heading h2 {
+    font-size: 18px;
+    margin: 0 0 6px;
+  }
+
+  .round-heading p {
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 620px;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .options {
+    display: grid;
+    gap: 16px;
+  }
+
+  .option {
+    display: block;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 22px 24px;
+    text-decoration: none;
+    color: var(--fg);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .option:hover {
+    border-color: var(--accent);
+    transform: translateX(2px);
+  }
+
+  .option .label {
+    margin: 0 0 8px;
+  }
+
+  .option h2 {
+    font-size: 17px;
+    margin: 0 0 8px;
+  }
+
+  .option p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin: 0;
+    max-width: 620px;
+  }
+
+  .round-1 .option {
+    opacity: 0.75;
+  }
+
+  .note {
+    margin-top: 40px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="intro">
+    <h1>Partnership Designer — layout review</h1>
+    <p>
+      Same concept, same mock data: one field of opportunities mixing loans,
+      grants, corporate partnerships, and equity, no siloed tabs by capital
+      type. This is the arrival flow into CHELCIE itself, so the whole point
+      is the narrative: there's more than grants in here. Twelve rounds
+      below, same underlying data and Draft-with-CHELCIE simulation,
+      different structures.
+    </p>
+  </div>
+
+  <div class="round-heading">
+    <h2>Round 12 &middot; from a Figma concept: floating right panel</h2>
+    <p>
+      Built from an actual Figma mock the user shared ("Concept 1: Floating Right Panel"), not a
+      chat description: Instrument Serif headlines, Instrument Sans everything else, a dark-teal
+      monochrome badge system instead of hue-coded capital types, dashed connector lines, faint
+      orbital rings behind the constellation, and the persistent create-panel moved to the right
+      side. Each capital type gets its own fixed compass quadrant (grants upper-left, corporate
+      upper-right, loans lower-left, equity lower-right) with a labeled heading, instead of Layout
+      T's proportional arc. Same underlying data, builder, refine, and tracker as every other round.
+    </p>
+  </div>
+
+  <div class="options">
+    <a class="option" href="v12-capital-constellation.html">
+      <p class="label">Round 12</p>
+      <h2>Capital Constellation</h2>
+      <p>Four fixed compass quadrants around a central hub, each labeled and color-consistent (dark teal, not hue-coded), cards showing type, fit, name, and funding amount. The create-panel floats on the right instead of the left. One viewport on desktop, everything reflows and cards shrink to fit on mobile. Now also has a small Constellation/List toggle for anyone who'd rather not read a radial map, plus an onboarding-profile modal (click the hub) to review and edit what drives the matches.</p>
+    </a>
+    <a class="option" href="v12-scroll-morph.html">
+      <p class="label">Round 12 &middot; alternative</p>
+      <h2>Scroll to List</h2>
+      <p>Same constellation, same cards &mdash; but instead of a click to toggle into a list, scrolling down morphs the scattered cards into a stacked list in place, then hands off to a real, normally-scrollable list section underneath. A second answer to "what if someone doesn't want the constellation," this one driven by scroll instead of a click.</p>
+    </a>
+  </div>
+
+  <div class="round-heading">
+    <h2>Round 11 &middot; the post-login capital landscape, pure black and white</h2>
+    <p>
+      A separate, more fully-specified brief: not a browsing screen, a discovery moment. Your
+      organization sits at the center, 3-5 curated signals surround it (never a list, never
+      every possibility at once), and one signal is flagged as something CHELCIE surfaced that
+      you likely hadn't considered. One prototype, one shared data model, three ways to
+      visualize the same landscape via a toggle &mdash; Constellation, Orbit, Radar &mdash; so the
+      metaphor can be evaluated without rebuilding anything. Selecting a signal reveals why it
+      surfaced, and a partnership-type signal flows straight into the Partnership Designer
+      (split panel on desktop, full-screen hand-off on mobile) without ever feeling like you
+      left the landscape.
+    </p>
+  </div>
+
+  <div class="options">
+    <a class="option" href="v11-capital-landscape.html">
+      <p class="label">Round 11</p>
+      <h2>Your capital landscape</h2>
+      <p>Organization-centered, sparse by design, one surfaced signal marked "new." Toggle between Constellation, Orbit, and Radar modes; select a signal to see why it surfaced and move into the Partnership Designer. Single viewport on desktop, full-screen canvas + bottom sheet on mobile.</p>
+    </a>
+  </div>
+
+  <div class="round-heading">
+    <h2>Round 10 &middot; back to Layout B, the DNA that actually had merit</h2>
+    <p>
+      After round 9's score reveal, the call was clear: Layout B (round 2) still has the most merit,
+      and a literal score isn't right for this. Looking back at why B worked, it isn't the
+      constellation visual, it's that "Create your own partnership" is <em>always on screen</em>,
+      pre-populated with real companies, never hidden behind a click or a details toggle the way
+      every round since has buried it. Both layouts below keep that persistent panel fixed, and
+      change what sits next to it. Also the first rounds built under a new standing rule: one
+      viewport on desktop, no page scroll, except for the one panel that's genuinely discovery
+      content (the map, or the list), which scrolls on its own.
+    </p>
+  </div>
+
+  <div class="options">
+    <a class="option" href="v10-layout-r-map-refined.html">
+      <p class="label">Layout R</p>
+      <h2>Connected, refined</h2>
+      <p>Layout B's own constellation, tightened into one viewport: your org at the center, opportunities scattered by fit, the persistent create-panel floating over the canvas exactly like B. Same mechanic, no score, no page scroll.</p>
+    </a>
+    <a class="option" href="v10-layout-s-list-panel.html">
+      <p class="label">Layout S</p>
+      <h2>List + panel</h2>
+      <p>Same persistent create-panel, but the constellation is swapped for a plain ranked list, best fit first, to test whether B's merit was really the map or the panel next to it. List scrolls on its own, panel doesn't need to.</p>
+    </a>
+    <a class="option" href="v10-layout-t-clusters.html">
+      <p class="label">Layout T</p>
+      <h2>Clusters</h2>
+      <p>Layout R's constellation, but grouped: loans, grants, corporate partners, and equity each get their own labeled sector radiating off your org, instead of one continuous fan ranked by fit. Distance still means fit, but only within a cluster, the grouping itself carries the "more than grants" narrative at a glance.</p>
+    </a>
+  </div>
+
+  <div class="round-heading">
+    <h2>Round 9 &middot; the score reveal, straight after onboarding v2</h2>
+    <p>
+      Where you land right after "Go to my workspace," built around a specific brief: this moment
+      has to feel like you just joined and got a result, like CHELCIE was already working on your
+      behalf while you finished setup, and like your own relationships are worth building too, not
+      just the matches handed to you. One viewport on desktop, no page scroll, the match list is the
+      only part that scrolls (it's discovery content). A distinct take from round 8: a real
+      Resilience Score (an average of your best match in each of the four capital types, so scoring
+      low in one visibly pulls the number down) instead of a dollar-potential figure, plus a
+      dedicated dark panel for designing your own approach, kept visually apart from the passive
+      match list beside it.
+    </p>
+  </div>
+
+  <div class="options">
+    <a class="option" href="v9-layout-q-score.html">
+      <p class="label">Layout Q</p>
+      <h2>Score</h2>
+      <p>A compact welcome + Resilience Score ring up top (with a per-capital-type breakdown: loans, grants, corporates, equities), then a fixed split below: your five strongest matches on the left, a dark "design your own partnership" panel on the right. Nothing scrolls except the match list itself.</p>
+    </a>
+  </div>
+
+  <div class="round-heading">
+    <h2>Round 8 &middot; the arrival page, for every kind of money</h2>
+    <p>
+      Where you land after <a href="../onboarding-v2/index.html">onboarding v2</a>. Grants, loans,
+      corporate partners and investors in one list, no tab per type, every entry leading with what
+      the funder gets out of <em>you</em>. Built quiet and scannable: no cards, hairlines and space
+      instead, following Airbnb and Monzo. Desktop and phone.
+    </p>
+  </div>
+
+  <div class="options">
+    <a class="option" href="v8-list.html">
+      <p class="label">A</p>
+      <h2>The list</h2>
+      <p>Just the entries. Two lines each; tap one and it opens in place with who decides, how to get in, the links to check it, then Draft the first message and Pursue / Hold / Pass.</p>
+    </a>
+    <a class="option" href="v8-builder.html">
+      <p class="label">B &middot; Cheri's pick</p>
+      <h2>The builder, flowing into A</h2>
+      <p>Layout A with one box above it: say what you're working on and CHELCIE adds companies with a reason to fund that. Onboarding never asks for prose, so this page is the one that does.</p>
+    </a>
+    <a class="option" href="v8-stack.html">
+      <p class="label">C</p>
+      <h2>The stack</h2>
+      <p>Layout A with a second view: the money sorted by what each kind costs you, equity at the top down to grants. Tap a band and the list filters to it.</p>
+    </a>
+  </div>
+
+  <div class="round-heading">
+    <h2>Round 7 &middot; a batch of patterns from outside fintech</h2>
+    <p>
+      A deep Mobbin pass across non-fintech categories (dating apps, design tools, streaming,
+      smart-home) for interaction patterns rather than industry examples. Four quick, lean builds
+      to see which ones hold up. All four share <a href="builder-shared.css">builder-shared.css</a>
+      and <a href="builder-shared.js">builder-shared.js</a> instead of re-pasting the same builder
+      and tracker code per file.
+    </p>
+  </div>
+
+  <div class="options">
+    <a class="option" href="v7-layout-m-swipe.html">
+      <p class="label">Layout M</p>
+      <h2>Swipe</h2>
+      <p>One opportunity full-screen at a time, dating-app style. Drag right (or tap the check) to start drafting it, left to pass and see the next. About triage speed, not browsing.</p>
+    </a>
+    <a class="option" href="v7-layout-n-canvas.html">
+      <p class="label">Layout N</p>
+      <h2>Canvas</h2>
+      <p>Every opportunity as a node on an infinite pannable, zoomable board, Figma/Miro-style. Drag a card to reposition it, drag the board to pan, click a card without dragging it to open the builder. The user arranges the layout, not us.</p>
+    </a>
+    <a class="option" href="v7-layout-o-bento.html">
+      <p class="label">Layout O</p>
+      <h2>Bento</h2>
+      <p>An asymmetric tile grid, Apple-style. The single best-fit match gets a 2x2 hero tile, everything else sized around it, all visible without scrolling through a list.</p>
+    </a>
+    <a class="option" href="v7-layout-p-dial.html">
+      <p class="label">Layout P</p>
+      <h2>Dial</h2>
+      <p>A four-quadrant radial dial, one wedge per kind of capital. Click a wedge, that type's opportunities appear below. Tactile and immediate instead of click-driven navigation.</p>
+    </a>
+  </div>
+
+  <div class="round-heading">
+    <h2>Round 6 &middot; grounded in a real financial concept</h2>
+    <p>
+      The map from round 4 had a real problem: there's no actual geography behind a funding
+      opportunity, so the pins were decorative, not meaningful. This round keeps the "discovery"
+      feel but grounds the structure in something real: a capital stack, the way finance people
+      already think about layering an organization's funding by seniority and risk.
+    </p>
+  </div>
+
+  <div class="options">
+    <a class="option" href="v6-layout-l-stack.html">
+      <p class="label">Layout L</p>
+      <h2>Capital Stack</h2>
+      <p>All thirteen opportunities plus freshly discovered companies coexist on one map, everything visible in a single viewport, no scroll. Vertical position carries the meaning: banded top to bottom exactly like a real capital-stack diagram, equity (highest commitment) at the top down to grants (non-dilutive, foundational) at the base. The map itself stays plain paper and ink; each pin is colored by kind of capital instead, the way a real map color-codes categories. Click a pin, a popup surfaces fit, amount, and why it fits, same as round 4's map.</p>
+    </a>
+  </div>
+
+  <div class="round-heading">
+    <h2>Round 5 &middot; an out-of-the-box experiment</h2>
+    <p>
+      Not grounded in a Mobbin reference this time, just a straight nostalgia pull: iPod/iTunes
+      cover flow. Same data, same builder underneath, but the whole browsing experience lives in
+      one viewport, no page scroll at all.
+    </p>
+  </div>
+
+  <div class="options">
+    <a class="option" href="v5-layout-k-coverflow.html">
+      <p class="label">Layout K</p>
+      <h2>Cover Flow</h2>
+      <p>Opportunities as covers in a 3D stack, center one facing forward with a real mirrored reflection underneath, side covers receding and dimming with distance. Click a side cover to bring it to center, click the center cover (or the "Design this partnership" button) to open the builder. Left/right arrow buttons, a bottom scrubber, and arrow-key navigation all drive the same stack. A two-tab switch swaps the whole flow between your matched opportunities and freshly discovered companies. Everything, including the headline and nav, fits one screen, sized live off the actual window rather than a fixed guess.</p>
+    </a>
+  </div>
+
+  <div class="round-heading">
+    <h2>Round 4 &middot; grounded in researched marketplace patterns</h2>
+    <p>
+      Round 2 and 3 were built from memory and a couple of quick reference checks. This round is
+      deep research first: pulled a proven consumer marketplace's actual host dashboard, its
+      section-by-section submission builder, its category-row homepage, and its detail-page
+      layout from Mobbin before writing any code. Same CHELCIE palette (paper/ink/teal), borrowed structure.
+    </p>
+  </div>
+
+  <div class="options">
+    <a class="option" href="v4-layout-g-dashboard.html">
+      <p class="label">Layout G</p>
+      <h2>Dashboard</h2>
+      <p>A "your next steps" band, then horizontal category rows, one per kind of capital plus "Realise your financial potential" for the generative Partnership Designer, all on one continuous page, no tabs. Clicking any card opens a builder with a left-hand outline of sections and checkmarks (the opportunity, what we're asking, how funds are used, why it fits, terms, review and send), one section focused at a time on the right, a sticky Back/progress/Continue bar. Same status + export tracker as before.</p>
+    </a>
+    <a class="option" href="v4-layout-h-compass.html">
+      <p class="label">Layout H</p>
+      <h2>Compass</h2>
+      <p>Same palette and type treatment as Layout G, but the browse view is a universe again: your organization at the center, true circular orbits, opportunities scattered in loose clusters per direction (one per kind of capital) and sized by fit as well as placed by it, a quiet scatter of twinkling background dust. Always know where to look for loans versus equity, without a rigid plus-sign grid. Same discover strip and section-outline builder as Layout G underneath.</p>
+    </a>
+    <a class="option" href="v4-layout-i-map.html">
+      <p class="label">Layout I</p>
+      <h2>Map</h2>
+      <p>Opportunities plotted like pins on a territory, loosely clustered into four labeled districts (one per kind of capital), each pin showing its ask amount the way a real map app shows price. Filter chips toggle a district on or off, zoom controls actually zoom, click a pin and a card floats up with the details, same pattern as Airbnb, Zillow, or Tripadvisor. Same discover strip and section-outline builder as Layout G underneath.</p>
+    </a>
+    <a class="option" href="v4-layout-j-gallery.html">
+      <p class="label">Layout J</p>
+      <h2>Gallery</h2>
+      <p>A waterfall grid you browse instead of a list you scan, modeled on a visual-discovery feed's card grid, floating pill tabs, and category chips. "For you" sorts by best fit, "Explore" goes alphabetical within a capital type, search narrows by name, a bold "Design a partnership" pill jumps straight to your best match. Click any card and its full detail opens in a centered overlay. Same discover strip and section-outline builder as Layout G underneath.</p>
+    </a>
+  </div>
+
+  <div class="round-heading">
+    <h2>Round 3 &middot; the split arrival, pure black and white</h2>
+    <p>
+      The split layout from <a href="../request-access/index.html">request access</a>, pushed
+      further monochrome than round 2 (no teal at all). Layout F below is the real synthesis:
+      the constellation from round 1 and the split panel aren't just sitting next to each other,
+      the split <em>is</em> the concept, organization → landscape → unexpected connection →
+      partnership. D and E were the earlier, less fused attempts on the way there.
+    </p>
+  </div>
+
+  <div class="options">
+    <a class="option" href="v3-layout-f-constellation-designer.html">
+      <p class="label">Layout F &middot; the synthesis</p>
+      <h2>Constellation + Designer</h2>
+      <p>Dark panel: your organization at the center, the constellation of everything already in your landscape radiating around it, on permanent display, never hidden behind a step. Light panel: the Partnership Designer as a discovery engine, describe what you're working on and it surfaces who should fund it that isn't already on your map. Click a star on the left and the right panel swaps to designing a partnership with that one directly, same output either way. One system, two ways in: what you know, and what you haven't considered yet.</p>
+    </a>
+    <a class="option" href="v3-layout-d-split-persistent.html">
+      <p class="label">Layout D</p>
+      <h2>Split, persistent</h2>
+      <p>Earlier pass: the dark panel is a static brand pitch, not the constellation. Capital types, funding range, then a ranked match list, detail, and draft happen in the light panel underneath.</p>
+    </a>
+    <a class="option" href="v3-layout-e-split-handoff.html">
+      <p class="label">Layout E</p>
+      <h2>Split, then hand off</h2>
+      <p>Earlier pass: the split is only the landing moment, then hands off to a full-bleed one-at-a-time review. No constellation, no persistent org-at-center visual.</p>
+    </a>
+  </div>
+
+  <div class="round-heading">
+    <h2>Round 2 &middot; spacious, one thing at a time</h2>
+    <p>
+      Following the direction of <a href="../onboarding-v2/index.html">onboarding v2</a> and
+      <a href="../request-access/index.html">request access</a>: paper/ink/teal, Archivo + Inter,
+      one focused question or opportunity per screen, generous negative space, a segmented
+      progress bar and footer nav instead of everything visible at once. Also looked at Airbnb's
+      own step-by-step onboarding for the same reason.
+    </p>
+  </div>
+
+  <div class="options">
+    <a class="option" href="v2-layout-a-sequence.html">
+      <p class="label">Layout A</p>
+      <h2>One at a time</h2>
+      <p>Three quick intake questions, then opportunities are reviewed one by one, full screen: not for us, or design a partnership. Choosing the latter walks through what they gain from you, then the pitch, then the draft, each its own screen.</p>
+    </a>
+    <a class="option" href="v2-layout-b-connected.html">
+      <p class="label">Layout B &middot; current favorite</p>
+      <h2>Connected</h2>
+      <p>This is the arrival screen after onboarding. The constellation is full-bleed behind everything; "Create your own partnership" floats over it on the left as an elevated card (shadow, rounded corners, always there, not a toggle), pre-populated with company names CHELCIE already surfaced, no typing required to see them (ported from Amy's C-CHANGE demo, describing your own program below sharpens the match). Click a company card or a constellation node and you land on one screen modeled on Airbnb's checkout: details on the left in a summary card, the right side is the actual document, broken into sections (what we're asking, how funds are used, why it fits, terms), each pre-drafted by CHELCIE but directly editable, with its own "redraft this section" link. Status + export tracked in "Your partnerships," export always reflects whatever you've actually edited.</p>
+    </a>
+    <a class="option" href="v2-layout-c-wizard.html">
+      <p class="label">Layout C</p>
+      <h2>Step by step</h2>
+      <p>The most literal reuse of the onboarding v2 chrome: a three-segment progress bar (what you need, your matches, design and send), one question per screen, a short ranked list instead of all thirteen, Back/Continue footer throughout.</p>
+    </a>
+  </div>
+
+  <div class="round-heading round-1">
+    <h2>Round 1 &middot; earlier pass</h2>
+    <p>
+      Denser, monochrome, everything visible on one screen. Kept for reference, layout 1's
+      connectedness carried forward into round 2's Layout B above.
+    </p>
+  </div>
+
+  <div class="options round-1">
+    <a class="option" href="layout-1-constellation.html">
+      <p class="label">Layout 1</p>
+      <h2>Constellation</h2>
+      <p>Opportunities scattered spatially across a canvas, loosely clustered, sized by fit score. Filters live in a side rail. Click a node to open a detail slide-over.</p>
+    </a>
+    <a class="option" href="layout-2-grid.html">
+      <p class="label">Layout 2</p>
+      <h2>Grid</h2>
+      <p>A ranked card grid, filter chips across the top, opportunity detail opens in a centered modal.</p>
+    </a>
+    <a class="option" href="layout-3-ledger.html">
+      <p class="label">Layout 3</p>
+      <h2>Ledger</h2>
+      <p>A dense ranked table, plain checkboxes for filters, rows expand in place instead of opening an overlay.</p>
+    </a>
+  </div>
+
+  <p class="note">
+    They all share <a href="data.js">data.js</a> (mock opportunities, filter and preference logic) and most share <a href="partnership-lib.js">partnership-lib.js</a> (Amy's real corporate-sponsor matching, ported from the C-CHANGE demo). Round 1 uses <a href="shared.css">shared.css</a> (monochrome). Rounds 2 and 4 use <a href="v2-shared.css">v2-shared.css</a> (paper/ink/teal, Archivo + Inter). Round 3 uses <a href="v3-shared.css">v3-shared.css</a> (paper/ink only, no teal). No build step, no backend, static files only.
+  </p>
+</div>
+</body>
+</html>
