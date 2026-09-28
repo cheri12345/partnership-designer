@@ -7,13 +7,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
-  href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap"
   rel="stylesheet"
 />
 <style>
   /* ---------- from a Figma concept ("Concept 1: Floating Right Panel") —
      a different visual language from the rest of this project on purpose:
-     Instrument Serif for headlines, Instrument Sans for everything else,
+     Inter for headlines, Instrument Sans for everything else,
      a dark-teal monochrome badge system instead of hue-coded capital
      types, dashed connector lines, orbital rings behind the constellation,
      and the persistent create-panel moved to the right. Kept as its own
@@ -30,6 +30,7 @@
     --deep2: #143644;
     --grant: #00636a;
     --muted-fill: #f4f4f4;
+    --accent-bright: #4fd8de;
   }
 
   * { box-sizing: border-box; }
@@ -40,9 +41,56 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: var(--paper);
+    background: #05080d;
     color: var(--ink);
     font-family: "Instrument Sans", system-ui, sans-serif;
+  }
+
+  /* The build screen now matches the workspace's dark-page/white-card
+     styling (same faint orbital rings, light text on the page itself,
+     white cards for the actual content) instead of a flat light bg. */
+
+  .bg-decor { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+  .bg-decor .glow {
+    position: absolute;
+    top: -15%;
+    right: -10%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle, rgba(79, 216, 222, 0.12), transparent 70%);
+  }
+  .bg-decor .ring { position: absolute; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 50%; }
+  .bg-decor .ring.r1 { top: 40px; right: 100px; width: 520px; height: 520px; }
+  .bg-decor .ring.r2 { top: 128px; right: 188px; width: 344px; height: 344px; }
+
+  .breadcrumb .crumb-link { color: rgba(255, 255, 255, 0.55); }
+  .breadcrumb .crumb-link:hover { color: #fff; }
+  .breadcrumb .crumb-sep { color: rgba(255, 255, 255, 0.3); }
+  .breadcrumb .crumb-current { color: #fff; }
+
+  /* Everything inside .build-draft sits directly on the dark page (unlike
+     .build-summary, a separate white card) — every label/sub-line in
+     here, including ones nested inside a tool panel, needs light text,
+     not just the ones that happen to be direct children. */
+  .build-draft .build-eyebrow,
+  .build-draft .build-sub { color: rgba(255, 255, 255, 0.55); }
+
+  .build-draft .field-group label,
+  .doc-section-head label { color: #fff; }
+
+  .drafting-state, .autosave-note, .draft-status { color: rgba(255, 255, 255, 0.55); }
+  .regen-link { color: #fff; }
+
+  body > header.topbar {
+    border-bottom: none;
+  }
+
+  body > header.topbar .wordmark {
+    color: #fff;
+  }
+
+  #headline {
+    color: rgba(255, 255, 255, 0.92);
   }
 
   body.scroll-unlocked {
@@ -53,8 +101,8 @@
   }
 
   h1, h2, h3, .serif {
-    font-family: "Instrument Serif", Georgia, serif;
-    font-weight: 400;
+    font-family: "Inter", system-ui, sans-serif;
+    font-weight: 600;
     font-style: normal;
     margin: 0;
     color: var(--deep);
@@ -84,33 +132,134 @@
     font-weight: 700;
     font-size: 16px;
     color: var(--ink);
-  }
-
-  .concept-pill {
-    background: var(--muted-fill);
-    color: var(--stone);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    padding: 4px 12px;
-    border-radius: 6px;
+    cursor: pointer;
   }
 
   .topbar-right {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
   }
 
+  /* ---------- notification bell + user chip: both open a dropdown
+     panel anchored below themselves, matching a real app-shell header
+     (avatar pill with a chevron, a bell with an unread badge) rather
+     than plain links. ---------- */
+
+  .notif-wrap, .user-menu-wrap { position: relative; }
+
+  .icon-btn {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .icon-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+  .icon-btn svg { width: 19px; height: 19px; }
+
+  .notif-badge {
+    position: absolute;
+    top: 2px;
+    right: 3px;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 3px;
+    border-radius: 999px;
+    background: #a51c30;
+    color: #fff;
+    font-size: 9.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #fff;
+    background: #000;
+    border-radius: 999px;
+    padding: 6px 12px 6px 6px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .user-chip:hover { background: #161616; }
+
+  .user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .user-name { font-size: 13px; font-weight: 500; color: #fff; }
+  .chevron-down { width: 14px; height: 14px; color: rgba(255, 255, 255, 0.6); flex-shrink: 0; }
+
+  .dropdown-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 220px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+    padding: 8px;
+    z-index: 40;
+  }
+
+  .dropdown-header { padding: 8px 10px 10px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+  .dropdown-name { font-size: 13px; font-weight: 700; color: var(--ink); margin: 0 0 2px; }
+  .dropdown-email { font-size: 11.5px; color: var(--stone); margin: 0; }
+
+  .dropdown-item {
+    display: block;
+    padding: 9px 10px;
+    border-radius: 7px;
+    font-size: 13px;
+    color: var(--ink);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .dropdown-item:hover { background: var(--muted-fill); }
+
+  .dropdown-empty { padding: 10px; font-size: 12.5px; color: var(--stone); }
+
+  /* Restored as a standalone, prominent button — the workspace is the
+     entry point to every draft/priority/setting, important enough to
+     stay visible in the topbar rather than buried in the account menu. */
   .pill-outline {
     background: #fff;
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 10px 20px;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--ink);
     cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 30px;
   }
 
   .pill-outline:hover { border-color: var(--deep); }
@@ -164,37 +313,26 @@
     padding: 4px 8px 24px;
   }
 
-  .list-view-rows { max-width: 640px; }
-
-  .list-row {
+  /* Same rich card as the mobile stack — full info up front (range,
+     timeline, why-it-fits) instead of a single compact row, just laid
+     out as a normal vertical list on a wider screen. */
+  .list-view-rows {
+    max-width: 640px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .list-view-rows .list-card {
     width: 100%;
-    background: none;
-    border: none;
-    border-bottom: 1px solid var(--border);
-    padding: 20px 6px;
-    cursor: pointer;
-    font-family: inherit;
     text-align: left;
   }
 
-  .list-row:first-child { border-top: 1px solid var(--border); }
-  .list-row:hover { background: var(--muted-fill); }
+  .list-view-rows .list-card .mobile-card-gain {
+    -webkit-line-clamp: 2;
+  }
 
-  .list-row-left { display: flex; align-items: center; gap: 16px; min-width: 0; }
-  .list-row-badge { flex-shrink: 0; }
-
-  .list-row-name { font-weight: 600; font-size: 14px; color: var(--ink); display: flex; align-items: center; gap: 6px; }
-  .list-row-meta { font-size: 12px; color: var(--stone); margin-top: 3px; }
-
-  .list-row-right { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
-  .list-row-fit { font-weight: 700; font-size: 13px; color: var(--ink); }
-  .list-row-amount { font-weight: 600; font-size: 13px; color: var(--deep2); min-width: 78px; text-align: right; }
-
-  .list-empty { padding: 40px 6px; color: var(--stone); font-size: 14px; }
+  .list-empty { padding: 40px 6px; color: rgba(255, 255, 255, 0.45); font-size: 14px; }
 
   main {
     flex: 1;
@@ -234,8 +372,7 @@
     min-height: 0;
     position: relative;
     overflow: hidden;
-    background-image: radial-gradient(#e4e4e4 1px, transparent 1px);
-    background-size: 28px 28px;
+    background: radial-gradient(ellipse at 50% 50%, #0e1620 0%, #05080d 65%, #030405 100%);
   }
 
   .orbit-svg {
@@ -246,22 +383,10 @@
     pointer-events: none;
   }
 
-  .orbit-ring {
-    fill: none;
-    stroke: var(--ink);
-    stroke-opacity: 0.07;
-  }
-
-  .conn-line {
-    stroke: var(--deep2);
-    stroke-opacity: 0.4;
-    stroke-dasharray: 3 4;
-  }
-
-  .conn-dot {
-    fill: var(--paper);
-    stroke: var(--deep2);
-    stroke-opacity: 0.5;
+  /* A hollow ring of tiny stars around the hub, not stroked circle
+     outlines — reads as a starry sky, not a radar/sonar screen. */
+  .sky-star {
+    fill: #ffffff;
   }
 
   .headline-block {
@@ -271,8 +396,8 @@
   }
 
   .headline-block h1 {
-    font-size: 2rem;
-    line-height: 1.15;
+    font-size: 1.625rem;
+    line-height: 1.2;
   }
 
   .quadrant-label {
@@ -287,7 +412,7 @@
     font-size: 0.75rem;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    color: var(--deep2);
+    color: rgba(255, 255, 255, 0.82);
     margin: 0 0 4px;
   }
 
@@ -295,7 +420,7 @@
     margin: 0;
     font-size: 0.6875rem;
     line-height: 1.4;
-    color: var(--ink);
+    color: rgba(255, 255, 255, 0.45);
   }
 
   .quadrant-label.align-right { text-align: right; }
@@ -310,8 +435,11 @@
     border-radius: 50%;
     border: none;
     font-family: inherit;
-    background: linear-gradient(135deg, var(--deep), var(--deep2));
-    box-shadow: 0 8px 18px rgba(8, 56, 57, 0.28);
+    /* A black hole, done with nothing but a gradient: solid dark core
+       (event horizon), a thin bright ring where light bends around the
+       edge (accretion disk), fading back to black at the rim. */
+    background: radial-gradient(circle at 50% 50%, #000 0%, #000 44%, #052426 58%, rgba(41, 216, 222, 0.45) 72%, #000 88%);
+    box-shadow: 0 0 24px 4px rgba(41, 216, 222, 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -323,7 +451,7 @@
   }
 
   .center-hub:hover {
-    box-shadow: 0 10px 22px rgba(8, 56, 57, 0.36);
+    box-shadow: 0 0 32px 6px rgba(41, 216, 222, 0.4);
     transform: translate(-50%, -50%) scale(1.04);
   }
 
@@ -345,6 +473,53 @@
   }
 
   .opp-node.shown { opacity: 1; }
+
+  /* Mobile: a plain vertical stack of cards instead of the radial map —
+     .opp-node reverts to normal document flow and canvas-container becomes
+     the scrolling flex column that holds them. */
+  .canvas-container.mobile-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    padding: 14px 16px 32px;
+  }
+
+  .mobile-stack .opp-node {
+    position: static;
+    transform: none;
+    opacity: 1;
+  }
+
+  .mobile-stack .node-card {
+    width: 100%;
+    padding: 14px 14px 15px;
+    gap: 6px;
+    transform: none !important;
+  }
+
+  .mobile-stack .node-card:hover {
+    transform: none !important;
+  }
+
+  .mobile-stack .node-name { font-size: 15px; }
+  .mobile-stack .node-amount { font-size: 12.5px; }
+
+  .mobile-card-timeline {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--stone);
+  }
+
+  .mobile-card-gain {
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--ink);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 
   .node-card {
     display: flex;
@@ -409,58 +584,166 @@
     color: var(--deep2);
   }
 
-  /* ---------- opportunities beyond the CARD_LIMIT: small solid dots,
-     still a specific real opportunity, still clickable — a warm, solid,
-     non-animated colour deliberately unlike the pulsing discovery dots
-     below, so the two kinds of dot don't read as the same affordance. */
+  /* ---------- opportunities beyond the CARD_LIMIT: small map-pin pills
+     (fit score + amount only, like a hotel map view's price pin), still a
+     specific real opportunity, still clickable. */
 
   .opp-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
     border: none;
-    background: var(--grant);
-    /* A soft glow in the brand's own teal, not a hard-edged marker
-       outline — reads as a small point of light in the constellation,
-       not a map pin or a contact blip on a scope. */
-    box-shadow: 0 0 5px 1px rgba(0, 99, 106, 0.45), 0 1px 2px rgba(0, 0, 0, 0.1);
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--deep2);
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 10px;
+    padding: 4px 9px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    opacity: 0.85;
     cursor: pointer;
-    padding: 0;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
   }
 
+  .opp-dot .pill-fit { color: var(--ink); }
+  .opp-dot .pill-sep { color: var(--border-card); }
+  .opp-dot .pill-amount { color: var(--deep2); }
+
   .opp-dot:hover {
-    transform: scale(1.4);
-    box-shadow: 0 0 9px 2px rgba(0, 99, 106, 0.65), 0 2px 5px rgba(0, 0, 0, 0.12);
+    transform: scale(1.1);
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.45);
+    opacity: 1;
   }
 
   /* ---------- floating right panel ---------- */
 
-  .create-panel {
+  /* The positioning/scrolling shell for the whole right-side column —
+     the next-best-action box and the create-panel are two separate
+     cards stacked inside it, not one merged box, so this is what's
+     centered/clamped/scrolled as a unit; each child below is just a
+     plain flex item. */
+  .panel-stack {
     position: absolute;
     top: 50%;
     right: 20px;
     transform: translateY(-50%);
-    /* Hugs its content (matching the Figma concept) rather than stretching
-       to fill the canvas — a short sponsor list left a wall of empty white
-       space below it otherwise. Centered vertically so that leftover space
-       splits evenly above and below instead of piling up underneath.
-       max-height is a safety cap for when the describe-your-own-program
-       section is expanded. */
     max-height: calc(100% - 40px);
     width: 360px;
     z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+  }
+
+  #nextActionZone {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  /* Nothing to recommend and nothing stalled — hide the box entirely
+     rather than showing an empty white card. */
+  #nextActionZone:empty { display: none; border: none; box-shadow: none; }
+
+  /* ---------- notification rows: modeled on real inbox/notification
+     panels (Remote, Expedia, Homerun, via Mobbin) — an icon circle,
+     bold title, gray description, a relative timestamp, rows divided
+     by a hairline inside one panel rather than each in its own bordered
+     box. ---------- */
+
+  .notif-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+
+  .notif-row + .notif-row { border-top: 1px solid var(--border); }
+
+  .notif-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .notif-icon.actionable { background: rgba(8, 56, 57, 0.1); color: var(--deep); }
+  .notif-icon.warn { background: rgba(212, 162, 74, 0.18); color: #8a5a1e; }
+  .notif-icon svg { width: 11px; height: 11px; }
+
+  .notif-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; }
+
+  .notif-body { min-width: 0; flex: 1; }
+
+  .notif-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .notif-desc {
+    font-size: 10.5px;
+    line-height: 1.3;
+    color: var(--stone);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .notif-desc a { color: var(--deep2); font-weight: 600; text-decoration: none; }
+  .notif-desc a:hover { text-decoration: underline; }
+
+  /* A plain text link, not a filled pill, so the whole row stays one
+     compact line instead of wrapping to a button on its own line. */
+  .notif-cta {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--deep);
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .notif-cta:hover { text-decoration: underline; }
+
+  .create-panel {
+    /* Hugs its content (matching the Figma concept) rather than stretching
+       to fill the canvas — a short sponsor list left a wall of empty white
+       space below it otherwise. */
+    flex-shrink: 0;
+    width: 100%;
     background: #fff;
     border: 1px solid var(--border);
     border-radius: 20px;
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
     padding: 24px;
-    overflow-y: auto;
   }
 
   .create-panel h2 {
-    font-size: 1.5rem;
+    font-size: 1rem;
     line-height: 1.2;
+    white-space: nowrap;
   }
 
   .create-panel .panel-sub {
@@ -623,6 +906,23 @@
 
   .back-link:hover { color: var(--deep); }
 
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .breadcrumb .crumb-link {
+    background: none;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+  }
+
   /* ---------- build screen ---------- */
 
   .build-wrap {
@@ -674,7 +974,8 @@
 
   .gain-callout blockquote {
     margin: 0 0 8px;
-    font-family: "Instrument Serif", serif;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
     font-size: 1.1875rem;
     line-height: 1.35;
     color: var(--deep);
@@ -732,13 +1033,76 @@
     background: none;
     border: none;
     font-size: 11.5px;
-    color: var(--deep2);
     text-decoration: underline;
     cursor: pointer;
     padding: 0;
   }
 
   .drafting-state { font-size: 13px; color: var(--stone); }
+
+  /* ---------- tool tabs: outreach / referral / application, the
+     partnership-designer equivalent of the real demo's Apply tile grid,
+     scoped to this one opportunity instead of a funder-picker. ---------- */
+
+  .tool-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0 24px;
+  }
+
+  .tool-tab {
+    background: #fff;
+    border: none;
+    padding: 12px 14px;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-family: inherit;
+  }
+
+  .tool-tab-label { font-size: 12.5px; font-weight: 700; color: var(--ink); }
+  .tool-tab-sub { font-size: 10.5px; color: var(--stone); }
+
+  .tool-tab.active { background: var(--ink); }
+  .tool-tab.active .tool-tab-label, .tool-tab.active .tool-tab-sub { color: #fff; }
+
+  .sub-tabs {
+    display: flex;
+    gap: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    margin-bottom: 20px;
+  }
+
+  .sub-tab {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 8px 2px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.55);
+    border-bottom: 2px solid transparent;
+  }
+
+  .sub-tab.active { color: #fff; border-bottom-color: #fff; }
+
+  .word-progress { font-size: 10.5px; color: rgba(255, 255, 255, 0.5); }
+
+  .budget-total { font-size: 14px; font-weight: 600; color: #fff; margin: 8px 0 0; }
+
+  .complete-row { margin-top: 32px; border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 20px; }
+
+  .next-steps { margin-top: 32px; border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 20px; }
+  .next-steps-list { margin: 8px 0 0; padding-left: 20px; }
+  .next-steps-list li { font-size: 13px; line-height: 1.6; color: rgba(255, 255, 255, 0.7); margin-bottom: 6px; }
 
   .draft-status {
     display: flex;
@@ -768,25 +1132,7 @@
 
   .draft-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 
-  /* ---------- overlays ---------- */
-
-  .overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--paper);
-    z-index: 50;
-    display: none;
-    flex-direction: column;
-  }
-
-  .overlay.active { display: flex; }
-
-  .overlay-body {
-    max-width: 560px;
-    margin: 0 auto;
-    padding: 48px 24px 100px;
-    width: 100%;
-  }
+  /* ---------- refine/onboarding controls ---------- */
 
   .refine-section { margin-bottom: 32px; }
 
@@ -820,38 +1166,6 @@
   }
 
   .side-option.selected { border-color: var(--deep); background: rgba(8, 56, 57, 0.05); }
-
-  .tracker-item {
-    border-top: 1px solid var(--border);
-    padding: 20px 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 14px;
-  }
-
-  .tracker-item:last-child { border-bottom: 1px solid var(--border); }
-
-  .tracker-kind { font-size: 11px; font-weight: 600; color: var(--stone); margin: 0 0 4px; }
-  .tracker-title { font-weight: 700; font-size: 15px; margin: 0 0 4px; }
-  .tracker-sub { font-size: 12px; color: var(--stone); margin: 0; }
-
-  .tracker-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-
-  .status-pill {
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 999px;
-    background: rgba(212, 162, 74, 0.18);
-    color: #8a5a1e;
-  }
-
-  .status-pill.sent { background: rgba(8, 56, 57, 0.12); color: var(--deep); }
-
-  .tracker-empty { font-size: 14px; color: var(--stone); line-height: 1.6; }
 
   /* ---------- quick view: a lightweight "before you draft" preview card,
      opened on a node click instead of jumping straight into the builder.
@@ -956,6 +1270,40 @@
 
   .quickview-why-row p { margin: 0; font-size: 12px; line-height: 1.45; color: var(--ink); }
 
+  .quickview-reqs { margin-bottom: 14px; }
+
+  .quickview-reqs .req-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--deep2);
+    margin: 0 0 8px;
+  }
+
+  .req-row { display: flex; align-items: flex-start; gap: 7px; margin-bottom: 5px; }
+
+  .req-row:last-child { margin-bottom: 0; }
+
+  .req-mark {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    line-height: 1;
+  }
+
+  .req-row.met .req-mark { background: rgba(8, 56, 57, 0.12); color: var(--deep); }
+  .req-row.unmet .req-mark { background: rgba(212, 74, 74, 0.12); color: #a33; }
+
+  .req-row p { margin: 0; font-size: 12px; line-height: 1.4; color: var(--ink); }
+  .req-row.unmet p { color: var(--stone); }
+
   .quickview-actions {
     display: flex;
     align-items: center;
@@ -1057,12 +1405,14 @@
 
   @media (max-width: 860px) {
     .canvas-container { min-height: 760px; }
-    .create-panel {
+    .panel-stack {
       position: static;
       width: 100%;
+      max-height: none;
       margin: 20px;
       inset: auto;
       transform: none;
+      overflow-y: visible;
     }
     /* The right-side labels are offset to clear the floating panel, which
        no longer floats at this width, so pull them back to the edge. */
@@ -1082,17 +1432,75 @@
     .node-name { font-size: 11px; }
     .node-amount, .node-fit { font-size: 10px; }
   }
+
+  /* Above the mobile-stack breakpoint the constellation is still doing
+     the full radial layout, but a fixed 190px card left the solver with
+     no feasible arrangement once the window narrowed much past 1100px —
+     six of them plus the hub's clearance and the floating panel just
+     don't fit in that little horizontal room at full size. */
+  @media (min-width: 861px) and (max-width: 1150px) {
+    .node-card { width: 138px; padding: 9px 9px 9px 11px; }
+    /* A narrower card wraps a long sponsor name to 3 lines instead of 2,
+       which grows the card's height right when the vertical budget is
+       just as tight as the horizontal one — clamping it keeps a card's
+       real size predictable enough for the solver to actually satisfy. */
+    .node-name {
+      font-size: 11.5px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .node-amount, .node-fit { font-size: 10.5px; }
+  }
+
+  /* The tightest part of that range needed even smaller cards — 138px
+     was still enough, combined with the hub and a pill sharing its
+     quadrant, to leave the solver with no clean arrangement below ~950px. */
+  @media (min-width: 861px) and (max-width: 950px) {
+    .node-card { width: 122px; padding: 8px 8px 8px 10px; gap: 4px; }
+    .node-name { font-size: 11px; }
+    .node-amount, .node-fit { font-size: 10px; }
+  }
 </style>
 </head>
 <body>
 
+<div class="bg-decor">
+  <span class="glow"></span>
+  <span class="ring r1"></span>
+  <span class="ring r2"></span>
+</div>
+
 <header class="topbar">
   <div class="topbar-left">
-    <span class="wordmark">CHELCIE</span>
-    <span class="concept-pill">ROUND 12 · FLOATING RIGHT PANEL</span>
+    <span class="wordmark" id="wordmarkHome" role="button" tabindex="0">CHELCIE</span>
   </div>
   <div class="topbar-right">
-    <button class="pill-outline" id="trackerBtn">Your partnerships</button>
+    <a class="pill-outline" id="trackerBtn" href="v12-workspace.html">CHELCIE workspace</a>
+
+    <div class="notif-wrap">
+      <button class="icon-btn" id="notifBellBtn" type="button" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span class="notif-badge" id="notifBadge" hidden>0</span>
+      </button>
+      <div class="dropdown-panel" id="notifDropdown" hidden></div>
+    </div>
+
+    <div class="user-menu-wrap">
+      <button class="user-chip" id="userChip" type="button">
+        <span class="user-avatar" id="userAvatar">?</span>
+        <span class="user-name" id="userNameLabel">Set up your account</span>
+        <svg class="chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="dropdown-panel" id="userDropdown" hidden>
+        <div class="dropdown-header">
+          <p class="dropdown-name" id="dropdownName">Set up your account</p>
+          <p class="dropdown-email" id="dropdownEmail"></p>
+        </div>
+        <a class="dropdown-item" href="v12-workspace?tab=settings">Account settings</a>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -1110,11 +1518,11 @@
     <div class="canvas-container" id="canvasContainer">
       <svg class="orbit-svg" id="orbitSvg"></svg>
 
-      <div class="quadrant-label" id="qlGrant" style="left:40px; top:150px;">
+      <div class="quadrant-label" id="qlGrant" style="left:40px; top:32px;">
         <h3>Grant Funds</h3>
         <p>Non-dilutive community capital and foundation support.</p>
       </div>
-      <div class="quadrant-label align-right" id="qlCorporate" style="right:420px; top:150px;">
+      <div class="quadrant-label align-right" id="qlCorporate" style="right:420px; top:32px;">
         <h3>Corporate Sponsors</h3>
         <p>Strategic commercial alignments and brand value.</p>
       </div>
@@ -1143,22 +1551,29 @@
       <div id="quickViewBody"></div>
     </div>
 
-    <aside class="create-panel">
-      <div class="panel-header-row">
-        <h2 class="serif">Partnerships ready for you</h2>
-        <button class="btn-secondary" id="refineProgramBtn">Refine</button>
-      </div>
-      <p class="panel-sub">These teams are already looking for work like yours — reach out directly, no grant queue to wait in.</p>
+    <div class="panel-stack">
+      <div id="nextActionZone"></div>
+      <aside class="create-panel">
+        <div class="panel-header-row">
+          <h2 class="serif">Partnerships ready for you</h2>
+          <button class="btn-secondary" id="refineProgramBtn">Refine</button>
+        </div>
+        <p class="panel-sub">These teams are already looking for work like yours — reach out directly, no grant queue to wait in.</p>
 
-      <div class="sponsor-list" id="sponsorList"></div>
-      <button class="btn-secondary" id="moreCompaniesBtn" style="width:100%; margin-top:14px;" hidden>Show me more company matches</button>
-    </aside>
+        <div class="sponsor-list" id="sponsorList"></div>
+        <button class="btn-secondary" id="moreCompaniesBtn" style="width:100%; margin-top:14px;" hidden>Show me more company matches</button>
+      </aside>
+    </div>
     </div>
   </section>
 
   <section class="screen" data-screen="build">
     <div class="build-wrap">
-      <button class="back-link" id="buildBackLink">← Back to your constellation</button>
+      <nav class="breadcrumb">
+        <button class="crumb-link" id="buildBackLink">Your constellation</button>
+        <span class="crumb-sep">/</span>
+        <span class="crumb-current" id="buildCrumbName"></span>
+      </nav>
       <div class="build-columns">
         <aside class="build-summary">
           <p class="build-eyebrow" id="buildEyebrow"></p>
@@ -1173,52 +1588,151 @@
 
         <div class="build-draft">
           <p class="build-eyebrow">Design your partnership</p>
-          <p class="build-sub" style="max-width:40ch;">CHELCIE drafts each section below to start. Edit anything directly, or redraft one section at a time if it's not quite right.</p>
+          <p class="build-sub" style="max-width:44ch;">Pick how you want to move this forward — CHELCIE drafts each one, ready to edit.</p>
 
           <div class="field-group">
             <label>Your organization</label>
             <input type="text" class="pitch-org" value="Northstar Labs" />
           </div>
 
-          <p class="drafting-state" id="buildLoading" hidden>CHELCIE is drafting this document…</p>
+          <div class="tool-tabs" id="toolTabs">
+            <button type="button" class="tool-tab active" data-tool="outreach">
+              <span class="tool-tab-label">Draft outreach</span>
+              <span class="tool-tab-sub">Funder intro email</span>
+            </button>
+            <button type="button" class="tool-tab" data-tool="referral">
+              <span class="tool-tab-label">Ask for a referral</span>
+              <span class="tool-tab-sub">Warm intro request</span>
+            </button>
+            <button type="button" class="tool-tab" data-tool="application">
+              <span class="tool-tab-label">Build the application</span>
+              <span class="tool-tab-sub">Narrative · budget · boilerplate</span>
+            </button>
+          </div>
 
-          <div id="buildSections" hidden>
-            <div class="doc-section" id="sectionAsk">
-              <div class="doc-section-head"><label>What we are asking</label><button class="regen-link" data-field="ask">Redraft with CHELCIE</button></div>
-              <textarea class="pitch-ask" rows="3"></textarea>
-            </div>
-            <div class="doc-section" id="sectionUse">
-              <div class="doc-section-head"><label>How the funds will be used</label><button class="regen-link" data-field="use">Redraft with CHELCIE</button></div>
-              <textarea class="pitch-use" rows="3"></textarea>
-            </div>
-            <div class="doc-section" id="sectionFit">
-              <div class="doc-section-head"><label>Why this fits</label><button class="regen-link" data-field="fit">Redraft with CHELCIE</button></div>
-              <textarea class="pitch-fit" rows="3"></textarea>
-            </div>
-            <div class="doc-section" id="sectionTerms">
-              <div class="doc-section-head"><label>Terms under discussion</label><button class="regen-link" data-field="terms">Redraft with CHELCIE</button></div>
-              <textarea class="pitch-terms" rows="2"></textarea>
-            </div>
-            <!-- Sponsor/company outreach drafts a real VP email (subject +
-                 body) instead — matching Amy's actual C-CHANGE demo, which
-                 drafts an email for a company target, not a multi-section
-                 one-pager. Same shared status/export/tracker footer below. -->
-            <div class="doc-section" id="sectionSubject" hidden>
-              <div class="doc-section-head"><label>Subject</label><button class="regen-link" data-field="subject">Redraft with CHELCIE</button></div>
-              <input type="text" class="pitch-subject" />
-            </div>
-            <div class="doc-section" id="sectionBody" hidden>
-              <div class="doc-section-head"><label>Body</label><button class="regen-link" data-field="body">Redraft with CHELCIE</button></div>
-              <textarea class="pitch-body" rows="16"></textarea>
-            </div>
-            <div style="border-top:1px solid var(--border); padding-top:18px;">
-              <p class="draft-status" id="draftStatus"></p>
-              <p class="autosave-note" id="autosaveNote"></p>
-              <div class="draft-actions">
-                <button class="btn-secondary" id="exportDraftBtn">Export .txt</button>
-                <button class="btn-secondary" id="markSentBtn">Mark as sent</button>
+          <div id="toolOutreach" class="tool-panel">
+            <p class="drafting-state" id="buildLoading" hidden>CHELCIE is drafting this document…</p>
+
+            <div id="buildSections" hidden>
+              <div class="doc-section" id="sectionAsk">
+                <div class="doc-section-head"><label>What we are asking</label><button class="regen-link" data-field="ask">Redraft with CHELCIE</button></div>
+                <textarea class="pitch-ask" rows="3"></textarea>
+              </div>
+              <div class="doc-section" id="sectionUse">
+                <div class="doc-section-head"><label>How the funds will be used</label><button class="regen-link" data-field="use">Redraft with CHELCIE</button></div>
+                <textarea class="pitch-use" rows="3"></textarea>
+              </div>
+              <div class="doc-section" id="sectionFit">
+                <div class="doc-section-head"><label>Why this fits</label><button class="regen-link" data-field="fit">Redraft with CHELCIE</button></div>
+                <textarea class="pitch-fit" rows="3"></textarea>
+              </div>
+              <div class="doc-section" id="sectionTerms">
+                <div class="doc-section-head"><label>Terms under discussion</label><button class="regen-link" data-field="terms">Redraft with CHELCIE</button></div>
+                <textarea class="pitch-terms" rows="2"></textarea>
+              </div>
+              <!-- Sponsor/company outreach drafts a real VP email (subject +
+                   body) instead — matching Amy's actual C-CHANGE demo, which
+                   drafts an email for a company target, not a multi-section
+                   one-pager. Same shared status/export/tracker footer below. -->
+              <div class="doc-section" id="sectionSubject" hidden>
+                <div class="doc-section-head"><label>Subject</label><button class="regen-link" data-field="subject">Redraft with CHELCIE</button></div>
+                <input type="text" class="pitch-subject" />
+              </div>
+              <div class="doc-section" id="sectionBody" hidden>
+                <div class="doc-section-head"><label>Body</label><button class="regen-link" data-field="body">Redraft with CHELCIE</button></div>
+                <textarea class="pitch-body" rows="16"></textarea>
+              </div>
+              <div style="border-top:1px solid var(--border); padding-top:18px;">
+                <p class="draft-status" id="draftStatus"></p>
+                <p class="autosave-note" id="autosaveNote"></p>
+                <div class="draft-actions">
+                  <button class="btn-secondary" id="exportDraftBtn">Export .txt</button>
+                  <button class="btn-secondary" id="markSentBtn">Mark as sent</button>
+                </div>
               </div>
             </div>
+          </div>
+
+          <div id="toolReferral" class="tool-panel" hidden>
+            <p class="build-sub" style="max-width:44ch; margin-top:0;">Ask someone you know for a warm introduction instead of reaching out cold.</p>
+            <div class="field-group">
+              <label>Who you're asking</label>
+              <input type="text" id="referralName" placeholder="First name" />
+            </div>
+            <div class="field-group">
+              <label>Their email</label>
+              <input type="text" id="referralEmail" placeholder="name@example.com" />
+            </div>
+            <button class="btn-primary" id="referralDraftBtn">Draft with CHELCIE</button>
+            <div id="referralOutput" hidden style="margin-top:22px;">
+              <div class="doc-section">
+                <div class="doc-section-head"><label>Message</label><button class="regen-link" id="referralRedraft">Redraft with CHELCIE</button></div>
+                <textarea id="referralBody" rows="10"></textarea>
+              </div>
+              <div class="draft-actions" style="border-top:1px solid var(--border); padding-top:18px;">
+                <button class="btn-secondary" id="referralExportBtn">Export .txt</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="toolApplication" class="tool-panel" hidden>
+            <div class="sub-tabs" id="appSubTabs">
+              <button type="button" class="sub-tab active" data-subtab="narrative">Narrative</button>
+              <button type="button" class="sub-tab" data-subtab="budget">Budget</button>
+              <button type="button" class="sub-tab" data-subtab="boilerplate">Boilerplate</button>
+            </div>
+
+            <div id="appNarrative" class="sub-panel">
+              <button class="btn-primary" id="appDraftAllBtn" style="margin-bottom:20px;">Draft whole application</button>
+              <div class="doc-section app-narrative-section" data-target="60">
+                <div class="doc-section-head"><label>Executive summary</label><span class="word-progress"></span></div>
+                <textarea class="app-narrative-field" rows="3" data-key="summary"></textarea>
+              </div>
+              <div class="doc-section app-narrative-section" data-target="120">
+                <div class="doc-section-head"><label>Statement of need</label><span class="word-progress"></span></div>
+                <textarea class="app-narrative-field" rows="4" data-key="need"></textarea>
+              </div>
+              <div class="doc-section app-narrative-section" data-target="150">
+                <div class="doc-section-head"><label>Project narrative</label><span class="word-progress"></span></div>
+                <textarea class="app-narrative-field" rows="5" data-key="project"></textarea>
+              </div>
+              <div class="doc-section app-narrative-section" data-target="80">
+                <div class="doc-section-head"><label>Evaluation plan</label><span class="word-progress"></span></div>
+                <textarea class="app-narrative-field" rows="3" data-key="evaluation"></textarea>
+              </div>
+            </div>
+
+            <div id="appBudget" class="sub-panel" hidden>
+              <div class="field-group">
+                <label>Requested amount</label>
+                <input type="text" id="budgetAsk" />
+              </div>
+              <div class="field-group">
+                <label>Indirect rate (%)</label>
+                <input type="number" id="budgetIndirect" value="15" min="0" max="100" />
+              </div>
+              <div class="field-group">
+                <label>Cost share / match</label>
+                <input type="text" id="budgetMatch" placeholder="$0" />
+              </div>
+              <p class="budget-total" id="budgetTotal"></p>
+            </div>
+
+            <div id="appBoilerplate" class="sub-panel" hidden>
+              <div class="doc-section">
+                <div class="doc-section-head"><label>Organization boilerplate</label><button class="regen-link" id="boilerplateCopy">Copy</button></div>
+                <textarea id="boilerplateText" rows="6" readonly></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="complete-row" id="completeRow">
+            <button class="btn-primary" id="markCompletedBtn">Mark as completed</button>
+          </div>
+
+          <div id="nextStepsPanel" class="next-steps" hidden>
+            <p class="build-eyebrow" style="margin-top:8px;">What's next</p>
+            <ul class="next-steps-list" id="nextStepsList"></ul>
           </div>
         </div>
       </div>
@@ -1226,14 +1740,6 @@
   </section>
 
 </main>
-
-<div class="overlay" id="trackerOverlay">
-  <header class="topbar">
-    <span class="wordmark">Your partnerships</span>
-    <button class="back-link" id="trackerClose">Close</button>
-  </header>
-  <div class="overlay-body" id="trackerBody"></div>
-</div>
 
 <div class="modal-backdrop" id="onboardingOverlay">
   <div class="onboarding-modal">
@@ -1300,6 +1806,83 @@
   const tracked = [];
   const favorites = new Set();
   const dismissed = new Set();
+  let settings = { researchPortfolioEnabled: false };
+
+  function persist() {
+    saveStore({
+      org: ORG,
+      prefs: {
+        types: Array.from(prefs.types),
+        minRange: prefs.minRange,
+        hideDilutive: prefs.hideDilutive,
+        under500k: prefs.under500k,
+        rollingOnly: prefs.rollingOnly,
+      },
+      tracked,
+      favorites: Array.from(favorites),
+      dismissed: Array.from(dismissed),
+      settings,
+    });
+    renderNextAction();
+    renderNotifDropdown();
+  }
+
+  // "Next best action" + "stalled drafts" — a small, single recommendation
+  // (not a stats dump) plus a separate nudge for drafts sitting unsent,
+  // per Amy's "know exactly what to do next" / "what's standing in the
+  // way" framing. Lives at the top of the create-panel, not a new screen.
+  function renderNextAction() {
+    const zone = document.getElementById("nextActionZone");
+    if (!zone) return;
+
+    const sentOppIds = new Set(tracked.filter((t) => t.status === "sent" && t.oppId).map((t) => t.oppId));
+    const candidates = OPPORTUNITIES.filter((o) => passesPrefs(o) && !sentOppIds.has(o.id));
+    const fullyMet = candidates.filter((o) => unmetRequirements(o).length === 0);
+    const pool = (fullyMet.length ? fullyMet : candidates).slice().sort((a, b) => b.fit - a.fit);
+    const best = pool[0];
+    const stalled = tracked.filter((t) => t.status === "draft");
+
+    let html = "";
+
+    if (best) {
+      const inProgress = tracked.some((t) => t.oppId === best.id && t.status === "draft");
+      const gaps = unmetRequirements(best).length;
+      const why = gaps === 0
+        ? `Every requirement is met, and it's the highest fit still open, at ${best.fit}.`
+        : `Highest fit still open, at ${best.fit} — worth pursuing even with ${gaps} requirement${gaps === 1 ? "" : "s"} outstanding.`;
+      html += `
+        <div class="notif-row">
+          <span class="notif-icon actionable"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 2 4.5 13.5H11L10 22 19.5 9.5H13V2Z" fill="currentColor"/></svg></span>
+          <div class="notif-main">
+            <div class="notif-body">
+              <p class="notif-title">${inProgress ? "Finish drafting to" : "Start drafting to"} ${best.name}</p>
+              <p class="notif-desc">${why}</p>
+            </div>
+            <button class="notif-cta" id="nextActionBtn">${inProgress ? "Continue" : "Start"}</button>
+          </div>
+        </div>
+      `;
+    }
+
+    if (stalled.length) {
+      html += `
+        <div class="notif-row">
+          <span class="notif-icon warn">!</span>
+          <div class="notif-main">
+            <div class="notif-body">
+              <p class="notif-title">${stalled.length} draft${stalled.length === 1 ? "" : "s"} ready but not sent</p>
+            </div>
+            <a class="notif-cta" href="v12-workspace.html">Review</a>
+          </div>
+        </div>
+      `;
+    }
+
+    zone.innerHTML = html;
+    if (best) {
+      document.getElementById("nextActionBtn").addEventListener("click", () => openOpportunity(best));
+    }
+  }
 
   const canvas = document.getElementById("canvasContainer");
   const orbitSvg = document.getElementById("orbitSvg");
@@ -1315,16 +1898,18 @@
     syncScrollLock();
   }
 
+  function passesPrefs(o) {
+    if (dismissed.has(o.id)) return false;
+    if (!prefs.types.has(o.type)) return false;
+    if (prefs.minRange && o.max < prefs.minRange) return false;
+    if (prefs.hideDilutive && o.dilutive) return false;
+    if (prefs.under500k && o.max > 500000) return false;
+    if (prefs.rollingOnly && !isRolling(o)) return false;
+    return true;
+  }
+
   function recompute() {
-    filtered = OPPORTUNITIES.filter((o) => {
-      if (dismissed.has(o.id)) return false;
-      if (!prefs.types.has(o.type)) return false;
-      if (prefs.minRange && o.max < prefs.minRange) return false;
-      if (prefs.hideDilutive && o.dilutive) return false;
-      if (prefs.under500k && o.max > 500000) return false;
-      if (prefs.rollingOnly && !isRolling(o)) return false;
-      return true;
-    }).sort((a, b) => b.fit - a.fit);
+    filtered = OPPORTUNITIES.filter(passesPrefs).sort((a, b) => b.fit - a.fit);
     renderMap();
     renderListView();
   }
@@ -1348,6 +1933,148 @@
   const QUADRANT_SPAN = 68;
   const CARD_LIMIT = 6;
 
+  // Mobile: every filtered opportunity as a full card, stacked vertically
+  // in fit order — no CARD_LIMIT split into cards vs. pills, since a
+  // stack can scroll instead of needing to fit a fixed canvas.
+  // Guarantees no item ever overlaps the org hub or another item, given
+  // each item's current w/h — called once with estimated sizes (before
+  // anything exists in the DOM to measure) and again with each item's
+  // real rendered size once it does, since content-dependent sizing
+  // (a long name wrapping, a wide dollar amount) makes the estimate
+  // only approximate.
+  function resolveHardOverlaps(positions, org, rect, cardGap, iterations) {
+    for (let iter = 0; iter < iterations; iter++) {
+      let moved = false;
+      for (const p of positions) {
+        const halfW = p.w / 2, halfH = p.h / 2;
+        const clampedX = Math.min(Math.max(p.x, halfW + 12), rect.width - halfW - 12);
+        const clampedY = Math.min(Math.max(p.y, halfH + 12), rect.height - halfH - 12);
+        if (clampedX !== p.x || clampedY !== p.y) moved = true;
+        p.x = clampedX;
+        p.y = clampedY;
+
+        const dx = p.x - org.x, dy = p.y - org.y;
+        const overlapX = (org.w + p.w) / 2 - Math.abs(dx);
+        const overlapY = (org.h + p.h) / 2 - Math.abs(dy);
+        if (overlapX > 0 && overlapY > 0) {
+          moved = true;
+          // Damped (0.6x, not the full overlap) — pushing the entire
+          // overlap every iteration let two competing constraints (say,
+          // this item's hub clearance and its gap from a neighbor) shove
+          // it back and forth by the same amount forever, a stable
+          // oscillation that "moved" could never see as settled. Ran the
+          // full 4000-iteration budget without once going quiet — this
+          // wasn't a too-tight-to-solve layout, it just never stopped
+          // overshooting.
+          // Hub clearance is damped much less than the pairwise pass below
+          // — a gentle pairwise nudge was able to cancel out a gentle hub
+          // correction each iteration indefinitely (a genuine trapped
+          // equilibrium, not just oscillation), because the two were
+          // fighting at comparable strength. Hub wins that fight faster.
+          if (overlapX < overlapY) p.x += (dx < 0 ? -1 : 1) * (overlapX * 0.9 + 1);
+          else p.y += (dy < 0 ? -1 : 1) * (overlapY * 0.9 + 1);
+        }
+      }
+      for (let i = 0; i < positions.length; i++) {
+        for (let j = i + 1; j < positions.length; j++) {
+          const p1 = positions[i], p2 = positions[j];
+          const gap = p1.isCard && p2.isCard ? cardGap : 6;
+          const dx = p2.x - p1.x, dy = p2.y - p1.y;
+          const overlapX = (p1.w + p2.w) / 2 + gap - Math.abs(dx);
+          const overlapY = (p1.h + p2.h) / 2 + gap - Math.abs(dy);
+          if (overlapX > 0 && overlapY > 0) {
+            moved = true;
+            if (overlapX < overlapY) {
+              const push = (overlapX * 0.18 / 2) * (dx < 0 ? -1 : 1) || overlapX / 2;
+              p1.x -= push; p2.x += push;
+            } else {
+              const push = (overlapY * 0.18 / 2) * (dy < 0 ? -1 : 1) || overlapY / 2;
+              p1.y -= push; p2.y += push;
+            }
+          }
+        }
+      }
+      if (!moved) { window.__debugIters = iter; break; }
+      window.__debugIters = iter;
+    }
+    // The damped loop above is what avoids oscillation on the big,
+    // evenly-matched corrections — but on a small straggler (two things
+    // still a handful of px into each other after everything else
+    // settled), that same damping can itself become the obstacle: each
+    // step is too gentle to ever fully close a residual this size before
+    // "moved" — driven by other, larger pairs — stops needing a look.
+    // A short, undamped follow-up (full-strength push, not fractional)
+    // mops up whatever's left, and at this point nothing is competing
+    // hard enough for it to reopen a fight the first pass already won.
+    for (let iter = 0; iter < 300; iter++) {
+      let moved = false;
+      for (const p of positions) {
+        const halfW = p.w / 2, halfH = p.h / 2;
+        p.x = Math.min(Math.max(p.x, halfW + 12), rect.width - halfW - 12);
+        p.y = Math.min(Math.max(p.y, halfH + 12), rect.height - halfH - 12);
+        const dx = p.x - org.x, dy = p.y - org.y;
+        const overlapX = (org.w + p.w) / 2 - Math.abs(dx);
+        const overlapY = (org.h + p.h) / 2 - Math.abs(dy);
+        if (overlapX > 0 && overlapY > 0) {
+          moved = true;
+          if (overlapX < overlapY) p.x += (dx < 0 ? -1 : 1) * (overlapX + 1);
+          else p.y += (dy < 0 ? -1 : 1) * (overlapY + 1);
+        }
+      }
+      for (let i = 0; i < positions.length; i++) {
+        for (let j = i + 1; j < positions.length; j++) {
+          const p1 = positions[i], p2 = positions[j];
+          const gap = p1.isCard && p2.isCard ? cardGap : 6;
+          const dx = p2.x - p1.x, dy = p2.y - p1.y;
+          const overlapX = (p1.w + p2.w) / 2 + gap - Math.abs(dx);
+          const overlapY = (p1.h + p2.h) / 2 + gap - Math.abs(dy);
+          if (overlapX > 0 && overlapY > 0) {
+            moved = true;
+            if (overlapX < overlapY) {
+              const push = (overlapX / 2) * (dx < 0 ? -1 : 1) || overlapX / 2;
+              p1.x -= push; p2.x += push;
+            } else {
+              const push = (overlapY / 2) * (dy < 0 ? -1 : 1) || overlapY / 2;
+              p1.y -= push; p2.y += push;
+            }
+          }
+        }
+      }
+      if (!moved) break;
+    }
+  }
+
+  // Shared by the mobile stack and the desktop List view — both are just
+  // "every opportunity as a full card, stacked vertically," the only
+  // difference is which container they render into and how tightly the
+  // gain snippet gets clamped.
+  function richCardInner(o) {
+    return `
+      <span class="node-card-top">
+        <span class="node-badge" style="background:${BADGE_BG[o.type]}">${TYPE_LABEL[o.type].toUpperCase()}</span>
+        <span class="node-right-group">
+          ${favorites.has(o.id) ? '<span class="node-fav">★</span>' : ""}
+          <span class="node-fit">${o.fit}</span>
+        </span>
+      </span>
+      <span class="node-name">${o.name}</span>
+      <span class="node-amount">${amountRange(o)}</span>
+      <span class="mobile-card-timeline">${o.timeline}</span>
+      <span class="mobile-card-gain">${o.gain}</span>
+    `;
+  }
+
+  function renderMobileStack() {
+    filtered.forEach((o) => {
+      const node = document.createElement("div");
+      node.className = "opp-node shown";
+      node.innerHTML = `<button class="node-card mobile-card" data-opp-id="${o.id}">${richCardInner(o)}</button>`;
+      const cardBtn = node.querySelector(".node-card");
+      cardBtn.addEventListener("click", () => openQuickView(o, cardBtn));
+      canvas.appendChild(node);
+    });
+  }
+
   function renderMap() {
     const preRect = canvas.getBoundingClientRect();
     if (!(preRect.width > 0 && preRect.height > 0)) {
@@ -1361,17 +2088,47 @@
     const rect = canvas.getBoundingClientRect();
     orbitSvg.setAttribute("viewBox", "0 0 " + rect.width + " " + rect.height);
 
+    // Below ~860px the radial constellation has nowhere near enough room
+    // for cards, pills, quadrant labels and the hub all at once — instead
+    // of squeezing that whole spatial layout down, mobile gets a plain
+    // vertical stack of cards, no relax()/collision math needed.
+    const isMobile = window.innerWidth <= 860;
+    canvas.classList.toggle("mobile-stack", isMobile);
+    document.getElementById("centerHub").style.display = isMobile ? "none" : "";
+    document.querySelectorAll(".quadrant-label").forEach((el) => {
+      el.style.display = isMobile ? "none" : "";
+    });
+    // The Constellation/List toggle has nothing left to switch between on
+    // mobile — both would show this same stack — so it'd otherwise look
+    // like a broken control that does nothing.
+    document.getElementById("viewToggle").style.display = isMobile ? "none" : "";
+    if (isMobile) {
+      renderMobileStack();
+      return;
+    }
+
     // The floating panel sits on top of the canvas rather than shrinking it
     // (it's a sibling, absolutely positioned), so centering on rect.width
     // alone centers on the FULL width including the space the panel
     // occupies — the constellation reads as shoved left. Center it instead
     // on the space actually left over once the panel's width is excluded.
-    const panelRect = document.querySelector(".create-panel").getBoundingClientRect();
+    const panelRect = document.querySelector(".panel-stack").getBoundingClientRect();
     const panelFloats = panelRect.width > 0 && window.innerWidth > 860;
     const availW = panelFloats ? panelRect.left - rect.left : rect.width;
 
     const cx = availW / 2, cy = rect.height / 2;
     const maxR = Math.min(availW, rect.height) / 2 - 90;
+    // The one place that defines how much open space surrounds the hub —
+    // both the hard-overlap obstacle below (keeps cards/pills out) and the
+    // starfield's inner radius (keeps stars out) read from this, so the
+    // two can't drift out of sync again like they did before: cards were
+    // free to sit just outside the hub's old, much smaller hit-box while
+    // still inside the visually-hollow zone the starfield was leaving.
+    // Scaled down on a narrower desktop canvas — a fixed 130 was eating
+    // most of the ring's own radius budget (maxR) once the window got
+    // smaller than roughly 1100px, leaving no room for cards to fit
+    // without overlapping, no matter how many times the solver ran.
+    const HUB_CLEAR_R = Math.min(130, Math.max(42, maxR * 0.34));
 
     // The hub itself was still pinned at a static CSS left:50%/top:50%
     // (the true center of the full canvas) while everything drawn around
@@ -1382,28 +2139,33 @@
     centerHubEl.style.top = (cy / rect.height) * 100 + "%";
 
 
-    [0.32, 0.55, 0.78, 1].forEach((f) => {
-      const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      ring.setAttribute("cx", cx);
-      ring.setAttribute("cy", cy);
-      ring.setAttribute("r", maxR * f);
-      ring.setAttribute("class", "orbit-ring");
-      orbitSvg.appendChild(ring);
-    });
-
     const groups = TYPES_ORDER
       .map((type) => ({ type, all: filtered.filter((o) => o.type === type) }))
       .filter((g) => g.all.length > 0);
 
-    const isMobile = window.innerWidth <= 860;
-    const margin = 88;
-    const maxRxPx = Math.max(isMobile ? 70 : 150, availW / 2 - margin);
-    const maxRyPx = Math.max(isMobile ? 130 : 96, rect.height / 2 - margin);
+    // Scaled down at smaller widths too — 88px off both edges was assuming
+    // a wide canvas with plenty to spare; on a narrower one it was eating
+    // into the radius budget cards actually need to clear the hub without
+    // also needing an oversized push from the solver.
+    const margin = Math.min(88, Math.max(50, availW * 0.1));
+    const maxRxPx = Math.max(150, availW / 2 - margin);
+    const maxRyPx = Math.max(96, rect.height / 2 - margin);
 
-    const CARD_W = isMobile ? 118 : 190;
-    const CARD_H = isMobile ? 100 : 78;
-    const DOT_SIZE = 16;
-    const GAP = isMobile ? 16 : 52;
+    const CARD_W = 190;
+    const CARD_H = 78;
+    // The pill's real rendered width varies with its text ("55 · $5M" vs
+    // "68 · $200K"), up to ~73px measured — a fixed 58px here meant the
+    // collision math thought every pill was narrower than it actually
+    // renders, so it could still converge on a "clean" layout that was
+    // visually overlapping.
+    const DOT_W = 82;
+    const DOT_H = 20;
+    // The comfortable 80px card-to-card gap that reads well on a wide
+    // screen is, by itself, more room than a narrower desktop window has
+    // to give two cards in the same quadrant — scale it down as availW
+    // shrinks (floor of 28, still a real gap) instead of holding out for
+    // 80px of breathing room the canvas can't actually spare.
+    const GAP = Math.max(28, Math.min(80, availW / 11));
     // Only the top CARD_LIMIT opportunities overall (globally by fit, not
     // per type — `filtered` is already sorted this way) render as full
     // cards; everything else still shows, but as a small clickable dot
@@ -1428,21 +2190,26 @@
         const angle = ringLen > 1
           ? centerRad - halfSpanRad + (posInRing / (ringLen - 1)) * (halfSpanRad * 2)
           : centerRad;
-        const t = ringFrac(ring);
         const isCard = cardIds.has(o.id);
+        // Pills are always the lower-fit leftovers beyond CARD_LIMIT, but a
+        // quadrant with only a handful of them (n<=3) got just one ring at
+        // a middling t=0.5 — no farther out than a card elsewhere could
+        // be. Pills always sit on the outer ring instead, regardless of
+        // how many share their quadrant; only cards use the tiered t.
+        const t = isCard ? ringFrac(ring) : 0.92;
         positions.push({
           o,
           type: g.type,
           x: cx + Math.cos(angle) * maxRxPx * t,
           y: cy + Math.sin(angle) * maxRyPx * t,
-          w: isCard ? CARD_W : DOT_SIZE,
-          h: isCard ? CARD_H : DOT_SIZE,
+          w: isCard ? CARD_W : DOT_W,
+          h: isCard ? CARD_H : DOT_H,
           isCard,
         });
       });
     });
 
-    const org = { x: cx, y: cy, w: 92 + 20, h: 92 + 20 };
+    const org = { x: cx, y: cy, w: HUB_CLEAR_R * 2, h: HUB_CLEAR_R * 2 };
     // The floating panel is a real 2D obstacle now (a plain "stay left of
     // it" line only worked back when the panel spanned the full canvas
     // height — now that it's a shorter, vertically-centered card, a rule
@@ -1483,19 +2250,31 @@
             const overlapY = (obstacle.h + p.h) / 2 - Math.abs(dy);
             if (overlapX > 0 && overlapY > 0) {
               moved = true;
-              const dist = Math.hypot(dx, dy) || 1;
-              const pushOut = Math.min(overlapX, overlapY) + 2;
-              p.x += (dx / dist) * pushOut;
-              p.y += (dy / dist) * pushOut;
+              // Push along whichever axis has the smaller overlap, same as
+              // the pairwise separation below — pushing diagonally by the
+              // overlap magnitude under-corrects that axis whenever the
+              // obstacle is mostly offset the other way, which was letting
+              // items settle still overlapping the hub.
+              if (overlapX < overlapY) {
+                p.x += (dx < 0 ? -1 : 1) * (overlapX + 2);
+              } else {
+                p.y += (dy < 0 ? -1 : 1) * (overlapY + 2);
+              }
             }
           }
         }
         for (let i = 0; i < positions.length; i++) {
           for (let j = i + 1; j < positions.length; j++) {
             const p1 = positions[i], p2 = positions[j];
+            // The generous card-to-card GAP is what makes two full cards
+            // read as comfortably spaced — applying that same 52px to a
+            // pill (a small map-pin badge, not a card) eats far more room
+            // than a pill actually needs and was making tight quadrants
+            // geometrically infeasible to solve once pills got bigger.
+            const gap = p1.isCard && p2.isCard ? GAP : 10;
             const dx = p2.x - p1.x, dy = p2.y - p1.y;
-            const overlapX = (p1.w + p2.w) / 2 + GAP - Math.abs(dx);
-            const overlapY = (p1.h + p2.h) / 2 + GAP - Math.abs(dy);
+            const overlapX = (p1.w + p2.w) / 2 + gap - Math.abs(dx);
+            const overlapY = (p1.h + p2.h) / 2 + gap - Math.abs(dy);
             if (overlapX > 0 && overlapY > 0) {
               moved = true;
               if (overlapX < overlapY) {
@@ -1512,19 +2291,14 @@
       }
     }
 
-    relax(500);
+    relax(1500);
 
     // Depth cue, cards only: distance from the org hub (taken from where a
     // card actually settled, not just its original ring) maps to size —
     // closer reads a little bigger, farther a little smaller. Every shown
     // card is fully opaque now; opacity is reserved as the card-vs-dot
     // signal instead of also doing double duty as a distance fade.
-    // At mobile, some quadrants are already packed within a couple of
-    // pixels of the tightest fit the canvas allows (the org hub, canvas
-    // edges and the panel leave no slack to spare), so the range there
-    // only shrinks far cards rather than growing near ones — growth is
-    // what needs the spare room this width doesn't have.
-    const scaleRange = isMobile ? [0.9, 1] : [0.85, 1.15];
+    const scaleRange = [0.85, 1.15];
     // Plain Euclidean pixel distance, not the elliptical per-axis one used
     // for placement — "closer to the sun" means visual proximity, and the
     // x/y budgets differ enough (a wide canvas, a short one) that dividing
@@ -1544,57 +2318,32 @@
       p.h = CARD_H * p.scale;
     });
 
-    relax(500);
+    relax(1500);
 
-    // Dots land exactly on one of the drawn orbit rings, not adrift in the
-    // empty space between them — snapped to the nearest ring radius along
-    // whatever angle collision-avoidance already settled it at, so it
-    // reads as a point sitting on the map rather than floating.
-    const ringRadii = [0.32, 0.55, 0.78, 1].map((f) => maxR * f).filter((r) => r > 70);
-    positions.forEach((p) => {
-      if (p.isCard) return;
-      const dist = Math.hypot(p.x - cx, p.y - cy) || 1;
-      const angle = Math.atan2(p.y - cy, p.x - cx);
-      let nearest = ringRadii[0];
-      for (const r of ringRadii) {
-        if (Math.abs(dist - r) < Math.abs(dist - nearest)) nearest = r;
-      }
-      p.x = cx + Math.cos(angle) * nearest;
-      p.y = cy + Math.sin(angle) * nearest;
-    });
-
-    positions.forEach((p) => {
+    // Hard guarantee, cards/pills must never overlap each other or the
+    // hub — unlike staying clear of a quadrant label or the floating
+    // panel (best-effort in relax() above), this one isn't negotiable.
+    // A dedicated final pass with only those two constraints (not also
+    // fighting the panel/labels for the same space) converges even in
+    // layouts tight enough that the full relax() above settles with a
+    // residual overlap. Called once here with estimated sizes, and again
+    // below with each item's real measured size once it exists in the DOM.
+    resolveHardOverlaps(positions, org, rect, GAP, 20000);
+    // Cards and pills alike are auto-sized to their content (a long
+    // sponsor name wraps to more lines, a bigger dollar amount widens a
+    // pill), so the estimated CARD_W/H and DOT_W/H fed into the collision
+    // math above are still only approximations — close enough to place
+    // everything, not exact enough to guarantee zero overlap on their
+    // own. Build the real DOM nodes now so their true rendered size can
+    // be measured, then run one more correction pass with those real
+    // sizes and re-apply the result, instead of trusting the estimate.
+    const nodeEls = positions.map((p) => {
       const o = p.o;
-      const x = (p.x / rect.width) * 100;
-      const y = (p.y / rect.height) * 100;
-      const cardOpacity = p.opacity;
-
-      // Connector lines only make sense for the real cards — drawing one
-      // to every small opportunity-dot too just turns the whole canvas
-      // into a hairball, and the dots already read as "part of this
-      // constellation" from their position alone.
-      if (p.isCard) {
-        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", cx);
-        line.setAttribute("y1", cy);
-        line.setAttribute("x2", p.x);
-        line.setAttribute("y2", p.y);
-        line.setAttribute("class", "conn-line");
-        orbitSvg.appendChild(line);
-
-        const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        dot.setAttribute("cx", p.x);
-        dot.setAttribute("cy", p.y);
-        dot.setAttribute("r", 3);
-        dot.setAttribute("class", "conn-dot");
-        orbitSvg.appendChild(dot);
-      }
-
       const node = document.createElement("div");
       node.className = "opp-node shown";
-      node.style.left = x + "%";
-      node.style.top = y + "%";
-      node.style.opacity = cardOpacity.toFixed(3);
+      node.style.left = (p.x / rect.width) * 100 + "%";
+      node.style.top = (p.y / rect.height) * 100 + "%";
+      node.style.opacity = p.opacity.toFixed(3);
 
       if (p.isCard) {
         node.innerHTML = `
@@ -1619,11 +2368,139 @@
         // for space as another shrunk card. A distinct, non-animated
         // colour (unlike the pulsing "discover more" dots) marks it as
         // a specific opportunity you can open, not a generic prompt.
-        node.innerHTML = `<button class="opp-dot" data-opp-id="${o.id}" aria-label="${o.name}" title="${o.name} — ${TYPE_LABEL[o.type]}, fit ${o.fit}"></button>`;
+        node.innerHTML = `<button class="opp-dot" data-opp-id="${o.id}" aria-label="${o.name}" title="${o.name} — ${TYPE_LABEL[o.type]}, fit ${o.fit}"><span class="pill-fit">${o.fit}</span><span class="pill-sep">·</span><span class="pill-amount">${fmtMoney(o.max)}</span></button>`;
         const dotBtn = node.querySelector(".opp-dot");
         dotBtn.addEventListener("click", () => openQuickView(o, dotBtn));
       }
       canvas.appendChild(node);
+      return node;
+    });
+
+    positions.forEach((p, i) => {
+      const el = nodeEls[i].firstElementChild;
+      const r = el.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) {
+        p.w = r.width;
+        p.h = r.height;
+      }
+    });
+    resolveHardOverlaps(positions, org, rect, GAP, 20000);
+
+    // Compute the ring from where the CARDS settled, then pull every pill
+    // onto it (same angle, radius snapped to the ring's centerline)
+    // instead of leaving pills at their own fixed outer tier — otherwise
+    // the ring and the pills drift apart: a clean, tight ring with pills
+    // floating past its edge in the empty space beyond it.
+    const cardDists = positions.filter((p) => p.isCard).map((p) => Math.hypot(p.x - cx, p.y - cy));
+    // Based on the FARTHEST card, not the average — a pill is by
+    // definition lower-fit than every card (below the CARD_LIMIT cutoff),
+    // so it must read as farther from the sun than every one of them, not
+    // just farther than most. Centering on the average let an outer-tier
+    // card end up beyond the ring a pill sat on, inverting the "closer
+    // score sits closer" rule for that specific card. Pushed out a
+    // further 1.15x on top of that so the ring still reads as its own
+    // distinct band, not glued to the last card's edge.
+    const ringCenter = (cardDists.length ? Math.max(...cardDists) : Math.max(HUB_CLEAR_R, maxR * 0.5)) * 1.06;
+    const RING_BAND = 88;
+    const STAR_INNER = Math.max(HUB_CLEAR_R, ringCenter - RING_BAND / 2);
+    const STAR_OUTER = STAR_INNER + RING_BAND;
+
+    // A pill sorted right next to a card within the same capital type
+    // often inherits almost that card's exact angle from the seeding
+    // step — fine while they sat at different radii, but pulling the
+    // pill onto the ring's radius then lines it up almost directly
+    // above/below that card, leaving the solver only a few degrees of
+    // real separation to find along a near-zero horizontal offset. A
+    // nudge away from any card at a near-matching angle first gives it
+    // real room in both directions, not just one. The needed gap is
+    // arc-length-aware (each card's own real measured half-width, not a
+    // flat constant) — a big card sitting close to the hub can span
+    // 20°+ on its own, so a fixed ~13° trigger let a wide near-hub card
+    // and a pill 18° apart still physically overlap (found via a
+    // hartwell/willowmere pair at 1400px: 18° apart at a 330px radius is
+    // only ~104px of arc, less than their combined ~122px half-widths).
+    const cardAngleInfo = positions
+      .filter((p) => p.isCard)
+      .map((p) => ({ angle: Math.atan2(p.y - cy, p.x - cx), halfW: p.w / 2 }));
+    positions.forEach((p) => {
+      if (p.isCard) return;
+      let angle = Math.atan2(p.y - cy, p.x - cx);
+      for (const ca of cardAngleInfo) {
+        let diff = angle - ca.angle;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        const neededAngle = (ca.halfW + p.w / 2 + GAP / 2) / ringCenter;
+        if (Math.abs(diff) < neededAngle) {
+          const push = neededAngle - Math.abs(diff) + 0.03;
+          angle += diff < 0 ? -push : push;
+        }
+      }
+      p.x = cx + Math.cos(angle) * ringCenter;
+      p.y = cy + Math.sin(angle) * ringCenter;
+    });
+    // Re-resolve after moving pills onto the ring — cards already settled
+    // are the priority now, so this pass is just cleaning up whatever
+    // conflicts that move introduced between pills and cards/each other.
+    resolveHardOverlaps(positions, org, rect, GAP, 8000);
+
+    // resolveHardOverlaps clamps to the canvas edge at the start of each
+    // iteration, but a hub/pairwise push later in that same iteration can
+    // still nudge something past the edge as the very last thing that
+    // happens, with no later clamp to catch it — which is exactly how a
+    // card ended up clipped by canvas-container's overflow:hidden. Being
+    // fully on-screen is more important than the last px of gap from a
+    // neighbor, so this pass runs last, unconditionally, no exceptions.
+    positions.forEach((p) => {
+      const halfW = p.w / 2, halfH = p.h / 2;
+      p.x = Math.min(Math.max(p.x, halfW + 12), rect.width - halfW - 12);
+      p.y = Math.min(Math.max(p.y, halfH + 12), rect.height - halfH - 12);
+    });
+
+    positions.forEach((p, i) => {
+      nodeEls[i].style.left = (p.x / rect.width) * 100 + "%";
+      nodeEls[i].style.top = (p.y / rect.height) * 100 + "%";
+    });
+
+    // A hollow ring of tiny stars around the hub instead of stroked
+    // concentric circles — the crisp ring outlines were the single
+    // biggest reason this read as a radar/sonar screen. Left empty in the
+    // middle so the org hub sits in open space, like a sun. Seeded so the
+    // field rescales with the canvas instead of reshuffling on every
+    // recompute/resize.
+    let starSeed = 918273645;
+    const starRand = () => {
+      starSeed = (starSeed * 1664525 + 1013904223) >>> 0;
+      return (starSeed >>> 8) / 16777216;
+    };
+    const makeStar = (px, py, isBright) => {
+      const star = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      star.setAttribute("cx", px.toFixed(1));
+      star.setAttribute("cy", py.toFixed(1));
+      star.setAttribute("r", (isBright ? 1.5 + starRand() : 0.5 + starRand() * 0.8).toFixed(2));
+      star.setAttribute("class", "sky-star");
+      star.setAttribute("opacity", (isBright ? 0.7 + starRand() * 0.3 : 0.2 + starRand() * 0.35).toFixed(2));
+      orbitSvg.appendChild(star);
+    };
+    for (let i = 0; i < 420; i++) {
+      const angle = starRand() * Math.PI * 2;
+      const rr = Math.sqrt(starRand() * (STAR_OUTER * STAR_OUTER - STAR_INNER * STAR_INNER) + STAR_INNER * STAR_INNER);
+      makeStar(cx + Math.cos(angle) * rr, cy + Math.sin(angle) * rr, starRand() < 0.12);
+    }
+    // Extra stars scattered around each card, scaled by its own fit score
+    // — the better the match, the more it visibly glows with its own
+    // little cluster on top of the base ring, not just "closer to the sun."
+    const cardFits = positions.filter((p) => p.isCard).map((p) => p.o.fit);
+    const cardFitMin = cardFits.length ? Math.min(...cardFits) : 0;
+    const cardFitSpan = cardFits.length ? Math.max(...cardFits) - cardFitMin || 1 : 1;
+    positions.forEach((p) => {
+      if (!p.isCard) return;
+      const extra = Math.round(((p.o.fit - cardFitMin) / cardFitSpan) * 14) + 4;
+      const spread = Math.max(p.w, p.h) / 2 + 30;
+      for (let i = 0; i < extra; i++) {
+        const angle = starRand() * Math.PI * 2;
+        const rr = spread + starRand() * 26;
+        makeStar(p.x + Math.cos(angle) * rr, p.y + Math.sin(angle) * rr, starRand() < 0.2);
+      }
     });
   }
 
@@ -1637,21 +2514,9 @@
       return;
     }
     rows.innerHTML = filtered.map((o) => `
-      <button class="list-row" data-opp-id="${o.id}">
-        <span class="list-row-left">
-          <span class="node-badge list-row-badge" style="background:${BADGE_BG[o.type]}">${TYPE_LABEL[o.type].toUpperCase()}</span>
-          <span>
-            <span class="list-row-name">${o.name}${favorites.has(o.id) ? ' <span class="node-fav">★</span>' : ""}</span>
-            <div class="list-row-meta">${o.timeline}</div>
-          </span>
-        </span>
-        <span class="list-row-right">
-          <span class="list-row-fit">${o.fit} fit</span>
-          <span class="list-row-amount">Up to ${fmtMoney(o.max)}</span>
-        </span>
-      </button>
+      <button class="node-card list-card" data-opp-id="${o.id}">${richCardInner(o)}</button>
     `).join("");
-    rows.querySelectorAll(".list-row").forEach((row) => {
+    rows.querySelectorAll(".list-card").forEach((row) => {
       const o = filtered.find((x) => x.id === row.dataset.oppId);
       row.addEventListener("click", () => openQuickView(o, row));
     });
@@ -1674,6 +2539,8 @@
   function fromOpportunity(o) {
     return {
       kind: "onepager",
+      oppId: o.id,
+      raw: o,
       eyebrow: TYPE_LABEL[o.type] + " · Fit " + o.fit,
       name: o.name,
       sub: amountRange(o) + " · " + o.timeline,
@@ -1723,10 +2590,30 @@
 
     document.getElementById("buildEyebrow").textContent = d.eyebrow;
     document.getElementById("buildName").textContent = d.name;
+    document.getElementById("buildCrumbName").textContent = d.name;
     document.getElementById("buildSub").textContent = d.sub;
     document.getElementById("buildGainText").textContent = d.gainQuote;
     document.getElementById("buildGainSub").textContent = d.gainSub;
     document.getElementById("buildTerms").textContent = d.termsLine;
+
+    // Fresh tool state for whichever partnership was just opened — none of
+    // referral/application/next-steps should carry over from the last one.
+    showTool("outreach");
+    document.getElementById("nextStepsPanel").hidden = true;
+    document.getElementById("completeRow").hidden = false;
+    document.getElementById("referralOutput").hidden = true;
+    document.getElementById("referralName").value = "";
+    document.getElementById("referralEmail").value = "";
+    document.querySelectorAll(".app-narrative-field").forEach((ta) => { ta.value = ""; });
+    updateNarrativeProgress();
+    document.getElementById("budgetAsk").value = d.raw ? amountRange(d.raw) : d.sub;
+    document.getElementById("budgetIndirect").value = 15;
+    document.getElementById("budgetMatch").value = "";
+    updateBudgetTotal();
+    document.getElementById("boilerplateText").value =
+      `${ORG} delivers measurable community impact through evidence-based programs, transparent reporting, and long-term partnerships with funders who share our commitment to outcomes.`;
+    document.querySelectorAll(".sub-tab").forEach((t) => t.classList.toggle("active", t.dataset.subtab === "narrative"));
+    document.querySelectorAll(".sub-panel").forEach((p) => { p.hidden = p.id !== "appNarrative"; });
 
     document.getElementById("buildSections").hidden = true;
     document.getElementById("buildLoading").hidden = false;
@@ -1760,6 +2647,7 @@
         subtitle: d.trackerSubtitle,
         exportText: text,
         filename: d.filenameBase(org) + ".txt",
+        oppId: d.oppId,
       });
       renderDraftStatus();
       noteAutosaved();
@@ -1769,6 +2657,150 @@
   function openOpportunity(o) {
     openDetail(fromOpportunity(o));
   }
+
+  /* ---------- tool tabs: outreach / referral / application ---------- */
+
+  const TOOL_PANELS = { outreach: "toolOutreach", referral: "toolReferral", application: "toolApplication" };
+
+  function showTool(name) {
+    document.querySelectorAll(".tool-tab").forEach((t) => t.classList.toggle("active", t.dataset.tool === name));
+    Object.entries(TOOL_PANELS).forEach(([key, id]) => {
+      document.getElementById(id).hidden = key !== name;
+    });
+  }
+
+  document.querySelectorAll(".tool-tab").forEach((t) => {
+    t.addEventListener("click", () => showTool(t.dataset.tool));
+  });
+
+  document.querySelectorAll(".sub-tab").forEach((t) => {
+    t.addEventListener("click", () => {
+      document.querySelectorAll(".sub-tab").forEach((x) => x.classList.remove("active"));
+      t.classList.add("active");
+      document.querySelectorAll(".sub-panel").forEach((p) => { p.hidden = true; });
+      document.getElementById("app" + t.dataset.subtab.charAt(0).toUpperCase() + t.dataset.subtab.slice(1)).hidden = false;
+    });
+  });
+
+  /* ---------- ask for a referral ---------- */
+
+  function draftReferral() {
+    const d = currentDesignable;
+    const org = document.querySelector(".pitch-org").value.trim() || ORG;
+    const name = document.getElementById("referralName").value.trim() || "[Name]";
+    const body = `Subject: Quick intro to ${d.name}?
+
+Hi ${name},
+
+Hope you're well. I'm reaching out with a short, specific ask.
+
+We're exploring ${d.name} as a partner for ${org} — it's one of the strongest fits on our list right now (${d.sub}). If you know someone on that team, would you be willing to forward a two-line intro? I'll send everything they'd need — a one-pager on the fit — so it costs you nothing beyond the forward.
+
+Happy to return the favor any time.
+
+— ${org}`;
+    document.getElementById("referralBody").value = body;
+    document.getElementById("referralOutput").hidden = false;
+  }
+
+  document.getElementById("referralDraftBtn").addEventListener("click", draftReferral);
+  document.getElementById("referralRedraft").addEventListener("click", draftReferral);
+  document.getElementById("referralExportBtn").addEventListener("click", () => {
+    const d = currentDesignable;
+    const org = document.querySelector(".pitch-org").value.trim() || ORG;
+    downloadTextFile(slug(org) + "-" + slug(d.name) + "-referral.txt", document.getElementById("referralBody").value);
+  });
+
+  /* ---------- build the application ---------- */
+
+  function wordCount(str) {
+    return str.trim() ? str.trim().split(/\s+/).length : 0;
+  }
+
+  function updateNarrativeProgress() {
+    document.querySelectorAll(".app-narrative-section").forEach((sec) => {
+      const ta = sec.querySelector("textarea");
+      const target = Number(sec.dataset.target);
+      const count = wordCount(ta.value);
+      const pct = Math.min(100, Math.round((count / target) * 100));
+      sec.querySelector(".word-progress").textContent = count ? `${count}/${target} words · ${pct}%` : `Target ~${target} words`;
+    });
+  }
+
+  document.querySelectorAll(".app-narrative-field").forEach((ta) => {
+    ta.addEventListener("input", updateNarrativeProgress);
+  });
+
+  function draftWholeApplication() {
+    const d = currentDesignable;
+    const isEmail = d.kind === "email";
+    const fields = {
+      summary: `${d.name}: ${isEmail ? d.gainQuote : d.defaultAskText}`,
+      need: d.gainQuote,
+      project: isEmail ? d.termsLine : d.defaultUseText,
+      evaluation: `We'll track progress against agreed milestones and report outcomes on a regular cadence, adjusting the approach based on what the data shows.`,
+    };
+    document.querySelectorAll(".app-narrative-field").forEach((ta) => {
+      ta.value = fields[ta.dataset.key] || "";
+    });
+    updateNarrativeProgress();
+  }
+
+  document.getElementById("appDraftAllBtn").addEventListener("click", draftWholeApplication);
+
+  function updateBudgetTotal() {
+    const d = currentDesignable;
+    const indirectPct = Number(document.getElementById("budgetIndirect").value) || 0;
+    const direct = d && d.raw ? d.raw.max : 0;
+    const indirect = direct * (indirectPct / 100);
+    const total = direct + indirect;
+    document.getElementById("budgetTotal").textContent = direct
+      ? `Direct ${fmtMoney(direct)} + indirect ${fmtMoney(indirect)} = ${fmtMoney(total)} total`
+      : "";
+  }
+
+  document.getElementById("budgetIndirect").addEventListener("input", updateBudgetTotal);
+
+  document.getElementById("boilerplateCopy").addEventListener("click", () => {
+    navigator.clipboard.writeText(document.getElementById("boilerplateText").value);
+  });
+
+  /* ---------- what's next: CHELCIE drafts, but doesn't submit anything
+     for you — this tells you concretely what to actually do with what
+     you just drafted, tailored to the capital type when known. ---------- */
+
+  function renderNextSteps() {
+    const d = currentDesignable;
+    const o = d.raw;
+    const list = document.getElementById("nextStepsList");
+    let lines;
+    if (o && o.type === "loan") {
+      lines = [
+        `Send this to ${o.name}'s lending team, or submit it through their application portal if they have one.`,
+        `Have your last 2 years of financials ready — most lenders ask for these alongside the application.`,
+      ];
+    } else if (o && o.type === "grant") {
+      lines = [
+        `Submit this alongside ${o.name}'s own application form before their next deadline (${o.timeline}).`,
+        `Have a W-9 and your most recent financials ready to attach.`,
+      ];
+    } else if (o && o.type === "equity") {
+      lines = [
+        `This becomes the basis for your first call with ${o.name} — expect a follow-up request for financials, a cap table, and projections.`,
+      ];
+    } else {
+      lines = [
+        `Send this directly to your contact at ${d.name}, or route it to their partnerships team if you don't have one yet.`,
+      ];
+    }
+    list.innerHTML = lines.map((l) => `<li>${l}</li>`).join("");
+    document.getElementById("nextStepsPanel").hidden = false;
+  }
+
+  document.getElementById("markCompletedBtn").addEventListener("click", () => {
+    document.getElementById("completeRow").hidden = true;
+    renderNextSteps();
+  });
 
   /* ---------- quick view: shown on a node click, before drafting starts ---------- */
 
@@ -1791,7 +2823,7 @@
     const canvasRect = document.querySelector(".map-shell").getBoundingClientRect();
     const cardRect = anchorEl.getBoundingClientRect();
     const margin = 14;
-    const panelBox = document.querySelector(".create-panel").getBoundingClientRect();
+    const panelBox = document.querySelector(".panel-stack").getBoundingClientRect();
     const rightLimit = (panelBox.width > 0 && window.innerWidth > 860)
       ? panelBox.left - margin
       : canvasRect.right - margin;
@@ -1835,6 +2867,15 @@
           <p>${whyMatchLine(o)}</p>
         </div>
       </div>
+      <div class="quickview-reqs">
+        <p class="req-label">Requirements you'd need to meet</p>
+        ${(o.requirements || []).map((r) => `
+          <div class="req-row ${r.met ? "met" : "unmet"}">
+            <span class="req-mark">${r.met ? "✓" : "!"}</span>
+            <p>${r.label}</p>
+          </div>
+        `).join("")}
+      </div>
       <div class="quickview-actions">
         <button class="quickview-skip" id="quickViewSkip">Not interested</button>
         <button class="btn-primary" id="quickViewStart">Start drafting</button>
@@ -1848,6 +2889,7 @@
       dismissed.add(o.id);
       closeQuickView();
       recompute();
+      persist();
     });
 
     currentQuickViewOpp = o;
@@ -1898,13 +2940,14 @@
     else favorites.add(o.id);
     renderFavButton(quickViewFav, o);
     syncFavBadge(o);
+    persist();
   });
   // No backdrop — dismiss on a click anywhere outside the popover, except a
   // node-card click (that has its own handler, which opens/repositions the
   // popover for the newly clicked card instead of closing it).
   document.addEventListener("click", (e) => {
     if (!quickViewCard.classList.contains("active")) return;
-    if (e.target.closest("#quickViewCard") || e.target.closest(".node-card") || e.target.closest(".opp-dot") || e.target.closest(".list-row")) return;
+    if (e.target.closest("#quickViewCard") || e.target.closest(".node-card") || e.target.closest(".opp-dot")) return;
     closeQuickView();
   });
   document.addEventListener("keydown", (e) => {
@@ -1945,6 +2988,10 @@
   });
 
   document.getElementById("buildBackLink").addEventListener("click", () => showScreen("map"));
+  document.getElementById("wordmarkHome").addEventListener("click", () => showScreen("map"));
+  document.getElementById("wordmarkHome").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showScreen("map"); }
+  });
 
   /* ---------- shared prefs controls: Refine Map and the onboarding
      profile modal both read/write the exact same `prefs` object (it's the
@@ -1964,6 +3011,7 @@
           prefs[v] = !prefs[v];
           p.classList.toggle("selected", prefs[v]);
         }
+        persist();
       });
     });
     const sideOptions = root.querySelectorAll(".side-option[data-value]");
@@ -1972,6 +3020,7 @@
         sideOptions.forEach((o) => o.classList.remove("selected"));
         b.classList.add("selected");
         prefs.minRange = Number(b.dataset.value);
+        persist();
       });
     });
   }
@@ -2015,6 +3064,7 @@
     const newName = document.getElementById("onboardOrgName").value.trim();
     if (newName) applyOrgName(newName);
     recompute();
+    persist();
     onboardingOverlay.classList.remove("active");
   });
   document.addEventListener("keydown", (e) => {
@@ -2027,23 +3077,16 @@
     const record = { id: Date.now() + Math.random(), status: "draft", createdAt: new Date(), ...entry };
     tracked.unshift(record);
     updateTrackerBadge();
+    persist();
     return record;
   }
 
   function updateTrackerBadge() {
-    document.getElementById("trackerBtn").textContent = tracked.length ? `Your partnerships (${tracked.length})` : "Your partnerships";
+    document.getElementById("trackerBtn").textContent = "CHELCIE workspace";
   }
 
   function exportEntry(entry) {
-    const blob = new Blob([entry.exportText], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = entry.filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    downloadTextFile(entry.filename, entry.exportText);
   }
 
   function renderDraftStatus() {
@@ -2070,6 +3113,7 @@
     autosaveTimer = setTimeout(() => {
       currentTrackedEntry.exportText = currentDocumentText().text;
       noteAutosaved();
+      persist();
     }, 500);
   }
   document.querySelectorAll(".pitch-org, .pitch-ask, .pitch-use, .pitch-fit, .pitch-terms, .pitch-subject, .pitch-body").forEach((el) => {
@@ -2089,47 +3133,8 @@
     currentTrackedEntry.exportText = currentDocumentText().text;
     currentTrackedEntry.status = currentTrackedEntry.status === "sent" ? "draft" : "sent";
     renderDraftStatus();
+    persist();
   });
-
-  const trackerOverlay = document.getElementById("trackerOverlay");
-  document.getElementById("trackerBtn").addEventListener("click", () => {
-    renderTracker();
-    trackerOverlay.classList.add("active");
-  });
-  document.getElementById("trackerClose").addEventListener("click", () => trackerOverlay.classList.remove("active"));
-
-  function renderTracker() {
-    const body = document.getElementById("trackerBody");
-    if (tracked.length === 0) {
-      body.innerHTML = `<p class="tracker-empty">Nothing drafted yet. Design a partnership from your constellation, or describe a program under "Partnerships ready for you," and it'll show up here with a status and an export.</p>`;
-      return;
-    }
-    body.innerHTML = tracked.map((t, i) => `
-      <div class="tracker-item">
-        <div>
-          <p class="tracker-kind">${t.kind === "onepager" ? "ONE-PAGER" : "OUTREACH EMAIL"}</p>
-          <p class="tracker-title">${t.title}</p>
-          <p class="tracker-sub">${t.subtitle}</p>
-        </div>
-        <div class="tracker-actions">
-          <span class="status-pill ${t.status}">${t.status === "sent" ? "Sent" : "Draft ready"}</span>
-          <button class="btn-secondary" data-idx="${i}" data-act="export">Export</button>
-          <button class="back-link" data-idx="${i}" data-act="toggle">${t.status === "sent" ? "Mark as not sent" : "Mark as sent"}</button>
-        </div>
-      </div>
-    `).join("");
-
-    body.querySelectorAll('[data-act="export"]').forEach((btn) => {
-      btn.addEventListener("click", () => exportEntry(tracked[Number(btn.dataset.idx)]));
-    });
-    body.querySelectorAll('[data-act="toggle"]').forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const t = tracked[Number(btn.dataset.idx)];
-        t.status = t.status === "sent" ? "draft" : "sent";
-        renderTracker();
-      });
-    });
-  }
 
   /* ---------- create-your-own-partnership panel ---------- */
 
@@ -2266,8 +3271,116 @@
 
   window.addEventListener("resize", syncScrollLock);
 
+  // Hydrate from the shared cross-page store (see data.js) so drafts,
+  // favorites, dismissed opportunities, the org profile, and settings
+  // carry over from the CHELCIE workspace / Research Portfolio pages
+  // instead of resetting every time you navigate between them.
+  (function hydrateFromStore() {
+    const saved = loadStore();
+    if (saved.org) applyOrgName(saved.org);
+    if (saved.prefs) {
+      prefs.types = new Set(saved.prefs.types && saved.prefs.types.length ? saved.prefs.types : ["loan", "grant", "corporate", "equity"]);
+      prefs.minRange = saved.prefs.minRange || 0;
+      prefs.hideDilutive = !!saved.prefs.hideDilutive;
+      prefs.under500k = !!saved.prefs.under500k;
+      prefs.rollingOnly = !!saved.prefs.rollingOnly;
+    }
+    (saved.tracked || []).forEach((t) => tracked.push({ ...t, createdAt: new Date(t.createdAt) }));
+    (saved.favorites || []).forEach((id) => favorites.add(id));
+    (saved.dismissed || []).forEach((id) => dismissed.add(id));
+    if (saved.settings) settings = saved.settings;
+    updateTrackerBadge();
+    renderUserChip(saved.account);
+    renderNotifDropdown();
+  })();
+
+  function renderUserChip(account) {
+    const name = account && account.name ? account.name.trim() : "";
+    const avatar = document.getElementById("userAvatar");
+    const label = document.getElementById("userNameLabel");
+    const dropdownName = document.getElementById("dropdownName");
+    const dropdownEmail = document.getElementById("dropdownEmail");
+    if (name) {
+      const initials = name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+      avatar.textContent = initials;
+      label.textContent = name;
+      dropdownName.textContent = name;
+    } else {
+      avatar.textContent = "?";
+      label.textContent = "Set up your account";
+      dropdownName.textContent = "Set up your account";
+    }
+    dropdownEmail.textContent = (account && account.email) || "";
+  }
+
+  /* ---------- bell + user dropdowns ---------- */
+
+  function renderNotifDropdown() {
+    const sentOppIds = new Set(tracked.filter((t) => t.status === "sent" && t.oppId).map((t) => t.oppId));
+    const candidates = OPPORTUNITIES.filter((o) => passesPrefs(o) && !sentOppIds.has(o.id));
+    const fullyMet = candidates.filter((o) => unmetRequirements(o).length === 0);
+    const pool = (fullyMet.length ? fullyMet : candidates).slice().sort((a, b) => b.fit - a.fit);
+    const best = pool[0];
+    const stalled = tracked.filter((t) => t.status === "draft");
+    const panel = document.getElementById("notifDropdown");
+    const badge = document.getElementById("notifBadge");
+
+    const count = stalled.length;
+    if (count) {
+      badge.hidden = false;
+      badge.textContent = String(count);
+    } else {
+      badge.hidden = true;
+    }
+
+    let html = "";
+    if (best) {
+      const inProgress = tracked.some((t) => t.oppId === best.id && t.status === "draft");
+      html += `<a class="dropdown-item" href="#" id="notifBestLink">${inProgress ? "Finish drafting to" : "Start drafting to"} ${best.name}</a>`;
+    }
+    if (stalled.length) {
+      html += `<a class="dropdown-item" href="v12-workspace.html">${stalled.length} draft${stalled.length === 1 ? "" : "s"} ready but not sent</a>`;
+    }
+    panel.innerHTML = html || `<p class="dropdown-empty">Nothing new right now.</p>`;
+    const bestLink = document.getElementById("notifBestLink");
+    if (bestLink) {
+      bestLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        closeDropdowns();
+        openOpportunity(best);
+      });
+    }
+  }
+
+  function closeDropdowns() {
+    document.getElementById("notifDropdown").hidden = true;
+    document.getElementById("userDropdown").hidden = true;
+  }
+
+  document.getElementById("notifBellBtn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    const panel = document.getElementById("notifDropdown");
+    const willOpen = panel.hidden;
+    closeDropdowns();
+    if (willOpen) {
+      renderNotifDropdown();
+      panel.hidden = false;
+    }
+  });
+
+  document.getElementById("userChip").addEventListener("click", (e) => {
+    e.stopPropagation();
+    const panel = document.getElementById("userDropdown");
+    const willOpen = panel.hidden;
+    closeDropdowns();
+    panel.hidden = !willOpen;
+  });
+
+  document.addEventListener("click", closeDropdowns);
+
   recompute();
   runDesign("");
+  renderNextAction();
   syncScrollLock();
 
   if (document.fonts && document.fonts.ready) {
@@ -2275,6 +3388,15 @@
   } else {
     setTimeout(renderMap, 300);
   }
+
+  // Deep-link from the workspace's drafts list: ?opp=<id> jumps straight
+  // to that opportunity's build screen instead of landing on the map.
+  (function openFromQueryParam() {
+    const oppId = new URLSearchParams(location.search).get("opp");
+    if (!oppId) return;
+    const o = OPPORTUNITIES.find((x) => x.id === oppId);
+    if (o) openOpportunity(o);
+  })();
 </script>
 </body>
 </html>

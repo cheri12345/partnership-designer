@@ -21,6 +21,11 @@ const OPPORTUNITIES = [
     gain:
       "Meridian is trying to prove that mission-driven lending performs as well as conventional credit. A clean repayment record from an organization like yours is exactly the track record they need to bring to their own funders.",
     worksWith: "Works with 40+ community organizations carrying $250K to $2M in outstanding loans.",
+    requirements: [
+      { label: "2+ years of audited financials", met: true },
+      { label: "Active operating budget over $500K", met: true },
+      { label: "No prior loan defaults", met: true },
+    ],
   },
   {
     id: "hartwell",
@@ -40,6 +45,11 @@ const OPPORTUNITIES = [
     gain:
       "Hartwell is under pressure from its own board to show funded work that ties back to measurable outcomes, not just activity. A tight, outcomes-based case is worth more to them than a long narrative.",
     worksWith: "Funds 18 organizations a year, mostly first-time grantees.",
+    requirements: [
+      { label: "501(c)(3) status or fiscal sponsor on file", met: true },
+      { label: "Program serves youth directly, not through an intermediary", met: true },
+      { label: "Outcomes data from at least 1 prior cohort", met: false },
+    ],
   },
   {
     id: "beacon",
@@ -59,6 +69,11 @@ const OPPORTUNITIES = [
     gain:
       "Beacon is trying to build a track record in mission-aligned deals before raising its next fund. An early, well-run investment in your organization becomes proof they can source deals other investors miss.",
     worksWith: "Has closed 6 deals in the last 18 months, all under $3M.",
+    requirements: [
+      { label: "3+ years of positive operating margin", met: false },
+      { label: "Willing to offer a board observer seat", met: true },
+      { label: "Minimum $2M in annual revenue", met: false },
+    ],
   },
   {
     id: "alderfitch",
@@ -78,6 +93,11 @@ const OPPORTUNITIES = [
     gain:
       "Alder and Fitch needs a small number of credible, well-run partners it can point to in its own sustainability reporting. They are looking for organizations that make the relationship easy, not just organizations that need the money.",
     worksWith: "Currently supports 4 partners nationally, room for 2 more this cycle.",
+    requirements: [
+      { label: "Co-branding and joint reporting capacity", met: true },
+      { label: "Dedicated staff contact for the partnership", met: true },
+      { label: "Existing workforce training curriculum", met: true },
+    ],
   },
   {
     id: "northstar",
@@ -97,6 +117,11 @@ const OPPORTUNITIES = [
     gain:
       "Northstar has federal targets for capital deployed into underserved areas. Every dollar placed with an organization like yours counts directly toward the numbers they report to their own regulators.",
     worksWith: "Deployed $42M last year across 60 organizations.",
+    requirements: [
+      { label: "3 years of audited financials", met: false },
+      { label: "Minimum $1M in annual revenue", met: true },
+      { label: "Collateral or a loan-loss reserve", met: false },
+    ],
   },
   {
     id: "cascade",
@@ -116,6 +141,11 @@ const OPPORTUNITIES = [
     gain:
       "Cascade pools money from six smaller family foundations that do not have the staff to find organizations on their own. They gain a vetted pipeline, you gain access to six funders through one relationship.",
     worksWith: "Distributes to 30 organizations a year on behalf of its member foundations.",
+    requirements: [
+      { label: "501(c)(3) status", met: true },
+      { label: "Operating budget under $2M", met: true },
+      { label: "No more than 2 active grants from member foundations", met: true },
+    ],
   },
   {
     id: "fielding",
@@ -135,6 +165,11 @@ const OPPORTUNITIES = [
     gain:
       "Fielding Bros. is trying to give its employees something real to volunteer for, not just a check to write. Organizations that can absorb volunteer hours, not only money, are what they are short on.",
     worksWith: "Runs 12 active partnerships, half added in the last year.",
+    requirements: [
+      { label: "Structured volunteer program in place", met: false },
+      { label: "Local presence near a Fielding Bros. office", met: true },
+      { label: "Co-marketing approval process", met: true },
+    ],
   },
   {
     id: "thornwood",
@@ -154,6 +189,11 @@ const OPPORTUNITIES = [
     gain:
       "Thornwood is a newer fund still building its reputation with limited partners. A visible, well-governed investment gives them a reference story for their next round of fundraising.",
     worksWith: "First fund, 3 investments closed to date.",
+    requirements: [
+      { label: "$5M+ trailing revenue", met: false },
+      { label: "Willing to take a board seat", met: true },
+      { label: "Clear path to a next funding round", met: false },
+    ],
   },
   {
     id: "unionsquare",
@@ -173,6 +213,11 @@ const OPPORTUNITIES = [
     gain:
       "Union Square has to show its local donors that money raised locally stays local. An organization with deep roots in the community is worth more to their story than a larger one from outside the region.",
     worksWith: "Funds 22 local organizations, renews about 70% each year.",
+    requirements: [
+      { label: "Physical presence in the funding region", met: true },
+      { label: "501(c)(3) status or fiscal sponsor", met: true },
+      { label: "Local board or advisory representation", met: true },
+    ],
   },
   {
     id: "harborview",
@@ -192,6 +237,11 @@ const OPPORTUNITIES = [
     gain:
       "Harborview is a lending cooperative owned by the organizations it lends to. Every loan that performs well strengthens the cooperative for every other member, including you, going forward.",
     worksWith: "148 member organizations, average loan size $310K.",
+    requirements: [
+      { label: "Member-eligible organization type", met: true },
+      { label: "3-year operating history", met: true },
+      { label: "No outstanding liens on equipment", met: true },
+    ],
   },
   {
     id: "kestrelvine",
@@ -211,6 +261,11 @@ const OPPORTUNITIES = [
     gain:
       "Kestrel and Vine is trying to diversify a portfolio that is currently concentrated in one sector. An organization like yours fills a gap they have to close before their next investor update.",
     worksWith: "9 active portfolio organizations across 4 sectors.",
+    requirements: [
+      { label: "Recurring revenue model", met: false },
+      { label: "Willing to share quarterly reporting", met: true },
+      { label: "Existing institutional investor on the cap table", met: false },
+    ],
   },
   {
     id: "willowmere",
@@ -230,6 +285,11 @@ const OPPORTUNITIES = [
     gain:
       "Willowmere's trustees renew the foundation's charter every 5 years based on demonstrated impact. A well-documented, multi-year partnership is exactly the kind of evidence they need going into that renewal.",
     worksWith: "Awards to 10 organizations per cycle, average grant $340K.",
+    requirements: [
+      { label: "Multi-year program plan documented", met: true },
+      { label: "Site-visit readiness", met: false },
+      { label: "501(c)(3) status", met: true },
+    ],
   },
   {
     id: "granitestate",
@@ -249,8 +309,54 @@ const OPPORTUNITIES = [
     gain:
       "Granite State ties a portion of executive compensation to community investment outcomes. They need partners who can show clear, attributable results, not just goodwill, to justify that spend internally.",
     worksWith: "6 active partnerships, this would be their largest this year.",
+    requirements: [
+      { label: "Executive sponsor identified internally", met: false },
+      { label: "Attributable outcomes reporting capacity", met: true },
+      { label: "Multi-year commitment capacity", met: true },
+    ],
   },
 ];
+
+function unmetRequirements(o) {
+  return (o.requirements || []).filter((r) => !r.met);
+}
+
+/* Shared cross-page state (org profile, prefs, tracked drafts, favorites,
+   dismissed opportunities, settings) so the constellation, the CHELCIE
+   workspace, and the Research Portfolio page all read/write the same
+   thing instead of resetting on navigation. A single JSON blob, merged
+   on write so one page never clobbers a field only another page owns. */
+const STORE_KEY = "cc12.store";
+
+function loadStore() {
+  try {
+    return JSON.parse(localStorage.getItem(STORE_KEY) || "null") || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveStore(patch) {
+  const next = { ...loadStore(), ...patch };
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(next));
+  } catch {
+    /* ignore (private mode, quota, etc.) */
+  }
+  return next;
+}
+
+function downloadTextFile(filename, text) {
+  const blob = new Blob([text], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 const TYPE_LABEL = {
   loan: "Loan",

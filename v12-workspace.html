@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CHELCIE Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* Restyled to match the "Northstar overview" Figma mock (same file as
+     v12's own Figma concept, node 73:2114) — a dark page continuing the
+     constellation's starfield, with white cards for anything that used
+     to be a plain row (stat tiles, drafts list). Fonts/dark-teal tokens
+     stay this project's own (Instrument Sans + Inter, --deep/--deep2/
+     --grant), not the mock's exact palette, since those are already
+     this file family's established system. */
+  :root {
+    --ink: #111111;
+    --stone: #666666;
+    --paper: #fafafa;
+    --border: #ebebeb;
+    --deep: #083839;
+    --deep2: #143644;
+    --grant: #00636a;
+    --muted-fill: #f4f4f4;
+    --accent-bright: #4fd8de;
+    --text-onDark: #ffffff;
+    --text-onDark-muted: rgba(255, 255, 255, 0.55);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+
+  body {
+    font-family: "Instrument Sans", system-ui, sans-serif;
+    color: var(--ink);
+    background: #05080d;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3 { font-family: "Inter", system-ui, sans-serif; font-weight: 600; margin: 0; color: var(--text-onDark); }
+  button, input { font-family: inherit; }
+
+  svg { display: block; }
+
+  /* ---------- decorative background: faint orbital rings + a glow,
+     echoing the constellation page, fixed behind everything else. ---------- */
+
+  .bg-decor { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+  .bg-decor .glow {
+    position: absolute;
+    top: -15%;
+    right: -10%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle, rgba(79, 216, 222, 0.12), transparent 70%);
+  }
+  .bg-decor .ring { position: absolute; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 50%; }
+  .bg-decor .ring.r1 { top: 40px; right: 100px; width: 520px; height: 520px; }
+  .bg-decor .ring.r2 { top: 128px; right: 188px; width: 344px; height: 344px; }
+
+  /* ---------- topbar ---------- */
+
+  header.topbar {
+    position: relative;
+    flex-shrink: 0;
+    background: #05080d;
+    color: #fff;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .brand-group { display: flex; align-items: center; gap: 10px; }
+  header.topbar .wordmark { font-weight: 700; font-size: 15px; color: #fff; }
+  .brand-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255, 255, 255, 0.35); flex-shrink: 0; }
+  .org-name-topbar { font-size: 13px; color: rgba(255, 255, 255, 0.5); }
+
+  .topbar-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 9px 18px;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .topbar-cta:hover { opacity: 0.9; }
+  .topbar-cta svg { width: 14px; height: 14px; color: var(--deep); }
+
+  /* ---------- notification bell + user chip: same treatment as the
+     constellation page's topbar, so the chrome matches everywhere. ---------- */
+
+  .topbar-actions { display: flex; align-items: center; gap: 16px; }
+
+  .notif-wrap, .user-menu-wrap { position: relative; }
+
+  .icon-btn {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .icon-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+  .icon-btn svg { width: 19px; height: 19px; }
+
+  .notif-badge {
+    position: absolute;
+    top: 2px;
+    right: 3px;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 3px;
+    border-radius: 999px;
+    background: #a51c30;
+    color: #fff;
+    font-size: 9.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #fff;
+    background: #000;
+    border-radius: 999px;
+    padding: 6px 12px 6px 6px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .user-chip:hover { background: #161616; }
+
+  .user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .user-name { font-size: 13px; font-weight: 500; color: #fff; }
+  .chevron-down { width: 14px; height: 14px; color: rgba(255, 255, 255, 0.6); flex-shrink: 0; }
+
+  .dropdown-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 220px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+    padding: 8px;
+    z-index: 40;
+  }
+
+  .dropdown-header { padding: 8px 10px 10px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+  .dropdown-name { font-size: 13px; font-weight: 700; color: var(--ink); margin: 0 0 2px; }
+  .dropdown-email { font-size: 11.5px; color: var(--stone); margin: 0; }
+
+  .dropdown-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 9px 10px;
+    border-radius: 7px;
+    font-size: 13px;
+    color: var(--ink);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .dropdown-item:hover { background: var(--muted-fill); }
+
+  .dropdown-empty { padding: 10px; font-size: 12.5px; color: var(--stone); }
+
+  /* ---------- tab row: a horizontal strip right under the topbar
+     instead of a sidebar — at 3-4 destinations, a second navigational
+     rail alongside the topbar was more chrome than the content needed,
+     and this reflows at any width with no separate mobile layout. ---------- */
+
+  .tab-row {
+    position: relative;
+    display: flex;
+    gap: 4px;
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0 32px;
+    overflow-x: auto;
+    /* overflow-x:auto forces overflow-y to compute as auto too (CSS's
+       visible/auto pairing rule), and a flex row that becomes a scroll
+       container this way can collapse its own auto height below its
+       children's real height instead of sizing to fit them — the tabs
+       were still there, just clipped to an invisible sliver. An explicit
+       min-height sidesteps that auto-sizing bug. */
+    min-height: 48px;
+  }
+
+  .tab-row button, .tab-row a {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 15px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.55);
+    white-space: nowrap;
+    box-sizing: border-box;
+  }
+
+  .tab-row button:hover, .tab-row a:hover { color: #fff; }
+  .tab-row button.active { color: #fff; }
+  .tab-row button.active::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff; flex-shrink: 0; }
+
+  /* ---------- main content ---------- */
+
+  .main { position: relative; padding: 40px 32px 80px; max-width: 780px; margin: 0 auto; width: 100%; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .page-kicker {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-onDark-muted);
+    margin: 0 0 8px;
+  }
+
+  .page-title { font-size: 1.6rem; margin-bottom: 10px; }
+  .page-sub { font-size: 13px; color: var(--text-onDark-muted); margin: 0 0 28px; max-width: 52ch; line-height: 1.55; }
+  .page-sub a { color: var(--accent-bright); font-weight: 600; text-decoration: none; }
+  .page-sub a:hover { text-decoration: underline; }
+
+  /* ---------- overview: hero stats ---------- */
+
+  .stat-grid { display: flex; gap: 16px; flex-wrap: wrap; }
+
+  .stat-tile {
+    position: relative;
+    flex: 1;
+    min-width: 170px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: #fff;
+    padding: 20px;
+  }
+
+  .stat-tile .stat-kicker {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin: 0 0 10px;
+    padding-right: 30px;
+  }
+
+  .stat-tile .stat-value { font-size: 1.9rem; font-weight: 700; color: var(--ink); margin: 0; }
+
+  .stat-icon {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stat-icon svg { width: 14px; height: 14px; color: #fff; }
+
+  /* ---------- opportunities-in-progress / drafts: white row-cards with
+     an icon marker, status dot, and a trailing chevron — matching the
+     mock's "Opportunity ledger" list. ---------- */
+
+  .list-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
+  .records-badge {
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .see-all-link {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--accent-bright);
+    text-decoration: none;
+  }
+
+  .see-all-link:hover { text-decoration: underline; }
+
+  .filter-tabs { display: flex; gap: 8px; margin-top: 20px; }
+
+  .filter-tab {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .filter-tab.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+  .tracker-item {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+    transition: border-color 0.15s ease;
+  }
+
+  .tracker-item.clickable { cursor: pointer; }
+  .tracker-item.clickable:hover { border-color: var(--deep); }
+
+  .tracker-marker {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ink);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tracker-marker svg { width: 17px; height: 17px; color: #fff; }
+
+  .tracker-body { flex: 1; min-width: 0; }
+  .tracker-title { font-family: "Inter", system-ui, sans-serif; font-weight: 700; font-size: 15.5px; color: var(--ink); margin: 0 0 4px; }
+  .tracker-sub { font-size: 12.5px; color: var(--stone); margin: 0; }
+
+  .tracker-actions { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(212, 162, 74, 0.18);
+    color: #8a5a1e;
+    white-space: nowrap;
+  }
+
+  .status-pill.sent { background: rgba(8, 56, 57, 0.12); color: var(--deep); }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+  .chevron { width: 16px; height: 16px; color: var(--stone); flex-shrink: 0; }
+
+  .tracker-empty { font-size: 14px; color: var(--text-onDark-muted); line-height: 1.6; }
+  .tracker-empty a { color: var(--accent-bright); font-weight: 600; }
+
+  .btn-primary {
+    background: linear-gradient(90deg, var(--deep), var(--deep2));
+    border: none;
+    border-radius: 999px;
+    padding: 12px 24px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover { opacity: 0.92; }
+
+  /* ---------- settings ---------- */
+
+  .settings-block { margin-bottom: 36px; }
+  .settings-block h2 { font-size: 15px; margin-bottom: 4px; }
+  .settings-block .block-sub { font-size: 12.5px; color: var(--text-onDark-muted); margin: 0 0 18px; }
+
+  .field { display: block; margin-bottom: 14px; max-width: 380px; }
+  .field span { display: block; font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, 0.75); margin-bottom: 6px; }
+  .field input[type="text"], .field input[type="email"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: var(--ink);
+    background: #fff;
+  }
+
+  .field input:focus { border-color: var(--deep); outline: none; }
+
+  .field-label { font-size: 12.5px; font-weight: 700; margin: 0 0 10px; color: rgba(255, 255, 255, 0.75); }
+
+  .pill-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+
+  .pill {
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 999px;
+    padding: 9px 18px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--ink);
+  }
+
+  .pill.selected { border-color: var(--deep); background: #e6f1f0; font-weight: 600; }
+
+  .side-options { display: grid; gap: 10px; max-width: 380px; margin-bottom: 22px; }
+
+  .side-option {
+    text-align: left;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--ink);
+  }
+
+  .side-option.selected { border-color: var(--deep); background: #e6f1f0; }
+
+  .toggle-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    max-width: 460px;
+    cursor: pointer;
+  }
+
+  .toggle-row input { margin-top: 2px; }
+  .toggle-row span { font-size: 13px; line-height: 1.5; color: var(--ink); }
+
+  .save-note { font-size: 12px; color: var(--accent-bright); margin-left: 12px; }
+</style>
+</head>
+<body>
+
+<div class="bg-decor">
+  <span class="glow"></span>
+  <span class="ring r1"></span>
+  <span class="ring r2"></span>
+</div>
+
+<header class="topbar">
+  <div class="brand-group">
+    <a class="wordmark" href="v12-capital-constellation.html" style="text-decoration:none;">CHELCIE</a>
+    <span class="brand-dot"></span>
+    <span class="org-name-topbar" id="sidebarOrgName">Northstar Labs</span>
+  </div>
+  <div class="topbar-actions">
+    <a class="topbar-cta" href="v12-capital-constellation.html">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.7 5.8L19 9l-5.3 1.2L12 16l-1.7-5.8L5 9l5.3-1.2L12 2z"/></svg>
+      Your constellation
+    </a>
+
+    <div class="notif-wrap">
+      <button class="icon-btn" id="notifBellBtn" type="button" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span class="notif-badge" id="notifBadge" hidden>0</span>
+      </button>
+      <div class="dropdown-panel" id="notifDropdown" hidden></div>
+    </div>
+
+    <div class="user-menu-wrap">
+      <button class="user-chip" id="userChip" type="button">
+        <span class="user-avatar" id="userAvatar">?</span>
+        <span class="user-name" id="userNameLabel">Set up your account</span>
+        <svg class="chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="dropdown-panel" id="userDropdown" hidden>
+        <div class="dropdown-header">
+          <p class="dropdown-name" id="dropdownName">Set up your account</p>
+          <p class="dropdown-email" id="dropdownEmail"></p>
+        </div>
+        <button class="dropdown-item" type="button" data-tab-link="settings">Account settings</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="tab-row" id="sideNav">
+  <button type="button" data-tab="priorities" class="active">Overview</button>
+  <button type="button" data-tab="drafts">Drafts</button>
+  <a href="v12-research-portfolio.html" id="researchPortfolioLink" style="display:none;">Research Portfolio</a>
+  <button type="button" data-tab="settings">Settings</button>
+</nav>
+
+<main class="main">
+
+  <section class="tab-panel active" id="tab-priorities">
+    <h1 class="page-title">Overview</h1>
+    <p class="page-sub">A snapshot of what's already committed, what's in motion, and what's still open — pulled from your constellation and your drafts, not a separate list to keep up to date.</p>
+
+    <div class="stat-grid">
+      <div class="stat-tile">
+        <p class="stat-kicker">Successfully secured</p>
+        <p class="stat-value" id="statSecured">$0</p>
+        <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></svg></span>
+      </div>
+      <div class="stat-tile">
+        <p class="stat-kicker">In progress</p>
+        <p class="stat-value" id="statInProgress">0</p>
+        <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="4.5" transform="rotate(-20 12 12)"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/></svg></span>
+      </div>
+      <div class="stat-tile">
+        <p class="stat-kicker">Ready to pursue</p>
+        <p class="stat-value" id="statReady">$0</p>
+        <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l14-5 1 3-14 5-1-3z"/><path d="M10 14l-3 7"/><path d="M17 9l4-1"/></svg></span>
+      </div>
+    </div>
+
+    <div id="priorityTrackedWrap" style="margin-top:36px;">
+      <div class="list-head-row">
+        <div>
+          <h2 style="font-size:15px; margin-bottom:4px;">Opportunities in progress</h2>
+          <p class="block-sub" style="font-size:12.5px; color:var(--text-onDark-muted); margin:0;">Every opportunity you've started drafting on or already sent — click any card to open its full draft.</p>
+        </div>
+        <span class="records-badge" id="recordsBadge"></span>
+      </div>
+      <div id="priorityTrackedList" style="margin-top:16px;"></div>
+      <a href="#" data-tab-link="drafts" class="see-all-link" id="seeAllDraftsLink" hidden>See all →</a>
+    </div>
+  </section>
+
+  <section class="tab-panel" id="tab-drafts">
+    <h1 class="page-title">Drafts</h1>
+    <p class="page-sub">Every opportunity you've started drafting on or already sent — click any card to open its full draft.</p>
+    <div class="filter-tabs" id="draftFilterTabs">
+      <button type="button" class="filter-tab active" data-filter="all">All</button>
+      <button type="button" class="filter-tab" data-filter="draft">Draft ready</button>
+      <button type="button" class="filter-tab" data-filter="sent">Sent</button>
+    </div>
+    <div id="draftsList" style="margin-top:20px;"></div>
+  </section>
+
+  <section class="tab-panel" id="tab-settings">
+    <h1 class="page-title">Your account & organization</h1>
+
+    <div class="settings-block">
+      <h2>Your account</h2>
+      <p class="block-sub">Not shared with anyone else in this prototype — just so CHELCIE knows who's asking.</p>
+      <label class="field"><span>Name</span><input type="text" id="acctName" placeholder="Your name" /></label>
+      <label class="field"><span>Email</span><input type="email" id="acctEmail" placeholder="you@organization.org" /></label>
+      <label class="field"><span>Role</span><input type="text" id="acctRole" placeholder="e.g. Executive Director" /></label>
+    </div>
+
+    <div class="settings-block">
+      <h2>Organization profile</h2>
+      <p class="block-sub">The same answers behind everything matched on your constellation — edit here or from the sun on the map, either one updates the other.</p>
+      <label class="field"><span>Organization name</span><input type="text" id="orgNameInput" /></label>
+      <p class="field-label">Capital types you'll consider</p>
+      <div class="pill-group" id="settingsTypeGroup">
+        <button type="button" class="pill" data-value="loan">Loans</button>
+        <button type="button" class="pill" data-value="grant">Grants</button>
+        <button type="button" class="pill" data-value="corporate">Corporate partnerships</button>
+        <button type="button" class="pill" data-value="equity">Equity</button>
+      </div>
+      <p class="field-label">Funding range you're working with</p>
+      <div class="side-options" id="settingsRangeGroup">
+        <button type="button" class="side-option" data-value="0">Any amount</button>
+        <button type="button" class="side-option" data-value="250000">At least $250K</button>
+        <button type="button" class="side-option" data-value="1000000">At least $1M</button>
+      </div>
+    </div>
+
+    <div class="settings-block">
+      <h2>Advanced</h2>
+      <label class="toggle-row">
+        <input type="checkbox" id="portfolioToggle" />
+        <span>This org tracks funding by internal program or budget line. Turning this on adds Research Portfolio to the nav above.</span>
+      </label>
+    </div>
+
+    <button class="btn-primary" id="settingsSave">Save changes</button>
+    <span class="save-note" id="settingsSaveNote"></span>
+  </section>
+
+</main>
+
+<script src="data.js"></script>
+<script>
+  const CAPITAL_TYPES = ["loan", "grant", "corporate", "equity"];
+
+  const ICON_FILE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M9 13h6M9 17h6M9 9h3"/></svg>';
+  const ICON_CHEVRON = '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+
+  let store = loadStore();
+  store.org = store.org || "Northstar Labs";
+  store.prefs = store.prefs || { types: [...CAPITAL_TYPES], minRange: 0 };
+  store.tracked = store.tracked || [];
+  store.dismissed = store.dismissed || [];
+  store.settings = store.settings || { researchPortfolioEnabled: false };
+  store.account = store.account || { name: "", email: "", role: "" };
+
+  document.getElementById("sidebarOrgName").textContent = store.org;
+
+  /* ---------- tab switching ---------- */
+
+  const navButtons = document.querySelectorAll("#sideNav button[data-tab]");
+  function goToTab(name) {
+    navButtons.forEach((b) => b.classList.toggle("active", b.dataset.tab === name));
+    document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
+    document.getElementById("tab-" + name).classList.add("active");
+  }
+  navButtons.forEach((btn) => {
+    btn.addEventListener("click", () => goToTab(btn.dataset.tab));
+  });
+  document.querySelectorAll("[data-tab-link]").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      goToTab(el.dataset.tabLink);
+    });
+  });
+
+  function syncResearchPortfolioLink() {
+    document.getElementById("researchPortfolioLink").style.display = store.settings.researchPortfolioEnabled ? "block" : "none";
+  }
+  syncResearchPortfolioLink();
+
+  // Deep-link support, e.g. the topbar's user chip linking straight to
+  // ?tab=settings instead of always landing on Overview.
+  (function openTabFromQueryParam() {
+    const tab = new URLSearchParams(location.search).get("tab");
+    if (tab && document.getElementById("tab-" + tab)) goToTab(tab);
+  })();
+
+  /* ---------- overview ---------- */
+
+  function renderPriorities() {
+    const sentOppIds = new Set(store.tracked.filter((t) => t.status === "sent" && t.oppId).map((t) => t.oppId));
+    const dismissedIds = new Set(store.dismissed);
+
+    const secured = store.tracked
+      .filter((t) => t.status === "sent" && t.oppId)
+      .reduce((sum, t) => {
+        const o = OPPORTUNITIES.find((x) => x.id === t.oppId);
+        return sum + (o ? o.max : 0);
+      }, 0);
+
+    const inProgress = store.tracked.filter((t) => t.status === "draft").length;
+
+    const readyToPursue = OPPORTUNITIES
+      .filter((o) => !dismissedIds.has(o.id) && !sentOppIds.has(o.id))
+      .reduce((sum, o) => sum + o.max, 0);
+
+    document.getElementById("statSecured").textContent = fmtMoney(secured);
+    document.getElementById("statInProgress").textContent = String(inProgress);
+    document.getElementById("statReady").textContent = fmtMoney(readyToPursue);
+
+    const wrap = document.getElementById("priorityTrackedWrap");
+    const list = document.getElementById("priorityTrackedList");
+    if (store.tracked.length === 0) {
+      wrap.hidden = true;
+      return;
+    }
+    wrap.hidden = false;
+    document.getElementById("recordsBadge").textContent = `${store.tracked.length} active record${store.tracked.length === 1 ? "" : "s"}`;
+
+    const OVERVIEW_LIMIT = 3;
+    renderTrackerCards(list, store.tracked.slice(0, OVERVIEW_LIMIT));
+    document.getElementById("seeAllDraftsLink").hidden = store.tracked.length <= OVERVIEW_LIMIT;
+  }
+
+  function trackerCardHTML(t) {
+    return `
+      <div class="tracker-item${t.oppId ? " clickable" : ""}" ${t.oppId ? `data-opp-id="${t.oppId}"` : ""}>
+        <span class="tracker-marker">${ICON_FILE}</span>
+        <div class="tracker-body">
+          <p class="tracker-title">${t.title}</p>
+          <p class="tracker-sub">${t.subtitle}</p>
+        </div>
+        <div class="tracker-actions">
+          <span class="status-pill ${t.status}"><span class="status-dot"></span>${t.status === "sent" ? "Sent" : "Draft ready"}</span>
+          ${ICON_CHEVRON}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderTrackerCards(container, items) {
+    container.innerHTML = items.map(trackerCardHTML).join("");
+    container.querySelectorAll(".tracker-item[data-opp-id]").forEach((row) => {
+      row.addEventListener("click", () => openOppForm(row.dataset.oppId));
+    });
+  }
+
+  /* ---------- drafts (full, filterable list) ---------- */
+
+  let draftFilter = "all";
+
+  function renderDrafts() {
+    const list = document.getElementById("draftsList");
+    const filtered = store.tracked.filter((t) => draftFilter === "all" || t.status === draftFilter);
+    if (filtered.length === 0) {
+      list.innerHTML = `<p class="tracker-empty">Nothing here yet. <a href="v12-capital-constellation.html">Head back to your constellation</a> to design a partnership.</p>`;
+      return;
+    }
+    renderTrackerCards(list, filtered);
+  }
+
+  document.querySelectorAll(".filter-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      draftFilter = btn.dataset.filter;
+      document.querySelectorAll(".filter-tab").forEach((b) => b.classList.toggle("active", b === btn));
+      renderDrafts();
+    });
+  });
+
+  function openOppForm(oppId) {
+    // No .html here on purpose: the local "serve" dev server 301-redirects
+    // a ".html?query" request to the extensionless path but drops the
+    // query string in that redirect, so the deep link never arrives.
+    // Linking straight to the extensionless path skips that redirect.
+    location.href = `v12-capital-constellation?opp=${encodeURIComponent(oppId)}`;
+  }
+
+  /* ---------- settings ---------- */
+
+  function syncSettingsUI() {
+    document.getElementById("acctName").value = store.account.name;
+    document.getElementById("acctEmail").value = store.account.email;
+    document.getElementById("acctRole").value = store.account.role;
+    document.getElementById("orgNameInput").value = store.org;
+    document.getElementById("portfolioToggle").checked = !!store.settings.researchPortfolioEnabled;
+
+    document.querySelectorAll("#settingsTypeGroup .pill").forEach((p) => {
+      p.classList.toggle("selected", store.prefs.types.includes(p.dataset.value));
+    });
+    document.querySelectorAll("#settingsRangeGroup .side-option").forEach((b) => {
+      b.classList.toggle("selected", Number(b.dataset.value) === (store.prefs.minRange || 0));
+    });
+  }
+
+  document.querySelectorAll("#settingsTypeGroup .pill").forEach((p) => {
+    p.addEventListener("click", () => {
+      const v = p.dataset.value;
+      const has = store.prefs.types.includes(v);
+      store.prefs.types = has ? store.prefs.types.filter((t) => t !== v) : [...store.prefs.types, v];
+      p.classList.toggle("selected", !has);
+    });
+  });
+
+  document.querySelectorAll("#settingsRangeGroup .side-option").forEach((b) => {
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#settingsRangeGroup .side-option").forEach((o) => o.classList.remove("selected"));
+      b.classList.add("selected");
+      store.prefs.minRange = Number(b.dataset.value);
+    });
+  });
+
+  document.getElementById("settingsSave").addEventListener("click", () => {
+    store.account = {
+      name: document.getElementById("acctName").value.trim(),
+      email: document.getElementById("acctEmail").value.trim(),
+      role: document.getElementById("acctRole").value.trim(),
+    };
+    store.org = document.getElementById("orgNameInput").value.trim() || store.org;
+    store.settings = { researchPortfolioEnabled: document.getElementById("portfolioToggle").checked };
+
+    store = saveStore({
+      account: store.account,
+      org: store.org,
+      prefs: store.prefs,
+      settings: store.settings,
+    });
+
+    document.getElementById("sidebarOrgName").textContent = store.org;
+    syncResearchPortfolioLink();
+    const note = document.getElementById("settingsSaveNote");
+    note.textContent = "Saved";
+    setTimeout(() => { note.textContent = ""; }, 1800);
+  });
+
+  renderPriorities();
+  renderDrafts();
+  syncSettingsUI();
+</script>
+</body>
+</html>

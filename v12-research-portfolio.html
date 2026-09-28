@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Research Portfolio — CHELCIE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  :root {
+    --ink: #111111;
+    --stone: #666666;
+    --paper: #fafafa;
+    --border: #ebebeb;
+    --deep: #083839;
+    --deep2: #143644;
+    --grant: #00636a;
+    --muted-fill: #f4f4f4;
+    --open-need: #c9c9c4;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+
+  body {
+    font-family: "Instrument Sans", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    margin: 0;
+  }
+
+  h1, h2, h3 { font-family: "Inter", system-ui, sans-serif; font-weight: 600; margin: 0; color: var(--deep); }
+  button { font-family: inherit; }
+
+  header.topbar {
+    background: #05080d;
+    color: #fff;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+  }
+
+  header.topbar .wordmark { font-weight: 700; font-size: 15px; }
+
+  header.topbar .topbar-links { display: flex; gap: 20px; }
+
+  header.topbar a { color: rgba(255, 255, 255, 0.6); font-size: 12.5px; text-decoration: none; }
+  header.topbar a:hover { color: #fff; }
+
+  main { max-width: 780px; margin: 0 auto; padding: 44px 24px 100px; }
+
+  .page-kicker {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin: 0 0 8px;
+  }
+
+  .page-title { font-size: 1.6rem; margin-bottom: 8px; }
+  .page-sub { font-size: 13px; color: var(--stone); margin: 0 0 28px; max-width: 60ch; line-height: 1.55; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--stone); }
+  .legend-swatch { width: 14px; height: 8px; flex-shrink: 0; border-radius: 1px; }
+
+  .pillar {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: #fff;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .pillar-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 2fr) auto;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+  }
+
+  .pillar-name { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grant); margin: 0 0 4px; }
+  .pillar-target { font-size: 13px; color: var(--ink); margin: 0; }
+
+  .pillar-pct { font-family: "Inter", system-ui, sans-serif; font-size: 1.7rem; font-weight: 700; color: var(--ink); text-align: right; }
+
+  .bar-track { position: relative; height: 8px; width: 100%; background: var(--muted-fill); border-radius: 4px; overflow: hidden; display: flex; }
+  .bar-seg { height: 100%; }
+  .bar-seg.secured { background: var(--ink); }
+  .bar-seg.aligned { background: var(--grant); }
+  .bar-seg.open { background: var(--open-need); }
+
+  .bar-note { font-size: 11px; color: var(--stone); margin: 8px 0 0; }
+  .bar-note strong { color: var(--grant); font-weight: 700; }
+
+  .stack-toggle {
+    all: unset;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--stone);
+    box-sizing: border-box;
+  }
+
+  .stack-toggle .chev { transition: transform 0.15s ease; }
+  .stack-toggle.open .chev { transform: rotate(180deg); }
+
+  .stack-list { display: none; border-top: 1px solid var(--border); }
+  .stack-list.open { display: block; }
+
+  .stack-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stack-row:last-child { border-bottom: none; }
+
+  .stack-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .stack-dot.secured { background: var(--ink); }
+  .stack-dot.aligned { background: var(--grant); }
+  .stack-dot.open { background: var(--open-need); }
+
+  .stack-source { font-size: 12.5px; color: var(--ink); }
+  .stack-status { font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--stone); margin-top: 2px; }
+  .stack-amount { font-size: 12px; color: var(--ink); font-weight: 600; }
+
+  .gate-note {
+    border: 1px solid var(--border);
+    background: var(--muted-fill);
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 13px;
+    color: var(--stone);
+    line-height: 1.6;
+  }
+
+  .gate-note a { color: var(--deep2); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="wordmark" href="v12-capital-constellation.html" style="text-decoration:none;">CHELCIE</a>
+  <div class="topbar-links">
+    <a href="v12-workspace.html">← CHELCIE workspace</a>
+    <a href="v12-capital-constellation.html">Your constellation</a>
+  </div>
+</header>
+
+<main>
+  <p class="page-kicker">Research Portfolio</p>
+  <h1 class="page-title">Same money, told by capital type</h1>
+  <p class="page-sub" id="pageSub">What's already secured, what CHELCIE has already aligned to close the rest, and what's still genuinely open — grouped the way your org tracks funding internally.</p>
+
+  <div class="legend">
+    <span class="legend-item"><span class="legend-swatch" style="background:var(--ink);"></span>Secured</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:var(--grant);"></span>Aligned by CHELCIE</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:var(--open-need);"></span>Open need</span>
+  </div>
+
+  <div id="portfolioBody"></div>
+</main>
+
+<script src="data.js"></script>
+<script>
+  const store = loadStore();
+  const org = store.org || "Northstar Labs";
+  document.getElementById("pageSub").textContent =
+    `What's already secured, what CHELCIE has already aligned to close the rest, and what's still genuinely open for ${org} — grouped by capital type.`;
+
+  const body = document.getElementById("portfolioBody");
+
+  if (!store.settings || !store.settings.researchPortfolioEnabled) {
+    body.innerHTML = `
+      <div class="gate-note">
+        This page is meant for organizations that track funding by internal program or budget line —
+        that's off right now. Turn it on from <a href="v12-workspace.html">Settings</a> in the CHELCIE
+        workspace, or keep reading; nothing here is hidden, it's just not linked from the nav until then.
+      </div>
+    `;
+  }
+
+  const TYPE_ORDER = ["loan", "grant", "corporate", "equity"];
+  const sentOppIds = new Set((store.tracked || []).filter((t) => t.status === "sent" && t.oppId).map((t) => t.oppId));
+  const dismissedIds = new Set(store.dismissed || []);
+
+  body.innerHTML += TYPE_ORDER.map((type) => {
+    const opps = OPPORTUNITIES.filter((o) => o.type === type);
+    const target = opps.reduce((s, o) => s + o.max, 0);
+    const secured = opps.filter((o) => sentOppIds.has(o.id)).reduce((s, o) => s + o.max, 0);
+    const open = opps.filter((o) => dismissedIds.has(o.id)).reduce((s, o) => s + o.max, 0);
+    const aligned = Math.max(0, target - secured - open);
+    const pct = target ? Math.round((secured / target) * 100) : 0;
+    const alignedCount = opps.filter((o) => !sentOppIds.has(o.id) && !dismissedIds.has(o.id)).length;
+
+    const seg = (n) => (target ? (n / target) * 100 : 0);
+
+    const rows = opps.map((o) => {
+      const status = sentOppIds.has(o.id) ? "secured" : dismissedIds.has(o.id) ? "open" : "aligned";
+      const label = status === "secured" ? "SECURED" : status === "open" ? "OPEN NEED" : "ALIGNED BY CHELCIE";
+      return `
+        <div class="stack-row">
+          <span class="stack-dot ${status}"></span>
+          <div>
+            <div class="stack-source">${o.name}</div>
+            <div class="stack-status">${label}</div>
+          </div>
+          <div class="stack-amount">${fmtMoney(o.max)}</div>
+        </div>
+      `;
+    }).join("");
+
+    return `
+      <div class="pillar">
+        <div class="pillar-head">
+          <div>
+            <p class="pillar-name">${TYPE_LABEL[type]}</p>
+            <p class="pillar-target">${fmtMoney(target)} target across ${opps.length} opportunit${opps.length === 1 ? "y" : "ies"}</p>
+          </div>
+          <div>
+            <div class="bar-track">
+              <div class="bar-seg secured" style="width:${seg(secured)}%"></div>
+              <div class="bar-seg aligned" style="width:${seg(aligned)}%"></div>
+              <div class="bar-seg open" style="width:${seg(open)}%"></div>
+            </div>
+            ${aligned > 0 ? `<p class="bar-note"><strong>${fmtMoney(aligned)} aligned</strong> — ${alignedCount} live opportunit${alignedCount === 1 ? "y" : "ies"} could cover it now.</p>` : ""}
+          </div>
+          <p class="pillar-pct">${pct}%</p>
+        </div>
+        <button class="stack-toggle" data-type="${type}">
+          <span>STACK · ${opps.length} LINE${opps.length === 1 ? "" : "S"}</span>
+          <span class="chev">▾</span>
+        </button>
+        <div class="stack-list" id="stack-${type}">${rows}</div>
+      </div>
+    `;
+  }).join("");
+
+  document.querySelectorAll(".stack-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      btn.classList.toggle("open");
+      document.getElementById("stack-" + btn.dataset.type).classList.toggle("open");
+    });
+  });
+</script>
+</body>
+</html>
