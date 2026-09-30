@@ -270,46 +270,104 @@
   .page-sub a { color: var(--accent-bright); font-weight: 600; text-decoration: none; }
   .page-sub a:hover { text-decoration: underline; }
 
-  /* ---------- overview: hero stats ---------- */
+  /* ---------- overview hero (Figma "Overview of Northstar Labs" mock,
+     node 92:2418): big headline + score-ring card side by side, a plain
+     (unboxed) stat pair beneath, then a section of dark draft-progress
+     cards — replacing the earlier boxed stat-tile row. ---------- */
 
-  .stat-grid { display: flex; gap: 16px; flex-wrap: wrap; }
+  .overview-hero { display: flex; align-items: flex-start; justify-content: space-between; gap: 32px; }
+  .overview-hero-left { flex: 1; min-width: 0; }
+  .overview-headline { font-size: 2.4rem; line-height: 1.08; letter-spacing: -0.01em; margin: 0 0 14px; }
+  .overview-sub { font-size: 13.5px; color: var(--text-onDark-muted); max-width: 54ch; line-height: 1.6; margin: 0; }
+  .overview-sub a { color: var(--accent-bright); font-weight: 600; text-decoration: none; }
+  .overview-sub a:hover { text-decoration: underline; }
 
-  .stat-tile {
-    position: relative;
-    flex: 1;
-    min-width: 170px;
-    border: 1px solid var(--border);
-    border-radius: 14px;
+  .score-card {
+    flex-shrink: 0;
+    width: 360px;
     background: #fff;
-    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    display: flex;
+    gap: 18px;
   }
 
-  .stat-tile .stat-kicker {
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+  .score-ring-wrap { position: relative; width: 96px; height: 96px; flex-shrink: 0; }
+  .score-ring-wrap svg { width: 100%; height: 100%; }
+  .score-ring-value { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .score-ring-value strong { font-size: 1.5rem; font-weight: 700; color: var(--ink); line-height: 1; }
+  .score-ring-value span { font-size: 8.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--stone); margin-top: 4px; }
+
+  .score-body { flex: 1; min-width: 0; }
+  .score-title { font-size: 14px; margin: 0 0 6px; color: var(--ink); }
+  .score-desc { font-size: 11px; color: var(--stone); line-height: 1.5; margin: 0 0 12px; }
+  .score-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .score-pill {
+    background: var(--muted-fill);
     color: var(--stone);
-    margin: 0 0 10px;
-    padding-right: 30px;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
   }
-
-  .stat-tile .stat-value { font-size: 1.9rem; font-weight: 700; color: var(--ink); margin: 0; }
-
-  .stat-icon {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    width: 30px;
-    height: 30px;
+  .score-improve-label { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--stone); margin: 0 0 6px; }
+  .score-suggestion { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+  .score-suggestion-icon {
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     background: var(--ink);
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
   }
+  .score-suggestion-icon svg { width: 10px; height: 10px; color: #fff; }
+  .score-suggestion-text { font-size: 11.5px; color: var(--ink); margin: 0; }
+  .score-suggestion-pts { font-size: 10px; color: var(--stone); margin: 0; }
 
-  .stat-icon svg { width: 14px; height: 14px; color: #fff; }
+  .stat-row-plain { display: flex; gap: 40px; margin: 28px 0 0; }
+  .stat-plain-kicker { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-onDark-muted); margin: 0 0 6px; }
+  .stat-plain-value { font-size: 1.9rem; font-weight: 700; color: #fff; margin: 0; }
+
+  /* ---------- draft progress cards (white, matching the rest of the
+     app's card convention — score card above uses the same treatment) ---------- */
+
+  .drafts-section-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
+  .stage-legend { display: flex; gap: 16px; flex-shrink: 0; margin-top: 3px; }
+  .stage-legend-item { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--text-onDark-muted); white-space: nowrap; }
+  .stage-legend-item .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .stage-legend-item.next { color: rgba(255, 255, 255, 0.35); }
+
+  .draft-progress-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 16px; }
+
+  .draft-progress-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    transition: border-color 0.15s ease;
+  }
+  .draft-progress-card.clickable { cursor: pointer; }
+  .draft-progress-card.clickable:hover { border-color: var(--deep); }
+
+  .dp-status { display: inline-flex; align-items: center; gap: 6px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--stone); margin-bottom: 12px; }
+  .dp-status.sent { color: var(--deep); }
+  .dp-title { font-family: "Inter", system-ui, sans-serif; font-weight: 700; font-size: 15.5px; color: var(--ink); margin: 0 0 4px; }
+  .dp-sub { font-size: 11.5px; color: var(--stone); margin: 0 0 22px; }
+
+  .dp-track { position: relative; height: 2px; background: var(--muted-fill); margin: 0 4px 8px; }
+  .dp-track-fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--ink); }
+  .dp-track-dot { position: absolute; top: 50%; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); transform: translate(-50%, -50%); border: 2px solid #fff; }
+  .dp-track-dot.hollow { background: #fff; border: 2px solid var(--border); }
+  .dp-track-dot.current { width: 11px; height: 11px; }
+  .dp-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--stone); margin-bottom: 18px; }
+
+  .dp-open-link { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: var(--ink); text-decoration: none; }
+  .dp-open-link svg { width: 14px; height: 14px; }
 
   /* ---------- opportunities-in-progress / drafts: white row-cards with
      an icon marker, status dot, and a trailing chevron — matching the
@@ -427,6 +485,19 @@
 
   .btn-primary:hover { opacity: 0.92; }
 
+  .btn-secondary {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 11px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-secondary:hover { border-color: var(--deep); }
+
   /* ---------- settings ---------- */
 
   .settings-block { margin-bottom: 36px; }
@@ -494,6 +565,53 @@
   .toggle-row input { margin-top: 2px; }
   .toggle-row span { font-size: 13px; line-height: 1.5; color: var(--ink); }
 
+  /* ---------- connected data: open banking + fintech access + uploaded
+     documents — this org already finished connecting these (see
+     defaultConnections() in data.js), so this reads as status, not a
+     setup flow. ---------- */
+
+  .connection-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+  }
+  .connection-icon { width: 34px; height: 34px; border-radius: 8px; background: var(--muted-fill); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .connection-icon svg { width: 16px; height: 16px; color: var(--deep); }
+  .connection-body { flex: 1; min-width: 0; }
+  .connection-title { font-size: 13.5px; font-weight: 600; color: var(--ink); margin: 0 0 2px; }
+  .connection-sub { font-size: 11.5px; color: var(--stone); margin: 0; }
+  .connection-pill {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--muted-fill);
+    color: var(--stone);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .connection-pill.connected { background: #e6f1f0; color: var(--deep); }
+
+  .documents-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+  .document-row { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+  .doc-icon { width: 28px; height: 28px; border-radius: 6px; background: var(--muted-fill); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .doc-icon svg { width: 13px; height: 13px; color: var(--deep); }
+  .doc-body { flex: 1; min-width: 0; }
+  .doc-title { font-size: 12.5px; font-weight: 600; color: var(--ink); margin: 0 0 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .doc-sub { font-size: 10.5px; color: var(--stone); margin: 0; }
+  .doc-remove { background: none; border: none; color: var(--stone); cursor: pointer; font-size: 16px; line-height: 1; padding: 4px; flex-shrink: 0; }
+  .doc-remove:hover { color: var(--ink); }
+
+  .doc-upload-row { display: flex; gap: 10px; max-width: 460px; }
+  .doc-upload-row input { flex: 1; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; }
+
   .save-note { font-size: 12px; color: var(--accent-bright); margin-left: 12px; }
 </style>
 </head>
@@ -546,42 +664,63 @@
   <button type="button" data-tab="priorities" class="active">Overview</button>
   <button type="button" data-tab="drafts">Drafts</button>
   <a href="v12-research-portfolio.html" id="researchPortfolioLink" style="display:none;">Research Portfolio</a>
-  <button type="button" data-tab="settings">Settings</button>
 </nav>
 
 <main class="main">
 
   <section class="tab-panel active" id="tab-priorities">
-    <h1 class="page-title">Overview</h1>
-    <p class="page-sub">A snapshot of what's already committed, what's in motion, and what's still open — pulled from your constellation and your drafts, not a separate list to keep up to date.</p>
+    <div class="overview-hero">
+      <div class="overview-hero-left">
+        <h1 class="overview-headline" id="overviewHeadline">Overview</h1>
+        <p class="overview-sub">A snapshot of what's already committed, what's in motion, and what's still open — pulled from your constellation and your drafts, not a separate list to keep up to date.</p>
+        <div class="stat-row-plain">
+          <div>
+            <p class="stat-plain-kicker">Successfully secured</p>
+            <p class="stat-plain-value" id="statSecured">$0</p>
+          </div>
+          <div>
+            <p class="stat-plain-kicker">Ready to pursue</p>
+            <p class="stat-plain-value" id="statReady">$0</p>
+          </div>
+        </div>
+      </div>
 
-    <div class="stat-grid">
-      <div class="stat-tile">
-        <p class="stat-kicker">Successfully secured</p>
-        <p class="stat-value" id="statSecured">$0</p>
-        <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></svg></span>
-      </div>
-      <div class="stat-tile">
-        <p class="stat-kicker">In progress</p>
-        <p class="stat-value" id="statInProgress">0</p>
-        <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="4.5" transform="rotate(-20 12 12)"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/></svg></span>
-      </div>
-      <div class="stat-tile">
-        <p class="stat-kicker">Ready to pursue</p>
-        <p class="stat-value" id="statReady">$0</p>
-        <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l14-5 1 3-14 5-1-3z"/><path d="M10 14l-3 7"/><path d="M17 9l4-1"/></svg></span>
+      <div class="score-card">
+        <div class="score-ring-wrap">
+          <svg viewBox="0 0 96 96">
+            <circle cx="48" cy="48" r="42" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="11" />
+            <circle id="scoreRingFill" cx="48" cy="48" r="42" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" transform="rotate(-90 48 48)" />
+          </svg>
+          <div class="score-ring-value">
+            <strong id="scoreValue">0</strong>
+            <span>Score</span>
+          </div>
+        </div>
+        <div class="score-body">
+          <h3 class="score-title">Your CHELCIE Score</h3>
+          <p class="score-desc">A live momentum score tracking how close your tracked opportunities are to closing, across every capital type CHELCIE matches you to.</p>
+          <div class="score-pills">
+            <span class="score-pill" id="scorePillFraction">0 / 100</span>
+            <span class="score-pill" id="scorePillRecords">0 records active</span>
+          </div>
+          <p class="score-improve-label">Improve score</p>
+          <div id="scoreSuggestions"></div>
+        </div>
       </div>
     </div>
 
     <div id="priorityTrackedWrap" style="margin-top:36px;">
-      <div class="list-head-row">
+      <div class="drafts-section-head">
         <div>
-          <h2 style="font-size:15px; margin-bottom:4px;">Opportunities in progress</h2>
-          <p class="block-sub" style="font-size:12.5px; color:var(--text-onDark-muted); margin:0;">Every opportunity you've started drafting on or already sent — click any card to open its full draft.</p>
+          <h2 style="font-size:15px; margin-bottom:4px;">What's behind those numbers</h2>
+          <p class="block-sub" style="font-size:12.5px; color:var(--text-onDark-muted); margin:0;">Every opportunity you've started drafting or already sent — see the full list in <a href="#" data-tab-link="drafts" style="color:var(--accent-bright); font-weight:600; text-decoration:none;">Drafts</a>.</p>
         </div>
-        <span class="records-badge" id="recordsBadge"></span>
+        <div class="stage-legend">
+          <span class="stage-legend-item"><span class="status-dot"></span>Current stage</span>
+          <span class="stage-legend-item next"><span class="status-dot"></span>Next stage</span>
+        </div>
       </div>
-      <div id="priorityTrackedList" style="margin-top:16px;"></div>
+      <div id="priorityTrackedList" class="draft-progress-grid"></div>
       <a href="#" data-tab-link="drafts" class="see-all-link" id="seeAllDraftsLink" hidden>See all →</a>
     </div>
   </section>
@@ -628,6 +767,36 @@
     </div>
 
     <div class="settings-block">
+      <h2>Connected data</h2>
+      <p class="block-sub">CHELCIE uses this to verify requirements automatically instead of asking you to re-answer them for every opportunity.</p>
+
+      <div class="connection-row">
+        <span class="connection-icon" id="connBankIcon"></span>
+        <div class="connection-body">
+          <p class="connection-title">Open banking</p>
+          <p class="connection-sub" id="connBankSub"></p>
+        </div>
+        <span class="connection-pill connected">Connected</span>
+      </div>
+
+      <div class="connection-row">
+        <span class="connection-icon" id="connFintechIcon"></span>
+        <div class="connection-body">
+          <p class="connection-title">Third-party fintech access</p>
+          <p class="connection-sub" id="connFintechSub"></p>
+        </div>
+        <span class="connection-pill connected">Connected</span>
+      </div>
+
+      <p class="field-label" style="margin-top:22px;">Uploaded documents</p>
+      <div id="documentsList" class="documents-list"></div>
+      <div class="doc-upload-row">
+        <input type="text" id="newDocName" placeholder="Add a document (e.g. FY25 financials.pdf)" />
+        <button type="button" class="btn-secondary" id="addDocBtn">Upload</button>
+      </div>
+    </div>
+
+    <div class="settings-block">
       <h2>Advanced</h2>
       <label class="toggle-row">
         <input type="checkbox" id="portfolioToggle" />
@@ -647,6 +816,12 @@
 
   const ICON_FILE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M9 13h6M9 17h6M9 9h3"/></svg>';
   const ICON_CHEVRON = '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+  const ICON_PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>';
+  const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+  const ICON_ARROW_UP_RIGHT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
+  const ICON_BANK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V10M20 21V10M2 10l10-6 10 6M6 10v11M10 10v11M14 10v11M18 10v11"/></svg>';
+  const ICON_PLUG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6M15 2v6M7 8h10v4a5 5 0 01-10 0V8z"/><path d="M12 17v5"/></svg>';
+  const ICON_FILE_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M9 13h6M9 17h6M9 9h3"/></svg>';
 
   let store = loadStore();
   store.org = store.org || "Northstar Labs";
@@ -655,6 +830,7 @@
   store.dismissed = store.dismissed || [];
   store.settings = store.settings || { researchPortfolioEnabled: false };
   store.account = store.account || { name: "", email: "", role: "" };
+  store.connections = store.connections || defaultConnections();
 
   document.getElementById("sidebarOrgName").textContent = store.org;
 
@@ -688,9 +864,106 @@
     if (tab && document.getElementById("tab-" + tab)) goToTab(tab);
   })();
 
+  /* ---------- topbar: notification bell + user chip ---------- */
+
+  function renderUserChip() {
+    const name = (store.account.name || "").trim();
+    const avatar = document.getElementById("userAvatar");
+    const label = document.getElementById("userNameLabel");
+    const dropdownName = document.getElementById("dropdownName");
+    const dropdownEmail = document.getElementById("dropdownEmail");
+    if (name) {
+      const initials = name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+      avatar.textContent = initials;
+      label.textContent = name;
+      dropdownName.textContent = name;
+    } else {
+      avatar.textContent = "?";
+      label.textContent = "Set up your account";
+      dropdownName.textContent = "Set up your account";
+    }
+    dropdownEmail.textContent = store.account.email || "";
+  }
+
+  function renderNotifDropdown() {
+    const dismissedIds = new Set(store.dismissed);
+    const sentOppIds = new Set(store.tracked.filter((t) => t.status === "sent" && t.oppId).map((t) => t.oppId));
+    const candidates = OPPORTUNITIES.filter((o) =>
+      !dismissedIds.has(o.id) && !sentOppIds.has(o.id) && store.prefs.types.includes(o.type)
+    );
+    const fullyMet = candidates.filter((o) => unmetRequirements(o).length === 0);
+    const pool = (fullyMet.length ? fullyMet : candidates).slice().sort((a, b) => b.fit - a.fit);
+    const best = pool[0];
+    const stalled = store.tracked.filter((t) => t.status === "draft");
+    const panel = document.getElementById("notifDropdown");
+    const badge = document.getElementById("notifBadge");
+
+    if (stalled.length) {
+      badge.hidden = false;
+      badge.textContent = String(stalled.length);
+    } else {
+      badge.hidden = true;
+    }
+
+    let html = "";
+    if (best) {
+      const inProgress = store.tracked.some((t) => t.oppId === best.id && t.status === "draft");
+      html += `<button class="dropdown-item" type="button" id="notifBestLink">${inProgress ? "Finish drafting to" : "Start drafting to"} ${best.name}</button>`;
+    }
+    if (stalled.length) {
+      html += `<button class="dropdown-item" type="button" data-tab-link="drafts">${stalled.length} draft${stalled.length === 1 ? "" : "s"} ready but not sent</button>`;
+    }
+    panel.innerHTML = html || `<p class="dropdown-empty">Nothing new right now.</p>`;
+    const bestLink = document.getElementById("notifBestLink");
+    if (bestLink) {
+      bestLink.addEventListener("click", () => {
+        closeDropdowns();
+        openOppForm(best.id);
+      });
+    }
+    // Re-wire data-tab-link buttons this innerHTML just created — the
+    // page-load-time listener setup ran before this markup existed.
+    panel.querySelectorAll("[data-tab-link]").forEach((el) => {
+      el.addEventListener("click", () => {
+        closeDropdowns();
+        goToTab(el.dataset.tabLink);
+      });
+    });
+  }
+
+  function closeDropdowns() {
+    document.getElementById("notifDropdown").hidden = true;
+    document.getElementById("userDropdown").hidden = true;
+  }
+
+  document.getElementById("notifBellBtn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    const panel = document.getElementById("notifDropdown");
+    const willOpen = panel.hidden;
+    closeDropdowns();
+    if (willOpen) {
+      renderNotifDropdown();
+      panel.hidden = false;
+    }
+  });
+
+  document.getElementById("userChip").addEventListener("click", (e) => {
+    e.stopPropagation();
+    const panel = document.getElementById("userDropdown");
+    const willOpen = panel.hidden;
+    closeDropdowns();
+    panel.hidden = !willOpen;
+  });
+
+  document.addEventListener("click", closeDropdowns);
+
+  renderUserChip();
+
   /* ---------- overview ---------- */
 
   function renderPriorities() {
+    document.getElementById("overviewHeadline").textContent = `Overview of ${store.org}`;
+
     const sentOppIds = new Set(store.tracked.filter((t) => t.status === "sent" && t.oppId).map((t) => t.oppId));
     const dismissedIds = new Set(store.dismissed);
 
@@ -701,15 +974,18 @@
         return sum + (o ? o.max : 0);
       }, 0);
 
-    const inProgress = store.tracked.filter((t) => t.status === "draft").length;
+    const stalledCount = store.tracked.filter((t) => t.status === "draft").length;
+    const sentCount = store.tracked.filter((t) => t.status === "sent").length;
+    const activeRecords = store.tracked.length;
 
     const readyToPursue = OPPORTUNITIES
       .filter((o) => !dismissedIds.has(o.id) && !sentOppIds.has(o.id))
       .reduce((sum, o) => sum + o.max, 0);
 
     document.getElementById("statSecured").textContent = fmtMoney(secured);
-    document.getElementById("statInProgress").textContent = String(inProgress);
     document.getElementById("statReady").textContent = fmtMoney(readyToPursue);
+
+    renderScoreCard({ activeRecords, stalledCount, sentCount });
 
     const wrap = document.getElementById("priorityTrackedWrap");
     const list = document.getElementById("priorityTrackedList");
@@ -718,11 +994,91 @@
       return;
     }
     wrap.hidden = false;
-    document.getElementById("recordsBadge").textContent = `${store.tracked.length} active record${store.tracked.length === 1 ? "" : "s"}`;
 
     const OVERVIEW_LIMIT = 3;
-    renderTrackerCards(list, store.tracked.slice(0, OVERVIEW_LIMIT));
+    renderDraftProgressCards(list, store.tracked.slice(0, OVERVIEW_LIMIT));
     document.getElementById("seeAllDraftsLink").hidden = store.tracked.length <= OVERVIEW_LIMIT;
+  }
+
+  function renderScoreCard({ activeRecords, stalledCount, sentCount }) {
+    const score = Math.max(20, Math.min(100, 30 + sentCount * 18 + activeRecords * 6));
+    const circumference = 2 * Math.PI * 42;
+    const ring = document.getElementById("scoreRingFill");
+    ring.style.strokeDasharray = String(circumference);
+    ring.style.strokeDashoffset = String(circumference * (1 - score / 100));
+
+    document.getElementById("scoreValue").textContent = String(score);
+    document.getElementById("scorePillFraction").textContent = `${score} / 100`;
+    document.getElementById("scorePillRecords").textContent = `${activeRecords} opportunit${activeRecords === 1 ? "y" : "ies"} tracked`;
+
+    const suggestions = [];
+    if (activeRecords < 4) {
+      suggestions.push({ icon: ICON_PLUS, text: "Track 1 more opportunity on your constellation", pts: "+4-6 pts" });
+    }
+    if (stalledCount > 0) {
+      suggestions.push({
+        icon: ICON_CHECK,
+        text: `Send ${stalledCount} draft${stalledCount === 1 ? "" : "s"} ready but not sent`,
+        pts: "+8-10 pts",
+        tabLink: "drafts",
+      });
+    }
+
+    const box = document.getElementById("scoreSuggestions");
+    if (suggestions.length === 0) {
+      box.innerHTML = `<p class="score-desc" style="margin:0;">Nothing more CHELCIE can surface right now — you're ahead of most orgs at this stage.</p>`;
+      return;
+    }
+    box.innerHTML = suggestions
+      .map(
+        (s) => `
+      <div class="score-suggestion${s.tabLink ? " clickable" : ""}" ${s.tabLink ? `data-tab-link="${s.tabLink}" style="cursor:pointer;"` : ""}>
+        <span class="score-suggestion-icon">${s.icon}</span>
+        <div>
+          <p class="score-suggestion-text">${s.text}</p>
+          <p class="score-suggestion-pts">${s.pts}</p>
+        </div>
+      </div>
+    `
+      )
+      .join("");
+    box.querySelectorAll("[data-tab-link]").forEach((el) => {
+      el.addEventListener("click", () => goToTab(el.dataset.tabLink));
+    });
+  }
+
+  function draftProgressCardHTML(t) {
+    const stops = ["Draft", "Review", "Sent"];
+    const stageIndex = t.status === "sent" ? 2 : 1;
+    const fillPct = (stageIndex / (stops.length - 1)) * 100;
+    const dots = stops
+      .map((label, i) => {
+        const pct = (i / (stops.length - 1)) * 100;
+        const reached = i <= stageIndex;
+        const current = i === stageIndex;
+        return `<span class="dp-track-dot${reached ? "" : " hollow"}${current ? " current" : ""}" style="left:${pct}%;"></span>`;
+      })
+      .join("");
+    return `
+      <div class="draft-progress-card${t.oppId ? " clickable" : ""}" ${t.oppId ? `data-opp-id="${t.oppId}"` : ""}>
+        <span class="dp-status ${t.status}"><span class="status-dot"></span>${t.status === "sent" ? "Sent" : "Draft ready"}</span>
+        <p class="dp-title">${t.title}</p>
+        <p class="dp-sub">${t.subtitle}</p>
+        <div class="dp-track">
+          <span class="dp-track-fill" style="width:${fillPct}%;"></span>
+          ${dots}
+        </div>
+        <div class="dp-labels"><span>Draft</span><span>Review</span><span>Sent</span></div>
+        <span class="dp-open-link">Open record ${ICON_ARROW_UP_RIGHT}</span>
+      </div>
+    `;
+  }
+
+  function renderDraftProgressCards(container, items) {
+    container.innerHTML = items.map(draftProgressCardHTML).join("");
+    container.querySelectorAll(".draft-progress-card[data-opp-id]").forEach((card) => {
+      card.addEventListener("click", () => openOppForm(card.dataset.oppId));
+    });
   }
 
   function trackerCardHTML(t) {
@@ -830,13 +1186,64 @@
 
     document.getElementById("sidebarOrgName").textContent = store.org;
     syncResearchPortfolioLink();
+    renderUserChip();
+    renderNotifDropdown();
     const note = document.getElementById("settingsSaveNote");
     note.textContent = "Saved";
     setTimeout(() => { note.textContent = ""; }, 1800);
   });
 
+  /* ---------- connected data: open banking, fintech access, documents ---------- */
+
+  function renderConnections() {
+    const c = store.connections;
+    document.getElementById("connBankIcon").innerHTML = ICON_BANK;
+    document.getElementById("connFintechIcon").innerHTML = ICON_PLUG;
+    document.getElementById("connBankSub").textContent =
+      `${c.openBanking.institution} •••• ${c.openBanking.accountMask} — connected ${c.openBanking.connectedAt}`;
+    document.getElementById("connFintechSub").textContent =
+      `${c.fintech.provider} — connected ${c.fintech.connectedAt}`;
+    renderDocuments();
+  }
+
+  function renderDocuments() {
+    const docs = store.connections.documents;
+    document.getElementById("documentsList").innerHTML = docs.length
+      ? docs.map((d, i) => `
+        <div class="document-row">
+          <span class="doc-icon">${ICON_FILE_SM}</span>
+          <div class="doc-body">
+            <p class="doc-title">${d.name}</p>
+            <p class="doc-sub">${d.uploadedAt} · ${d.size}</p>
+          </div>
+          <button type="button" class="doc-remove" data-idx="${i}" aria-label="Remove document">&times;</button>
+        </div>
+      `).join("")
+      : `<p class="tracker-empty">No documents uploaded yet.</p>`;
+
+    document.querySelectorAll(".doc-remove").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        store.connections.documents.splice(Number(btn.dataset.idx), 1);
+        renderDocuments();
+        store = saveStore({ connections: store.connections });
+      });
+    });
+  }
+
+  document.getElementById("addDocBtn").addEventListener("click", () => {
+    const input = document.getElementById("newDocName");
+    const name = input.value.trim();
+    if (!name) return;
+    store.connections.documents.unshift({ name, uploadedAt: "Just now", size: "—" });
+    input.value = "";
+    renderDocuments();
+    store = saveStore({ connections: store.connections });
+  });
+
+  renderConnections();
   renderPriorities();
   renderDrafts();
+  renderNotifDropdown();
   syncSettingsUI();
 </script>
 </body>

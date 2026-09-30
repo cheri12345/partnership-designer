@@ -21,6 +21,8 @@ const OPPORTUNITIES = [
     gain:
       "Meridian is trying to prove that mission-driven lending performs as well as conventional credit. A clean repayment record from an organization like yours is exactly the track record they need to bring to their own funders.",
     worksWith: "Works with 40+ community organizations carrying $250K to $2M in outstanding loans.",
+    applyUrl: "https://meridiancommunitycapital.org/apply",
+    applyContact: "lending@meridiancommunitycapital.org",
     requirements: [
       { label: "2+ years of audited financials", met: true },
       { label: "Active operating budget over $500K", met: true },
@@ -45,10 +47,16 @@ const OPPORTUNITIES = [
     gain:
       "Hartwell is under pressure from its own board to show funded work that ties back to measurable outcomes, not just activity. A tight, outcomes-based case is worth more to them than a long narrative.",
     worksWith: "Funds 18 organizations a year, mostly first-time grantees.",
+    applyUrl: "https://hartwellfamilyfoundation.org/grants",
+    applyContact: "grants@hartwellfamilyfoundation.org",
     requirements: [
       { label: "501(c)(3) status or fiscal sponsor on file", met: true },
       { label: "Program serves youth directly, not through an intermediary", met: true },
-      { label: "Outcomes data from at least 1 prior cohort", met: false },
+      {
+        label: "Outcomes data from at least 1 prior cohort",
+        met: false,
+        guidance: "Start tracking outcomes for your current cohort now — even a partial year of data is often enough to satisfy this on your next application.",
+      },
     ],
   },
   {
@@ -69,10 +77,19 @@ const OPPORTUNITIES = [
     gain:
       "Beacon is trying to build a track record in mission-aligned deals before raising its next fund. An early, well-run investment in your organization becomes proof they can source deals other investors miss.",
     worksWith: "Has closed 6 deals in the last 18 months, all under $3M.",
+    applyContact: "dealteam@beaconimpact.vc",
     requirements: [
-      { label: "3+ years of positive operating margin", met: false },
+      {
+        label: "3+ years of positive operating margin",
+        met: false,
+        guidance: "Work with your finance team on a plan to reach positive margin, or prepare a short explanation of your path there for the diligence conversation.",
+      },
       { label: "Willing to offer a board observer seat", met: true },
-      { label: "Minimum $2M in annual revenue", met: false },
+      {
+        label: "Minimum $2M in annual revenue",
+        met: false,
+        guidance: "This is a hard revenue floor for Beacon — worth revisiting once you're closer, or ask CHELCIE for earlier-stage equity matches.",
+      },
     ],
   },
   {
@@ -93,6 +110,8 @@ const OPPORTUNITIES = [
     gain:
       "Alder and Fitch needs a small number of credible, well-run partners it can point to in its own sustainability reporting. They are looking for organizations that make the relationship easy, not just organizations that need the money.",
     worksWith: "Currently supports 4 partners nationally, room for 2 more this cycle.",
+    applyUrl: "https://alderfitch.com/partnerships",
+    applyContact: "partnerships@alderfitch.com",
     requirements: [
       { label: "Co-branding and joint reporting capacity", met: true },
       { label: "Dedicated staff contact for the partnership", met: true },
@@ -117,10 +136,20 @@ const OPPORTUNITIES = [
     gain:
       "Northstar has federal targets for capital deployed into underserved areas. Every dollar placed with an organization like yours counts directly toward the numbers they report to their own regulators.",
     worksWith: "Deployed $42M last year across 60 organizations.",
+    applyUrl: "https://northstarcdfi.org/apply",
+    applyContact: "originations@northstarcdfi.org",
     requirements: [
-      { label: "3 years of audited financials", met: false },
+      {
+        label: "3 years of audited financials",
+        met: false,
+        guidance: "Ask your accountant about commissioning an audit for the missing year(s) — some lenders accept reviewed financials plus a committed audit timeline as a bridge.",
+      },
       { label: "Minimum $1M in annual revenue", met: true },
-      { label: "Collateral or a loan-loss reserve", met: false },
+      {
+        label: "Collateral or a loan-loss reserve",
+        met: false,
+        guidance: "Talk to your board about pledging equipment or setting aside a small reserve fund — either one can satisfy this requirement.",
+      },
     ],
   },
   {
@@ -141,6 +170,8 @@ const OPPORTUNITIES = [
     gain:
       "Cascade pools money from six smaller family foundations that do not have the staff to find organizations on their own. They gain a vetted pipeline, you gain access to six funders through one relationship.",
     worksWith: "Distributes to 30 organizations a year on behalf of its member foundations.",
+    applyUrl: "https://cascadegrants.org/apply",
+    applyContact: "info@cascadegrants.org",
     requirements: [
       { label: "501(c)(3) status", met: true },
       { label: "Operating budget under $2M", met: true },
@@ -165,8 +196,14 @@ const OPPORTUNITIES = [
     gain:
       "Fielding Bros. is trying to give its employees something real to volunteer for, not just a check to write. Organizations that can absorb volunteer hours, not only money, are what they are short on.",
     worksWith: "Runs 12 active partnerships, half added in the last year.",
+    applyUrl: "https://fieldingbros.com/giving",
+    applyContact: "giving@fieldingbros.com",
     requirements: [
-      { label: "Structured volunteer program in place", met: false },
+      {
+        label: "Structured volunteer program in place",
+        met: false,
+        guidance: "Draft a simple volunteer program outline — even a lightweight one with defined roles and hours is usually enough to qualify.",
+      },
       { label: "Local presence near a Fielding Bros. office", met: true },
       { label: "Co-marketing approval process", met: true },
     ],
@@ -189,10 +226,19 @@ const OPPORTUNITIES = [
     gain:
       "Thornwood is a newer fund still building its reputation with limited partners. A visible, well-governed investment gives them a reference story for their next round of fundraising.",
     worksWith: "First fund, 3 investments closed to date.",
+    applyContact: "deals@thornwood.vc",
     requirements: [
-      { label: "$5M+ trailing revenue", met: false },
+      {
+        label: "$5M+ trailing revenue",
+        met: false,
+        guidance: "This is a hard revenue floor for Thornwood — worth revisiting once you're closer, or ask CHELCIE for earlier-stage equity matches.",
+      },
       { label: "Willing to take a board seat", met: true },
-      { label: "Clear path to a next funding round", met: false },
+      {
+        label: "Clear path to a next funding round",
+        met: false,
+        guidance: "Put together a one-page story of your next raise — who, how much, and roughly when — before your first call.",
+      },
     ],
   },
   {
@@ -213,6 +259,8 @@ const OPPORTUNITIES = [
     gain:
       "Union Square has to show its local donors that money raised locally stays local. An organization with deep roots in the community is worth more to their story than a larger one from outside the region.",
     worksWith: "Funds 22 local organizations, renews about 70% each year.",
+    applyUrl: "https://unionsquarefund.org/apply",
+    applyContact: "grants@unionsquarefund.org",
     requirements: [
       { label: "Physical presence in the funding region", met: true },
       { label: "501(c)(3) status or fiscal sponsor", met: true },
@@ -237,6 +285,8 @@ const OPPORTUNITIES = [
     gain:
       "Harborview is a lending cooperative owned by the organizations it lends to. Every loan that performs well strengthens the cooperative for every other member, including you, going forward.",
     worksWith: "148 member organizations, average loan size $310K.",
+    applyUrl: "https://harborviewlending.coop/apply",
+    applyContact: "lending@harborviewlending.coop",
     requirements: [
       { label: "Member-eligible organization type", met: true },
       { label: "3-year operating history", met: true },
@@ -261,10 +311,19 @@ const OPPORTUNITIES = [
     gain:
       "Kestrel and Vine is trying to diversify a portfolio that is currently concentrated in one sector. An organization like yours fills a gap they have to close before their next investor update.",
     worksWith: "9 active portfolio organizations across 4 sectors.",
+    applyContact: "partners@kestrelvine.vc",
     requirements: [
-      { label: "Recurring revenue model", met: false },
+      {
+        label: "Recurring revenue model",
+        met: false,
+        guidance: "If any of your revenue is subscription- or contract-based, highlight that share explicitly — it may already partially satisfy this.",
+      },
       { label: "Willing to share quarterly reporting", met: true },
-      { label: "Existing institutional investor on the cap table", met: false },
+      {
+        label: "Existing institutional investor on the cap table",
+        met: false,
+        guidance: "Mention this early in diligence — some investors will still proceed as the first institutional check, just on different terms.",
+      },
     ],
   },
   {
@@ -285,9 +344,15 @@ const OPPORTUNITIES = [
     gain:
       "Willowmere's trustees renew the foundation's charter every 5 years based on demonstrated impact. A well-documented, multi-year partnership is exactly the kind of evidence they need going into that renewal.",
     worksWith: "Awards to 10 organizations per cycle, average grant $340K.",
+    applyUrl: "https://willowmerefoundation.org/apply",
+    applyContact: "programs@willowmerefoundation.org",
     requirements: [
       { label: "Multi-year program plan documented", met: true },
-      { label: "Site-visit readiness", met: false },
+      {
+        label: "Site-visit readiness",
+        met: false,
+        guidance: "Pick a date and prepare a short visit itinerary — most orgs just need a clear program tour and a few staff conversations ready to go.",
+      },
       { label: "501(c)(3) status", met: true },
     ],
   },
@@ -309,8 +374,14 @@ const OPPORTUNITIES = [
     gain:
       "Granite State ties a portion of executive compensation to community investment outcomes. They need partners who can show clear, attributable results, not just goodwill, to justify that spend internally.",
     worksWith: "6 active partnerships, this would be their largest this year.",
+    applyUrl: "https://granitestatepartners.com/community",
+    applyContact: "community@granitestatepartners.com",
     requirements: [
-      { label: "Executive sponsor identified internally", met: false },
+      {
+        label: "Executive sponsor identified internally",
+        met: false,
+        guidance: "Ask a member of your leadership team to sponsor this partnership internally — Granite State wants a named executive contact before proceeding.",
+      },
       { label: "Attributable outcomes reporting capacity", met: true },
       { label: "Multi-year commitment capacity", met: true },
     ],
@@ -344,6 +415,36 @@ function saveStore(patch) {
     /* ignore (private mode, quota, etc.) */
   }
   return next;
+}
+
+/* This prototype assumes the org already finished connecting its data to
+   CHELCIE — open banking, a fintech/accounting connection, and a handful
+   of uploaded documents — rather than starting from zero. Shared here so
+   the constellation, the CHELCIE workspace, and the record page all seed
+   (and read/write) the same connected state instead of each inventing
+   its own. */
+function defaultConnections() {
+  return {
+    openBanking: {
+      connected: true,
+      institution: "Chase Business Banking",
+      accountMask: "4471",
+      connectedAt: "Aug 14, 2026",
+    },
+    fintech: {
+      connected: true,
+      provider: "QuickBooks Online",
+      connectedAt: "Aug 14, 2026",
+    },
+    documents: [
+      { name: "FY24 audited financial statements.pdf", uploadedAt: "Aug 14, 2026", size: "1.8 MB" },
+      { name: "IRS 501(c)(3) determination letter.pdf", uploadedAt: "Aug 14, 2026", size: "0.4 MB" },
+      { name: "Board-approved operating budget FY25.xlsx", uploadedAt: "Aug 20, 2026", size: "0.2 MB" },
+      { name: "Certificate of good standing.pdf", uploadedAt: "Aug 20, 2026", size: "0.3 MB" },
+      { name: "W-9.pdf", uploadedAt: "Aug 20, 2026", size: "0.1 MB" },
+      { name: "Loan-loss reserve policy.pdf", uploadedAt: "Sep 2, 2026", size: "0.6 MB" },
+    ],
+  };
 }
 
 function downloadTextFile(filename, text) {

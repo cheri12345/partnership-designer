@@ -41,45 +41,21 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: #05080d;
+    background: #000000;
     color: var(--ink);
     font-family: "Instrument Sans", system-ui, sans-serif;
   }
 
   /* The build screen now matches the workspace's dark-page/white-card
-     styling (same faint orbital rings, light text on the page itself,
-     white cards for the actual content) instead of a flat light bg. */
+     styling (light text on the page itself, white cards for the actual
+     content) instead of a flat light bg. */
 
-  .bg-decor { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-  .bg-decor .glow {
-    position: absolute;
-    top: -15%;
-    right: -10%;
-    width: 60%;
-    height: 60%;
-    background: radial-gradient(circle, rgba(79, 216, 222, 0.12), transparent 70%);
-  }
-  .bg-decor .ring { position: absolute; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 50%; }
-  .bg-decor .ring.r1 { top: 40px; right: 100px; width: 520px; height: 520px; }
-  .bg-decor .ring.r2 { top: 128px; right: 188px; width: 344px; height: 344px; }
+  .bg-decor { display: none; }
 
   .breadcrumb .crumb-link { color: rgba(255, 255, 255, 0.55); }
   .breadcrumb .crumb-link:hover { color: #fff; }
   .breadcrumb .crumb-sep { color: rgba(255, 255, 255, 0.3); }
   .breadcrumb .crumb-current { color: #fff; }
-
-  /* Everything inside .build-draft sits directly on the dark page (unlike
-     .build-summary, a separate white card) — every label/sub-line in
-     here, including ones nested inside a tool panel, needs light text,
-     not just the ones that happen to be direct children. */
-  .build-draft .build-eyebrow,
-  .build-draft .build-sub { color: rgba(255, 255, 255, 0.55); }
-
-  .build-draft .field-group label,
-  .doc-section-head label { color: #fff; }
-
-  .drafting-state, .autosave-note, .draft-status { color: rgba(255, 255, 255, 0.55); }
-  .regen-link { color: #fff; }
 
   body > header.topbar {
     border-bottom: none;
@@ -119,8 +95,46 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 40px;
-    border-bottom: 1px solid var(--border);
   }
+
+  /* ---------- cross-app tab row: the same Overview/Drafts/Settings strip
+     CHELCIE workspace uses, so any screen in this file can jump straight
+     to a workspace section instead of routing through Overview first. ---------- */
+
+  .tab-row {
+    position: relative;
+    display: flex;
+    gap: 4px;
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0 40px;
+    overflow-x: auto;
+    min-height: 48px;
+    flex-shrink: 0;
+  }
+
+  /* display:flex above beats the browser's default [hidden]{display:none}
+     UA rule (author CSS always wins over UA CSS at equal specificity) —
+     without this, toggling the hidden property on #crossNav did nothing. */
+  .tab-row[hidden] { display: none; }
+
+  .tab-row a {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 15px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.55);
+    white-space: nowrap;
+    box-sizing: border-box;
+  }
+
+  .tab-row a:hover { color: #fff; }
+  .tab-row a.active { color: #fff; }
+  .tab-row a.active::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff; flex-shrink: 0; }
 
   .topbar-left {
     display: flex;
@@ -372,7 +386,7 @@
     min-height: 0;
     position: relative;
     overflow: hidden;
-    background: radial-gradient(ellipse at 50% 50%, #0e1620 0%, #05080d 65%, #030405 100%);
+    background: #000000;
   }
 
   .orbit-svg {
@@ -583,6 +597,20 @@
     font-size: 11px;
     color: var(--deep2);
   }
+
+  /* Shown when every requirement is already met — the same "ready to
+     submit" signal as the record page's readiness hero, surfaced here so
+     it's visible without opening each card. */
+  .node-ready-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--deep);
+  }
+  .node-ready-badge svg { width: 10px; height: 10px; flex-shrink: 0; }
 
   /* ---------- opportunities beyond the CARD_LIMIT: small map-pin pills
      (fit score + amount only, like a hotel map view's price pin), still a
@@ -985,12 +1013,196 @@
 
   .build-terms { font-size: 12.5px; color: var(--stone); line-height: 1.6; }
 
+  /* ---------- record detail: requirements, readiness, preparation
+     workflow, drafted materials, notes — evolved from a Figma "record"
+     page (node 102:799) but reworked around this app's real data
+     (requirements/met, draft-review-sent status, the outreach/referral/
+     application tools) instead of its generic multi-person team-collab
+     widgets (key contacts, an activity feed of teammates) — this
+     prototype's whole conceit is one org working directly with CHELCIE,
+     not an internal team, so those were dropped rather than faked. ---------- */
+
+  .record-sections { margin-top: 28px; display: flex; flex-direction: column; gap: 20px; }
+
+  .readiness-column { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+  /* One white card holding the whole drafting tool — tabs, every field,
+     and the status/actions row — instead of a scatter of individually
+     boxed textareas floating straight on the black page with no
+     container tying them together. Matches every other section on this
+     page (Requirements, Readiness, Materials, Notes). */
+  .build-draft { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 26px; margin-top: 28px; }
+  .build-draft .status-card,
+  .build-draft .wrapup-card,
+  .build-draft .next-steps-card { border: none; padding: 22px 0 0; margin-top: 22px; border-top: 1px solid var(--border); border-radius: 0; }
+
+  .record-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 22px; }
+  .record-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .record-card-head h3 { font-size: 15px; margin: 0 0 4px; }
+  .record-card-sub { font-size: 12px; color: var(--stone); margin: 0; max-width: 40ch; line-height: 1.5; }
+
+  /* the readiness hero: the first thing shown for an opportunity, before
+     any drafting tool — a plain-language status line plus the ticklist
+     backing it up, so the org sees it's already prepared instead of
+     starting from a blank form. No percentage, no ring — the ticklist
+     right below already shows the "why"; a number and a gauge on top of
+     that was just the same fact told three times. */
+  .readiness-hero { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 26px; }
+  .readiness-hero-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+  .readiness-hero-eyebrow { font-family: "Inter", system-ui, sans-serif; font-size: 1.375rem; font-weight: 700; color: var(--ink); margin: 0; }
+  .readiness-hero-sub { font-size: 12.5px; color: var(--stone); line-height: 1.6; margin: 0; max-width: 60ch; }
+  .readiness-hero-divider { border-top: 1px solid var(--border); margin: 20px 0 18px; }
+
+  /* export button: an obvious pill with an icon (not a small text link) —
+     primary/teal once the record reads "ready to submit", since exporting
+     is the natural next move at that point; a plain outline otherwise.
+     The dropdown offers .docx/.pdf for real, but disabled — this UI is
+     ahead of the actual file generation, which isn't built yet. */
+  .export-menu-wrap { position: relative; flex-shrink: 0; }
+  .export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .export-btn:hover { border-color: var(--deep); }
+  .export-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .export-btn .export-btn-chevron { width: 11px; height: 11px; opacity: 0.6; }
+
+  .export-btn.ready { background: linear-gradient(90deg, var(--deep), var(--deep2)); border-color: transparent; color: #fff; }
+  .export-btn.ready .export-btn-chevron { opacity: 0.85; }
+
+  .export-dropdown { min-width: 240px; padding: 6px; }
+
+  .export-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 10px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+  }
+  .export-dropdown-item:hover { background: var(--muted-fill); }
+  .export-dropdown-item[disabled] { color: var(--stone); cursor: not-allowed; }
+  .export-dropdown-item[disabled]:hover { background: none; }
+
+  .export-item-label { flex: 1; }
+  .export-item-ext { font-size: 11px; color: var(--stone); }
+  .export-item-soon {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: var(--muted-fill);
+    color: var(--stone);
+    padding: 3px 7px;
+    border-radius: 999px;
+  }
+
+  /* Prefixed record-req-* (not req-row/req-label) — this file already has
+     an unrelated, unscoped .req-row/.req-label pair for the quick-view
+     popover's own requirements mini-list; reusing those bare names would
+     silently pick up its later rules by source order, the same
+     equal-specificity bug this project has hit before. */
+  .record-req-list { display: flex; flex-direction: column; gap: 12px; }
+  .record-req-row { display: flex; align-items: flex-start; gap: 10px; }
+  .record-req-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .record-req-check.met { background: var(--deep); border-color: var(--deep); }
+  .record-req-check svg { width: 11px; height: 11px; color: #fff; }
+  .record-req-label-wrap { flex: 1; min-width: 0; }
+  .record-req-label { font-size: 13px; color: var(--ink); margin: 0; }
+  .record-req-row.unmet .record-req-label { color: var(--stone); }
+  .record-req-source { font-size: 10.5px; color: var(--stone); margin: 2px 0 0; }
+  .record-req-guidance { font-size: 10.5px; color: #8a5a1e; margin: 2px 0 0; line-height: 1.5; max-width: 52ch; }
+  .record-req-needed {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #8a5a1e;
+    background: rgba(212, 162, 74, 0.18);
+    padding: 3px 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+
+  /* preparation workflow track — same visual language as the CHELCIE
+     workspace's overview draft cards, reused here on the light card. */
+  .dp-track { position: relative; height: 2px; background: var(--muted-fill); margin: 24px 4px 8px; }
+  .dp-track-fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--deep); }
+  .dp-track-dot { position: absolute; top: 50%; width: 8px; height: 8px; border-radius: 50%; background: var(--deep); transform: translate(-50%, -50%); border: 2px solid #fff; }
+  .dp-track-dot.hollow { background: #fff; border: 2px solid var(--border); }
+  .dp-track-dot.current { width: 11px; height: 11px; }
+  .dp-labels { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--stone); }
+
+  .materials-list { display: flex; flex-direction: column; }
+  .material-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+    cursor: pointer;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+  }
+  .material-row:first-child { border-top: none; }
+  .material-icon { width: 34px; height: 34px; border-radius: 8px; background: var(--muted-fill); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .material-icon svg { width: 15px; height: 15px; color: var(--deep); }
+  .material-body { flex: 1; min-width: 0; }
+  .material-title { font-size: 13.5px; font-weight: 600; color: var(--ink); margin: 0 0 2px; }
+  .material-sub { font-size: 11.5px; color: var(--stone); margin: 0; }
+  .material-status { font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--stone); flex-shrink: 0; white-space: nowrap; }
+  .material-status.ready { color: var(--deep); }
+  .material-open { width: 14px; height: 14px; color: var(--stone); flex-shrink: 0; }
+
+  .note-input-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; align-items: flex-end; }
+  .note-input-row textarea { width: 100%; font-family: inherit; font-size: 13px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; resize: vertical; }
+
+  .notes-list { display: flex; flex-direction: column; margin-top: 14px; }
+  .note-item { padding: 12px 0; border-top: 1px solid var(--border); }
+  .note-item:first-child { border-top: none; }
+  .note-item-meta { font-size: 11px; color: var(--stone); margin: 0 0 4px; }
+  .note-item-text { font-size: 13px; color: var(--ink); margin: 0; line-height: 1.5; white-space: pre-wrap; }
+  .notes-empty { font-size: 12.5px; color: var(--stone); margin: 0; }
+
   .field-group { margin-bottom: 20px; }
 
   .field-group label {
     display: block;
     font-size: 13px;
     font-weight: 600;
+    color: var(--ink);
     margin-bottom: 8px;
   }
 
@@ -1015,7 +1227,7 @@
     margin-bottom: 8px;
   }
 
-  .doc-section-head label { font-size: 13px; font-weight: 600; }
+  .doc-section-head label { font-size: 13px; font-weight: 600; color: var(--ink); }
 
   .doc-section textarea,
   .doc-section input[type="text"] {
@@ -1033,6 +1245,7 @@
     background: none;
     border: none;
     font-size: 11.5px;
+    color: var(--deep);
     text-decoration: underline;
     cursor: pointer;
     padding: 0;
@@ -1076,7 +1289,7 @@
   .sub-tabs {
     display: flex;
     gap: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid var(--border);
     margin-bottom: 20px;
   }
 
@@ -1088,49 +1301,57 @@
     padding: 8px 2px;
     font-size: 12.5px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--stone);
     border-bottom: 2px solid transparent;
   }
 
-  .sub-tab.active { color: #fff; border-bottom-color: #fff; }
+  .sub-tab.active { color: var(--deep); border-bottom-color: var(--deep); }
 
-  .word-progress { font-size: 10.5px; color: rgba(255, 255, 255, 0.5); }
+  .word-progress { font-size: 10.5px; color: var(--stone); }
 
-  .budget-total { font-size: 14px; font-weight: 600; color: #fff; margin: 8px 0 0; }
+  .budget-total { font-size: 14px; font-weight: 600; color: var(--ink); margin: 8px 0 0; }
 
-  .complete-row { margin-top: 32px; border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 20px; }
+  /* status + wrap-up: both used to sit as bare text/buttons directly on
+     the dark page, with two visually-identical white pills ("Export
+     .txt" / "Mark as sent") giving no sense of which was the primary
+     action, then an unrelated-looking "Mark as completed" button below a
+     second thin divider — easy to mistake for a duplicate of "sent".
+     Given real card treatment (matching every other section on this
+     page) plus a clear primary/secondary button hierarchy, and the
+     wrap-up button renamed to say what it actually does: reveal the
+     next-step guidance, not persist any "completed" state. */
+  .status-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; margin-top: 24px; }
+  .status-card-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 
-  .next-steps { margin-top: 32px; border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 20px; }
-  .next-steps-list { margin: 8px 0 0; padding-left: 20px; }
-  .next-steps-list li { font-size: 13px; line-height: 1.6; color: rgba(255, 255, 255, 0.7); margin-bottom: 6px; }
-
-  .draft-status {
-    display: flex;
+  .status-pill {
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--stone);
-    margin: 0 0 6px;
+    gap: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    padding: 6px 13px;
+    border-radius: 999px;
+    background: rgba(212, 162, 74, 0.15);
+    color: #8a5a1e;
   }
+  .status-pill.sent { background: rgba(8, 56, 57, 0.1); color: var(--deep); }
 
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #d4a24a;
-  }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 
-  .status-dot.sent { background: var(--deep); }
-
-  .autosave-note {
-    font-size: 11.5px;
-    color: var(--stone);
-    opacity: 0.75;
-    margin: 0 0 16px;
-    min-height: 14px;
-  }
+  .autosave-note { font-size: 11.5px; color: var(--stone); margin: 0; min-height: 14px; }
 
   .draft-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .draft-actions .btn-primary { padding: 11px 22px; font-size: 13px; }
+
+  .wrapup-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-top: 24px; }
+  .wrapup-title { font-size: 14px; font-weight: 700; color: var(--ink); margin: 0 0 4px; font-family: "Inter", system-ui, sans-serif; }
+  .wrapup-card .btn-secondary { margin-top: 16px; }
+
+  .next-steps-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-top: 24px; }
+  .next-steps-list { margin: 10px 0 0; padding-left: 20px; }
+  .next-steps-list li { font-size: 13px; line-height: 1.6; color: var(--stone); margin-bottom: 6px; }
 
   /* ---------- refine/onboarding controls ---------- */
 
@@ -1504,6 +1725,12 @@
   </div>
 </header>
 
+<nav class="tab-row" id="crossNav" hidden>
+  <a href="v12-workspace?tab=priorities">Overview</a>
+  <a href="v12-workspace?tab=drafts">Drafts</a>
+  <a href="v12-research-portfolio.html" id="researchPortfolioLink" style="display:none;">Research Portfolio</a>
+</nav>
+
 <main>
 
   <section class="screen active" data-screen="map">
@@ -1574,6 +1801,7 @@
         <span class="crumb-sep">/</span>
         <span class="crumb-current" id="buildCrumbName"></span>
       </nav>
+
       <div class="build-columns">
         <aside class="build-summary">
           <p class="build-eyebrow" id="buildEyebrow"></p>
@@ -1586,7 +1814,60 @@
           <p class="build-terms" id="buildTerms"></p>
         </aside>
 
-        <div class="build-draft">
+        <!-- Shown next to the opportunity summary, before any drafting tool
+             — what CHELCIE already has on file (open banking, fintech
+             access, uploaded documents) means most of this record's
+             requirements are already satisfied. Leading with that instead
+             of burying it below the drafting tools is the whole point:
+             you're not starting from zero. -->
+        <div class="readiness-column" id="readinessSection" hidden>
+          <div class="readiness-hero">
+            <div class="readiness-hero-head">
+              <p class="readiness-hero-eyebrow" id="readinessHeroEyebrow">Ready to submit</p>
+              <div class="export-menu-wrap">
+                <button class="export-btn" id="exportMenuBtn" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+                  Export
+                  <svg class="export-btn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-panel export-dropdown" id="exportDropdown" hidden>
+                  <button type="button" class="export-dropdown-item" id="exportTxtBtn">
+                    <span class="export-item-label">Plain text</span>
+                    <span class="export-item-ext">.txt</span>
+                  </button>
+                  <button type="button" class="export-dropdown-item" disabled>
+                    <span class="export-item-label">Word document</span>
+                    <span class="export-item-ext">.docx</span>
+                    <span class="export-item-soon">Soon</span>
+                  </button>
+                  <button type="button" class="export-dropdown-item" disabled>
+                    <span class="export-item-label">PDF</span>
+                    <span class="export-item-ext">.pdf</span>
+                    <span class="export-item-soon">Soon</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <p class="readiness-hero-sub" id="readinessNote"></p>
+            <div class="readiness-hero-divider"></div>
+            <p class="record-card-sub" id="reqProgressLabel" style="margin-bottom:14px;"></p>
+            <div id="reqList" class="record-req-list"></div>
+          </div>
+
+          <div class="record-card">
+            <div class="record-card-head">
+              <div>
+                <h3>Preparation workflow</h3>
+                <p class="record-card-sub">Track readiness here — CHELCIE doesn't submit anything on your behalf.</p>
+              </div>
+            </div>
+            <div class="dp-track" id="prepTrack"></div>
+            <div class="dp-labels"><span>Draft</span><span>Review</span><span>Sent</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="build-draft">
           <p class="build-eyebrow">Design your partnership</p>
           <p class="build-sub" style="max-width:44ch;">Pick how you want to move this forward — CHELCIE drafts each one, ready to edit.</p>
 
@@ -1642,12 +1923,14 @@
                 <div class="doc-section-head"><label>Body</label><button class="regen-link" data-field="body">Redraft with CHELCIE</button></div>
                 <textarea class="pitch-body" rows="16"></textarea>
               </div>
-              <div style="border-top:1px solid var(--border); padding-top:18px;">
-                <p class="draft-status" id="draftStatus"></p>
-                <p class="autosave-note" id="autosaveNote"></p>
+              <div class="status-card">
+                <div class="status-card-row">
+                  <span class="status-pill" id="draftStatus"></span>
+                  <span class="autosave-note" id="autosaveNote"></span>
+                </div>
                 <div class="draft-actions">
                   <button class="btn-secondary" id="exportDraftBtn">Export .txt</button>
-                  <button class="btn-secondary" id="markSentBtn">Mark as sent</button>
+                  <button class="btn-primary" id="markSentBtn">Mark as sent</button>
                 </div>
               </div>
             </div>
@@ -1669,8 +1952,10 @@
                 <div class="doc-section-head"><label>Message</label><button class="regen-link" id="referralRedraft">Redraft with CHELCIE</button></div>
                 <textarea id="referralBody" rows="10"></textarea>
               </div>
-              <div class="draft-actions" style="border-top:1px solid var(--border); padding-top:18px;">
-                <button class="btn-secondary" id="referralExportBtn">Export .txt</button>
+              <div class="status-card">
+                <div class="draft-actions">
+                  <button class="btn-primary" id="referralExportBtn">Export .txt</button>
+                </div>
               </div>
             </div>
           </div>
@@ -1726,14 +2011,41 @@
             </div>
           </div>
 
-          <div class="complete-row" id="completeRow">
-            <button class="btn-primary" id="markCompletedBtn">Mark as completed</button>
+          <div class="wrapup-card" id="completeRow">
+            <p class="wrapup-title">Done drafting for now?</p>
+            <p class="record-card-sub">CHELCIE will lay out exactly what to do with this next.</p>
+            <button class="btn-secondary" id="markCompletedBtn">Show me what's next</button>
           </div>
 
-          <div id="nextStepsPanel" class="next-steps" hidden>
-            <p class="build-eyebrow" style="margin-top:8px;">What's next</p>
+          <div id="nextStepsPanel" class="next-steps-card" hidden>
+            <p class="wrapup-title">What's next</p>
             <ul class="next-steps-list" id="nextStepsList"></ul>
           </div>
+      </div>
+
+      <div class="record-sections" id="recordSections" hidden>
+        <div class="record-card">
+          <div class="record-card-head">
+            <div>
+              <h3>Materials CHELCIE has drafted</h3>
+              <p class="record-card-sub">Everything CHELCIE generated for this record — open any of them to keep editing.</p>
+            </div>
+          </div>
+          <div id="materialsList" class="materials-list"></div>
+        </div>
+
+        <div class="record-card">
+          <div class="record-card-head">
+            <div>
+              <h3>Notes</h3>
+              <p class="record-card-sub" id="notesCountLabel"></p>
+            </div>
+          </div>
+          <div class="note-input-row">
+            <textarea id="noteInput" rows="2" placeholder="Add a note for yourself about this record…"></textarea>
+            <button class="btn-secondary" id="noteAddBtn">Add note</button>
+          </div>
+          <div id="notesList" class="notes-list"></div>
         </div>
       </div>
     </div>
@@ -1807,6 +2119,7 @@
   const favorites = new Set();
   const dismissed = new Set();
   let settings = { researchPortfolioEnabled: false };
+  let connections = defaultConnections();
 
   function persist() {
     saveStore({
@@ -1894,6 +2207,10 @@
 
   function showScreen(id) {
     screens.forEach((s) => s.classList.toggle("active", s.dataset.screen === id));
+    // The cross-app nav only earns its place on a record page, where it
+    // saves a trip back through the map — on the constellation itself it
+    // was just a second, redundant way to say "you're on your constellation".
+    document.getElementById("crossNav").hidden = id !== "build";
     window.scrollTo(0, 0);
     syncScrollLock();
   }
@@ -2048,6 +2365,12 @@
   // "every opportunity as a full card, stacked vertically," the only
   // difference is which container they render into and how tightly the
   // gain snippet gets clamped.
+  function readyBadgeHTML(o) {
+    return unmetRequirements(o).length === 0
+      ? '<span class="node-ready-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Ready to submit</span>'
+      : "";
+  }
+
   function richCardInner(o) {
     return `
       <span class="node-card-top">
@@ -2059,6 +2382,7 @@
       </span>
       <span class="node-name">${o.name}</span>
       <span class="node-amount">${amountRange(o)}</span>
+      ${readyBadgeHTML(o)}
       <span class="mobile-card-timeline">${o.timeline}</span>
       <span class="mobile-card-gain">${o.gain}</span>
     `;
@@ -2357,6 +2681,7 @@
             </span>
             <span class="node-name">${o.name}</span>
             <span class="node-amount">Up to ${fmtMoney(o.max)}</span>
+            ${readyBadgeHTML(o)}
           </button>
         `;
         const cardBtn = node.querySelector(".node-card");
@@ -2615,6 +2940,19 @@
     document.querySelectorAll(".sub-tab").forEach((t) => t.classList.toggle("active", t.dataset.subtab === "narrative"));
     document.querySelectorAll(".sub-panel").forEach((p) => { p.hidden = p.id !== "appNarrative"; });
 
+    document.getElementById("noteInput").value = "";
+
+    // The requirements/readiness/prep-workflow/materials sections only make
+    // sense for an actual funding opportunity (a checklist of real
+    // requirements) — a sponsor/company outreach (d.raw is unset) skips
+    // straight to drafting the email, so those sections stay hidden.
+    document.getElementById("readinessSection").hidden = !d.raw;
+    document.getElementById("recordSections").hidden = !d.raw;
+    if (d.raw) {
+      renderRequirements(d.raw);
+      renderReadiness(d);
+    }
+
     document.getElementById("buildSections").hidden = true;
     document.getElementById("buildLoading").hidden = false;
 
@@ -2651,6 +2989,11 @@
       });
       renderDraftStatus();
       noteAutosaved();
+      if (d.raw) {
+        renderPrepWorkflow(currentTrackedEntry.status);
+        renderMaterials();
+        renderNotes();
+      }
     }, 900);
   }
 
@@ -2701,6 +3044,7 @@ Happy to return the favor any time.
 — ${org}`;
     document.getElementById("referralBody").value = body;
     document.getElementById("referralOutput").hidden = false;
+    if (d.raw) renderMaterials();
   }
 
   document.getElementById("referralDraftBtn").addEventListener("click", draftReferral);
@@ -2725,6 +3069,7 @@ Happy to return the favor any time.
       const pct = Math.min(100, Math.round((count / target) * 100));
       sec.querySelector(".word-progress").textContent = count ? `${count}/${target} words · ${pct}%` : `Target ~${target} words`;
     });
+    if (currentDesignable && currentDesignable.raw) renderMaterials();
   }
 
   document.querySelectorAll(".app-narrative-field").forEach((ta) => {
@@ -2769,37 +3114,240 @@ Happy to return the favor any time.
      for you — this tells you concretely what to actually do with what
      you just drafted, tailored to the capital type when known. ---------- */
 
-  function renderNextSteps() {
-    const d = currentDesignable;
+  function nextStepLines(d) {
     const o = d.raw;
-    const list = document.getElementById("nextStepsList");
-    let lines;
+    // When CHELCIE has the funder's real application URL or a named
+    // contact on file, say exactly where this goes instead of a vague
+    // "if they have one" — the whole point of these lines is to remove
+    // guesswork, not add it back.
+    const portal = o && o.applyUrl
+      ? `<a href="${o.applyUrl}" target="_blank" rel="noopener" class="regen-link" style="text-decoration:underline;">${o.applyUrl.replace(/^https?:\/\//, "")}</a>`
+      : null;
+    const contact = o && o.applyContact ? ` Contact: ${o.applyContact}.` : "";
+
     if (o && o.type === "loan") {
-      lines = [
-        `Send this to ${o.name}'s lending team, or submit it through their application portal if they have one.`,
+      return [
+        portal
+          ? `Send this to ${o.name}'s lending team, or apply directly at ${portal}.${contact}`
+          : `Send this to ${o.name}'s lending team, or submit it through their application portal if they have one.${contact}`,
         `Have your last 2 years of financials ready — most lenders ask for these alongside the application.`,
       ];
-    } else if (o && o.type === "grant") {
-      lines = [
-        `Submit this alongside ${o.name}'s own application form before their next deadline (${o.timeline}).`,
+    }
+    if (o && o.type === "grant") {
+      return [
+        portal
+          ? `Submit this at ${portal} before their next deadline (${o.timeline}).${contact}`
+          : `Submit this alongside ${o.name}'s own application form before their next deadline (${o.timeline}).${contact}`,
         `Have a W-9 and your most recent financials ready to attach.`,
       ];
-    } else if (o && o.type === "equity") {
-      lines = [
-        `This becomes the basis for your first call with ${o.name} — expect a follow-up request for financials, a cap table, and projections.`,
-      ];
-    } else {
-      lines = [
-        `Send this directly to your contact at ${d.name}, or route it to their partnerships team if you don't have one yet.`,
+    }
+    if (o && o.type === "equity") {
+      return [
+        `This becomes the basis for your first call with ${o.name} — expect a follow-up request for financials, a cap table, and projections.${contact}`,
       ];
     }
-    list.innerHTML = lines.map((l) => `<li>${l}</li>`).join("");
+    return [
+      portal
+        ? `Send this to ${d.name}'s partnerships team, or via ${portal}.${contact}`
+        : `Send this directly to your contact at ${d.name}, or route it to their partnerships team if you don't have one yet.${contact}`,
+    ];
+  }
+
+  function renderNextSteps() {
+    const list = document.getElementById("nextStepsList");
+    list.innerHTML = nextStepLines(currentDesignable).map((l) => `<li>${l}</li>`).join("");
     document.getElementById("nextStepsPanel").hidden = false;
   }
 
   document.getElementById("markCompletedBtn").addEventListener("click", () => {
     document.getElementById("completeRow").hidden = true;
     renderNextSteps();
+  });
+
+  /* ---------- record detail: requirements, readiness, preparation
+     workflow, drafted materials, notes (see CSS comment above for why
+     this reworks the Figma "record" reference instead of copying it
+     as-is). Only ever called for a real opportunity (d.raw set). ---------- */
+
+  const ICON_CHECK_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+  const ICON_MAIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>';
+  const ICON_HANDSHAKE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l5-4 4 3 3-3 8 6"/><path d="M11 11l3 3-2 2"/></svg>';
+  const ICON_DOC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M9 13h6M9 17h6M9 9h3"/></svg>';
+  const ICON_CHEVRON_SM = '<svg class="material-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+
+  // Northstar Labs already connected its financial data (see
+  // defaultConnections() in data.js), so a met requirement isn't
+  // self-attested — it's backed by wherever that data actually lives.
+  function requirementSource(label) {
+    if (/financ|revenue|margin|budget|reserve/i.test(label)) return "Verified via open banking";
+    if (/501\(c\)\(3\)|fiscal sponsor|incorporat|good standing|w-9|lien|collateral|history/i.test(label)) return "From an uploaded document";
+    return "Confirmed with CHELCIE";
+  }
+
+  function renderRequirements(o) {
+    const reqs = o.requirements || [];
+    const metCount = reqs.filter((r) => r.met).length;
+    document.getElementById("reqProgressLabel").textContent = `${metCount} of ${reqs.length} requirements complete`;
+    document.getElementById("reqList").innerHTML = reqs.map((r) => `
+      <div class="record-req-row${r.met ? "" : " unmet"}">
+        <span class="record-req-check${r.met ? " met" : ""}">${r.met ? ICON_CHECK_SM : ""}</span>
+        <div class="record-req-label-wrap">
+          <p class="record-req-label">${r.label}</p>
+          ${r.met
+            ? `<p class="record-req-source">${requirementSource(r.label)}</p>`
+            : `<p class="record-req-guidance">${r.guidance || "Reach out to CHELCIE about the best way to close this gap."}</p>`}
+        </div>
+        ${r.met ? "" : `<span class="record-req-needed">Needed</span>`}
+      </div>
+    `).join("");
+  }
+
+  function renderReadiness(d) {
+    const o = d.raw;
+    const reqs = o.requirements || [];
+    const metCount = reqs.filter((r) => r.met).length;
+    const missing = reqs.length - metCount;
+
+    document.getElementById("readinessHeroEyebrow").textContent = missing === 0
+      ? "Ready to submit"
+      : `Getting ready — ${missing} requirement${missing === 1 ? "" : "s"} still missing`;
+    document.getElementById("exportMenuBtn").classList.toggle("ready", missing === 0);
+
+    // The ticklist right below already shows *why* each requirement is
+    // met (open banking, an uploaded document, CHELCIE) — restating that
+    // in a paragraph up here was pure duplication. This line earns its
+    // place instead: what to actually do next, which the ticklist can't
+    // say — including a real application link/contact when CHELCIE has
+    // one on file, so innerHTML (not textContent) to let that link render.
+    document.getElementById("readinessNote").innerHTML = nextStepLines(d)[0];
+  }
+
+  // A plain-text version of the readiness card — something the org can
+  // actually attach or paste into an email, not just a screen they have
+  // to describe to someone else.
+  function readinessSummaryText(d) {
+    const o = d.raw;
+    const reqs = o.requirements || [];
+    const metCount = reqs.filter((r) => r.met).length;
+    const org = (document.querySelector(".pitch-org") || {}).value || ORG;
+    const lines = [
+      `${o.name} — readiness summary`,
+      `Prepared by ${org.trim() || ORG}`,
+      "",
+      document.getElementById("readinessHeroEyebrow").textContent,
+      document.getElementById("readinessNote").textContent,
+      "",
+      ...(o.applyUrl ? [`Apply at: ${o.applyUrl}`] : []),
+      ...(o.applyContact ? [`Contact: ${o.applyContact}`] : []),
+      ...(o.applyUrl || o.applyContact ? [""] : []),
+      `Requirements (${metCount} of ${reqs.length} complete):`,
+      ...reqs.map((r) => `${r.met ? "[x]" : "[ ]"} ${r.label} — ${r.met ? requirementSource(r.label) : "Needed: " + (r.guidance || "Reach out to CHELCIE about the best way to close this gap.")}`),
+    ];
+    return lines.join("\n");
+  }
+
+  document.getElementById("exportTxtBtn").addEventListener("click", () => {
+    const d = currentDesignable;
+    if (!d || !d.raw) return;
+    closeDropdowns();
+    const org = (document.querySelector(".pitch-org") || {}).value || ORG;
+    downloadTextFile(`${slug(org)}-${slug(d.raw.name)}-readiness.txt`, readinessSummaryText(d));
+  });
+
+  function renderPrepWorkflow(status) {
+    const stops = ["Draft", "Review", "Sent"];
+    const stageIndex = status === "sent" ? 2 : 1;
+    const fillPct = (stageIndex / (stops.length - 1)) * 100;
+    const dots = stops.map((label, i) => {
+      const pct = (i / (stops.length - 1)) * 100;
+      const reached = i <= stageIndex;
+      const current = i === stageIndex;
+      return `<span class="dp-track-dot${reached ? "" : " hollow"}${current ? " current" : ""}" style="left:${pct}%;"></span>`;
+    }).join("");
+    document.getElementById("prepTrack").innerHTML = `<span class="dp-track-fill" style="width:${fillPct}%;"></span>${dots}`;
+  }
+
+  function renderMaterials() {
+    const d = currentDesignable;
+    if (!d || !d.raw) return;
+
+    const outreachDrafted = !document.getElementById("buildSections").hidden;
+    const referralDrafted = !document.getElementById("referralOutput").hidden;
+    const narrativeStarted = Array.from(document.querySelectorAll(".app-narrative-field")).some((ta) => ta.value.trim());
+
+    const rows = [
+      {
+        tool: "outreach",
+        icon: ICON_MAIL,
+        title: "Draft outreach",
+        sub: "Funder intro email",
+        ready: outreachDrafted,
+        status: outreachDrafted ? "Drafted" : "Drafting…",
+      },
+      {
+        tool: "referral",
+        icon: ICON_HANDSHAKE,
+        title: "Referral request",
+        sub: "Warm intro message",
+        ready: referralDrafted,
+        status: referralDrafted ? "Drafted" : "Not started",
+      },
+      {
+        tool: "application",
+        icon: ICON_DOC,
+        title: "Application package",
+        sub: "Narrative · budget · boilerplate",
+        ready: narrativeStarted,
+        status: narrativeStarted ? "In progress" : "Not started",
+      },
+    ];
+
+    document.getElementById("materialsList").innerHTML = rows.map((r) => `
+      <button type="button" class="material-row" data-tool="${r.tool}">
+        <span class="material-icon">${r.icon}</span>
+        <span class="material-body">
+          <p class="material-title">${r.title}</p>
+          <p class="material-sub">${r.sub}</p>
+        </span>
+        <span class="material-status${r.ready ? " ready" : ""}">${r.status}</span>
+        ${ICON_CHEVRON_SM}
+      </button>
+    `).join("");
+
+    document.querySelectorAll(".material-row").forEach((row) => {
+      row.addEventListener("click", () => {
+        showTool(row.dataset.tool);
+        row.closest(".record-sections").scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    });
+  }
+
+  function renderNotes() {
+    if (!currentTrackedEntry) return;
+    const notes = currentTrackedEntry.notes || [];
+    document.getElementById("notesCountLabel").textContent = notes.length
+      ? `${notes.length} note${notes.length === 1 ? "" : "s"}`
+      : "Nothing yet";
+    document.getElementById("notesList").innerHTML = notes.length
+      ? notes.map((n) => `
+          <div class="note-item">
+            <p class="note-item-meta">${new Date(n.at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</p>
+            <p class="note-item-text">${n.text}</p>
+          </div>
+        `).join("")
+      : `<p class="notes-empty">Nothing here yet — jot down anything worth remembering about this record.</p>`;
+  }
+
+  document.getElementById("noteAddBtn").addEventListener("click", () => {
+    if (!currentTrackedEntry) return;
+    const input = document.getElementById("noteInput");
+    const text = input.value.trim();
+    if (!text) return;
+    currentTrackedEntry.notes = currentTrackedEntry.notes || [];
+    currentTrackedEntry.notes.unshift({ text, at: Date.now() });
+    input.value = "";
+    renderNotes();
+    persist();
   });
 
   /* ---------- quick view: shown on a node click, before drafting starts ---------- */
@@ -3091,10 +3639,12 @@ Happy to return the favor any time.
 
   function renderDraftStatus() {
     if (!currentTrackedEntry) return;
+    const sent = currentTrackedEntry.status === "sent";
     const s = document.getElementById("draftStatus");
     const btn = document.getElementById("markSentBtn");
-    s.innerHTML = `<span class="status-dot ${currentTrackedEntry.status}"></span> ${currentTrackedEntry.status === "sent" ? "Marked as sent" : "Draft ready, not sent yet"}`;
-    btn.textContent = currentTrackedEntry.status === "sent" ? "Mark as not sent" : "Mark as sent";
+    s.className = "status-pill" + (sent ? " sent" : "");
+    s.innerHTML = `<span class="status-dot"></span> ${sent ? "Marked as sent" : "Draft ready, not sent yet"}`;
+    btn.textContent = sent ? "Mark as not sent" : "Mark as sent";
   }
 
   // Edits to the draft fields are never lost — every keystroke keeps the
@@ -3133,6 +3683,7 @@ Happy to return the favor any time.
     currentTrackedEntry.exportText = currentDocumentText().text;
     currentTrackedEntry.status = currentTrackedEntry.status === "sent" ? "draft" : "sent";
     renderDraftStatus();
+    if (currentDesignable && currentDesignable.raw) renderPrepWorkflow(currentTrackedEntry.status);
     persist();
   });
 
@@ -3289,9 +3840,11 @@ Happy to return the favor any time.
     (saved.favorites || []).forEach((id) => favorites.add(id));
     (saved.dismissed || []).forEach((id) => dismissed.add(id));
     if (saved.settings) settings = saved.settings;
+    connections = saved.connections || defaultConnections();
     updateTrackerBadge();
     renderUserChip(saved.account);
     renderNotifDropdown();
+    document.getElementById("researchPortfolioLink").style.display = settings.researchPortfolioEnabled ? "inline-flex" : "none";
   })();
 
   function renderUserChip(account) {
@@ -3355,6 +3908,8 @@ Happy to return the favor any time.
   function closeDropdowns() {
     document.getElementById("notifDropdown").hidden = true;
     document.getElementById("userDropdown").hidden = true;
+    const exportDropdown = document.getElementById("exportDropdown");
+    if (exportDropdown) exportDropdown.hidden = true;
   }
 
   document.getElementById("notifBellBtn").addEventListener("click", (e) => {
@@ -3371,6 +3926,14 @@ Happy to return the favor any time.
   document.getElementById("userChip").addEventListener("click", (e) => {
     e.stopPropagation();
     const panel = document.getElementById("userDropdown");
+    const willOpen = panel.hidden;
+    closeDropdowns();
+    panel.hidden = !willOpen;
+  });
+
+  document.getElementById("exportMenuBtn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    const panel = document.getElementById("exportDropdown");
     const willOpen = panel.hidden;
     closeDropdowns();
     panel.hidden = !willOpen;
